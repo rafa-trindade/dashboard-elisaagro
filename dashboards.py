@@ -102,7 +102,6 @@ if start_date or end_date:
 
         data_frame = data_frame.append(sums, ignore_index=True)
 
-
         fig = go.Figure(data=[go.Table(
             header=dict(values=list(data_frame.columns),
                 fill_color='firebrick',
