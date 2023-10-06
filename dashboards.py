@@ -5,7 +5,12 @@ import plotly.graph_objects as go
 import datetime as dt
 
 
-st.set_page_config(layout="wide", page_title="Restaurante Dona Nize", page_icon=None)
+base="light"
+backgroundColor="#e0d8d8"
+secondaryBackgroundColor="#b5a1a1"
+
+
+st.set_page_config(layout="wide", page_title="Restaurante Dona Nize", initial_sidebar_state="expanded", page_icon="🧊")
 
 st.sidebar.header("Restaurante Dona Nize | Elisa Agro")
 
@@ -13,6 +18,8 @@ df = pd.read_csv("databaseElisa.csv", sep=";", decimal=",", thousands=".",
                  usecols=['data','fazenda', 'almoco', 'janta', 'cafe','lanche', 'total'],
                  index_col=None
                  ) 
+
+
 
 st.markdown("""
         <style>
@@ -96,10 +103,10 @@ if start_date or end_date:
 
         sums = {
             "Fazenda": "<b>TOTAL</b>",
-            "Café": "<b>" + str(int(data_frame["Café"].sum())) + "</b>",
-            "Almoço": "<b>" + str(int(data_frame["Almoço"].sum())) + "</b>",
-            "Lanche": "<b>" + str(int(data_frame["Lanche"].sum())) + "</b>",
-            "Janta": "<b>" + str(int(data_frame["Janta"].sum())) + "</b>"
+            "Café": "<b>" + str('{0:,}'.format(int(data_frame["Café"].sum())).replace(',','.')) + "</b>",
+            "Almoço": "<b>" + str('{0:,}'.format(int(data_frame["Almoço"].sum())).replace(',','.')) + "</b>",
+            "Lanche": "<b>" + str('{0:,}'.format(int(data_frame["Lanche"].sum())).replace(',','.')) + "</b>",
+            "Janta": "<b>" + str('{0:,}'.format(int(data_frame["Janta"].sum())).replace(',','.')) + "</b>"
                 }
 
         data_frame = data_frame.append(sums, ignore_index=True)
@@ -178,4 +185,5 @@ if start_date or end_date:
 
             
     else:
+
         st.warning('A coluna "data" não foi encontrada na base fornecida.')
