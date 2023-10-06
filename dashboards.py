@@ -3,6 +3,7 @@ import pandas as pd
 import plotly.express as px
 import plotly.graph_objects as go
 import datetime as dt
+from datetime import datetime
 
 
 base="light"
@@ -29,15 +30,16 @@ st.markdown("""
             
         """, unsafe_allow_html=True)
 
-
-
 df['data'] = pd.to_datetime(df['data'], format='%d/%m/%Y', errors='coerce')
 df['data'] = df['data'].dt.date
 
-start_date = st.sidebar.date_input('DATA INÍCIO:', None, format="DD/MM/YYYY")
+mes_atual = dt.datetime.today().month
+ano_atual = dt.datetime.today().year
+
+default_start_date = dt.date(ano_atual, mes_atual, 1)
+
+start_date = st.sidebar.date_input('DATA INÍCIO:', default_start_date, None, format="DD/MM/YYYY")
 end_date = st.sidebar.date_input('DATA FIM:', None, format="DD/MM/YYYY")
-
-
 
 
 st.sidebar.write("____")
@@ -47,13 +49,8 @@ if start_date:
 if end_date:
     end_date = pd.Timestamp(end_date)
 
-
-
-
 col1, col2 = st.columns([2,1])
 c = st.container()
-
-
 
 if start_date or end_date:
 
