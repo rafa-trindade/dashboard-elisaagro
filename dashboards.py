@@ -7,8 +7,8 @@ import datetime as dt
 
 st.set_page_config(layout="wide", page_title="Restaurante Dona Nize", page_icon=None)
 
-
 st.sidebar.header("Restaurante Dona Nize | Elisa Agro")
+
 df = pd.read_csv("databaseElisa.csv", sep=";", decimal=",", thousands=".",
                  usecols=['data','fazenda', 'almoco', 'janta', 'cafe','lanche', 'total'],
                  index_col=None
@@ -17,7 +17,7 @@ df = pd.read_csv("databaseElisa.csv", sep=";", decimal=",", thousands=".",
 st.markdown("""
         <style>
                .block-container {
-                    padding-top: 30px;
+                    padding-top: 0px;
                 }
         </style>
             
@@ -31,6 +31,8 @@ df['data'] = df['data'].dt.date
 
 start_date = st.sidebar.date_input('DATA INÍCIO:', None, format="DD/MM/YYYY")
 end_date = st.sidebar.date_input('DATA FIM:', None, format="DD/MM/YYYY")
+
+st.sidebar.write("____")
 
 if start_date:
     start_date = pd.Timestamp(start_date)
@@ -115,17 +117,18 @@ if start_date or end_date:
                 align='center'))
             ])
 
-        fig.update_layout(width=550, height=400,title={ 'text': "Demostrativo | Período", 'y':0.85, 'x':0.5, 'xanchor': 'center', 'yanchor': 'top'})
-        fig.update_layout(margin=dict(b=50,r=10))
-
+        fig.update_layout(title={ 'text': "Demostrativo | Período", 'y':0.76, 'x':0.0, 'xanchor': 'left', 'yanchor': 'top'})
+        fig.update_layout(margin=dict(r=10,t=140))
         col1.plotly_chart(fig, use_container_width=True)
+
+        
 
         #################### Gráfico Fazenda Período ########################
         fazenda_total = filtered_df.groupby("fazenda")[["total"]].sum().reset_index()
         fig_venda_fazenda = px.pie(fazenda_total, names="fazenda", values="total",color_discrete_sequence=px.colors.sequential.RdBu)
         fig_venda_fazenda.update_layout(width=600, height=400)
         fig_venda_fazenda.update_traces(textposition='inside', textinfo='percent+label')
-        fig_venda_fazenda.update_layout(margin=dict(l=10, b=50))
+        fig_venda_fazenda.update_layout(margin=dict(l=10, b=50,t=140))
         col2.plotly_chart(fig_venda_fazenda, use_container_width=True)
 
         #################### Gráfico Venda Mês Atual ########################
@@ -169,7 +172,6 @@ if start_date or end_date:
                                     )
                 
             fig_venda_mes.update_traces(textangle=0, textposition="outside", cliponaxis=False)
-            fig_venda_mes.update_layout(width=1000, height=600,title={ 'y':0.99, 'x':0.1, 'xanchor': 'center', 'yanchor': 'top'})
             fig_venda_mes.update_layout(margin=dict(t=50))
 
             c.plotly_chart(fig_venda_mes, use_container_width=True)
