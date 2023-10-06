@@ -157,8 +157,6 @@ if start_date or end_date:
         fig_venda_fazenda.update_layout(margin=dict(l=10, b=50,t=140))
         col2.plotly_chart(fig_venda_fazenda, use_container_width=True)
 
-        st.write("____")
-
         #################### Gráfico Visão Geral Mensal ########################
         # Convertendo a coluna 'data' para o tipo datetime
         df['data'] = pd.to_datetime(df['data'], errors='coerce')
@@ -196,7 +194,7 @@ if start_date or end_date:
         df_mes_filtrado = df[(df['data'].dt.month == mes_selecionado) & (df['data'].dt.year == selected_ano)]
 
         if df_mes_filtrado.empty:
-            st.warning(f"Não há dados disponíveis para {selected_mes}/{selected_ano}.")
+            c.warning(f"Não há dados disponíveis para {selected_mes}/{selected_ano}.")
         else:
             # Agregando os dados
             venda_total = df_mes_filtrado.groupby("data")[["total"]].sum().reset_index()
