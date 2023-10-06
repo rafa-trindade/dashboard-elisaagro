@@ -80,7 +80,6 @@ if start_date or end_date:
         elif start_date:
             periodo = dia_start + "/" + mes_start + "/" + ano_start
             filtered_df = df[(df['data'] == start_date)]
-            periodo
         elif end_date:
             periodo = dia_end + "/" + mes_end + "/" + ano_end
             filtered_df = df[(df['data'] == end_date)]
@@ -146,8 +145,8 @@ if start_date or end_date:
             ])
 
         fig.update_layout(title={ 'text': "Demostrativo: " + periodo, 'y':0.76, 'x':0.0, 'xanchor': 'left', 'yanchor': 'top'})
-        fig.update_layout(margin=dict(r=10,t=140))
-        col1.plotly_chart(fig, use_container_width=True)
+        fig.update_layout(height = 420, margin=dict(r=10,t=140))
+        col1.plotly_chart(fig, use_container_width=True, automargin=True)
 
         
 
