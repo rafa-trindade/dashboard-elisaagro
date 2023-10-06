@@ -23,7 +23,7 @@ df = pd.read_csv("databaseElisa.csv", sep=";", decimal=",", thousands=".",
 st.markdown("""
         <style>
                .block-container {
-                    padding-top: 0px;
+                    padding-top: 20px;
                 }
         </style>
             
@@ -38,9 +38,11 @@ ano_atual = dt.datetime.today().year
 
 default_start_date = dt.date(ano_atual, mes_atual, 1)
 
+st.sidebar.markdown('<h3 style="margin-bottom:-30px; align: center;">Demostrativo</h3>', unsafe_allow_html=True)
+
+
 start_date = st.sidebar.date_input('DATA INÍCIO:', default_start_date, None, format="DD/MM/YYYY")
 end_date = st.sidebar.date_input('DATA FIM:', None, format="DD/MM/YYYY")
-
 
 st.sidebar.write("____")
 
@@ -155,52 +157,56 @@ if start_date or end_date:
         fig_venda_fazenda.update_layout(margin=dict(l=10, b=50,t=140))
         col2.plotly_chart(fig_venda_fazenda, use_container_width=True)
 
-        #################### Gráfico Venda Mês Atual ########################
-        if df['data'].dtype != 'datetime64[ns]':
-            df['data'] = pd.to_datetime(df['data'], errors='coerce')
+        st.write("____")
 
-            ano_atual = dt.datetime.now().year
-            mes_atual = dt.datetime.now().month
+        #################### Gráfico Visão Geral Mensal ########################
+        # Convertendo a coluna 'data' para o tipo datetime
+        df['data'] = pd.to_datetime(df['data'], errors='coerce')
 
-            def switch(mes_atual):
-                if mes_atual == 1:
-                    return "janeiro"
-                elif mes_atual == 2:
-                    return "Fevereiro"
-                elif mes_atual == 3:
-                    return "Março"
-                elif mes_atual == 4:
-                    return "Abril"
-                elif mes_atual == 5:
-                    return "Maio"
-                elif mes_atual == 6:
-                    return "Junho"                    
-                elif mes_atual == 7:
-                    return "Julho"
-                elif mes_atual == 8:
-                    return "Agosto"
-                elif mes_atual == 9:
-                    return "Setembro"
-                elif mes_atual == 10:
-                    return "Outubro"
-                elif mes_atual == 11:
-                    return "Novembro"
-                elif mes_atual == 12:
-                    return "Dezembro"                                                                
+        # Dicionário para mapear número do mês ao nome em português com a primeira letra maiúscula
+        meses = {
+            1: "Janeiro",
+            2: "Fevereiro",
+            3: "Março",
+            4: "Abril",
+            5: "Maio",
+            6: "Junho",
+            7: "Julho",
+            8: "Agosto",
+            9: "Setembro",
+            10: "Outubro",
+            11: "Novembro",
+            12: "Dezembro"
+        }
 
-            df_mes = df[(df['data'].dt.month == mes_atual) & (df['data'].dt.year == ano_atual)]
+        st.sidebar.markdown('<h3 style="margin-bottom:-30px;">Visão Geral Mensal</h3>', unsafe_allow_html=True)
+        
+        # Determinando o mês e ano atuais
+        mes_atual = meses[dt.datetime.now().month]
+        ano_atual = dt.datetime.now().year
 
-            venda_total = df_mes.groupby("data")[["total"]].sum().reset_index()
-            fig_venda_mes = px.bar(venda_total, x="data", y="total", color_discrete_sequence=px.colors.sequential.RdBu, title="Visão Geral: " + switch(mes_atual) + "/" + str(ano_atual),
-                                    text_auto='.2f',
-                                    )
-                
-            fig_venda_mes.update_traces(textangle=0, textposition="outside", cliponaxis=False)
+        # Criação dos selectbox para o mês e ano, com valores padrão sendo o mês e ano atuais
+        selected_mes = st.sidebar.selectbox("Mês", list(meses.values()), index=list(meses.values()).index(mes_atual))
+        selected_ano = st.sidebar.selectbox("Ano", sorted(df['data'].dt.year.unique(), reverse=True), index=0)
+
+        # Convertendo a seleção de mês de volta para o número do mês
+        mes_selecionado = [key for key, value in meses.items() if value == selected_mes][0]
+
+        # Filtrando o dataframe com base no mês e ano selecionados
+        df_mes_filtrado = df[(df['data'].dt.month == mes_selecionado) & (df['data'].dt.year == selected_ano)]
+
+        if df_mes_filtrado.empty:
+            st.warning(f"Não há dados disponíveis para {selected_mes}/{selected_ano}.")
+        else:
+            # Agregando os dados
+            venda_total = df_mes_filtrado.groupby("data")[["total"]].sum().reset_index()
+
+            # Criando o gráfico
+            title = f"Visão Geral: {selected_mes}/{selected_ano}"
+            fig_venda_mes = px.bar(venda_total, x="data", y="total", color_discrete_sequence=px.colors.sequential.RdBu, title=title, text_auto='.2f')
             fig_venda_mes.update_layout(margin=dict(t=50))
-
             c.plotly_chart(fig_venda_mes, use_container_width=True)
-
-            
+         
     else:
 
         st.warning('A coluna "data" não foi encontrada na base fornecida.')
