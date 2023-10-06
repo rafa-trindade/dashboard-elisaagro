@@ -157,8 +157,6 @@ if start_date or end_date:
         fig.update_layout(height = 460, margin=dict(r=10,t=140))
         col1.plotly_chart(fig, use_container_width=True, automargin=True)
 
-        
-
         #################### Gráfico Fazenda Período ########################
 
         # Cálculo dos totais
@@ -175,7 +173,6 @@ if start_date or end_date:
         fig_venda_fazenda.update_traces(textposition='inside', textinfo='percent+label')
         fig_venda_fazenda.update_layout(width=600, height=460, margin=dict(l=10, b=50, t=130))
         col2.plotly_chart(fig_venda_fazenda, use_container_width=True)
-
 
         #################### Gráfico Visão Geral Mensal ########################
         # Convertendo a coluna 'data' para o tipo datetime
@@ -228,7 +225,7 @@ if start_date or end_date:
 
             # Criando o gráfico e usando 'total_formatado' para os valores das barras e 'data_formatada' para o eixo x
             title = f"Visão Diária: {selected_mes}/{selected_ano}"
-            fig_venda_mes = px.bar(venda_total, x="data_formatada", y="total", color_discrete_sequence=px.colors.sequential.RdBu, title=title, text='total_formatado')
+            fig_venda_mes = px.bar(venda_total, x="data_formatada", y="total", color_discrete_sequence=[px.colors.diverging.RdBu[0]], title=title, text='total_formatado')
             
             # Configurações de layout e formatação
             fig_venda_mes.update_layout(
@@ -244,7 +241,6 @@ if start_date or end_date:
 
             c1.plotly_chart(fig_venda_mes, use_container_width=True)
          
-
         #################### Gráfico Visão Geral Anual ########################
 
         # Convertendo a coluna 'data' para o tipo datetime
@@ -272,7 +268,7 @@ if start_date or end_date:
 
         # Criando o gráfico e outras configurações
         title = f"Visão Mensal: {selected_ano}"
-        fig_venda_mes = px.bar(venda_total_mensal, x="mes_ano", y="total", color_discrete_sequence=px.colors.sequential.RdBu, title=title, text='total_formatado')
+        fig_venda_mes = px.bar(venda_total_mensal, x="mes_ano", y="total", color_discrete_sequence=[px.colors.diverging.RdBu[1]], title=title, text='total_formatado')
 
         # Atualizando layout e formatação dos eixos
         fig_venda_mes.update_layout(
@@ -295,8 +291,6 @@ if start_date or end_date:
 
         col3.plotly_chart(fig_venda_mes, use_container_width=True)
 
-
-
         #################### Gráfico Visão Geral Total por ano ########################
 
         # Convertendo a coluna 'data' para o tipo datetime
@@ -313,7 +307,7 @@ if start_date or end_date:
 
         # Criando o gráfico e outras configurações
         title = "Visão Geral Anual"
-        fig_venda_ano = px.bar(venda_total_anual, x="ano", y="total", color_discrete_sequence=px.colors.sequential.RdBu, title=title, text='total_formatado')
+        fig_venda_ano = px.bar(venda_total_anual, x="ano", y="total", color_discrete_sequence=[px.colors.diverging.RdGy_r[1]], title=title, text='total_formatado')
 
         # Atualizando layout e formatação dos eixos
         fig_venda_ano.update_layout(
@@ -336,9 +330,6 @@ if start_date or end_date:
 
         # Considerando que "c3" seja o novo container:
         col4.plotly_chart(fig_venda_ano, use_container_width=True)
-
-
-
 
     else:
 
