@@ -19,8 +19,6 @@ df = pd.read_csv("databaseElisa.csv", sep=";", decimal=",", thousands=".",
                  index_col=None
                  ) 
 
-
-
 st.markdown("""
         <style>
                .block-container {
@@ -39,6 +37,9 @@ df['data'] = df['data'].dt.date
 start_date = st.sidebar.date_input('DATA INÍCIO:', None, format="DD/MM/YYYY")
 end_date = st.sidebar.date_input('DATA FIM:', None, format="DD/MM/YYYY")
 
+
+
+
 st.sidebar.write("____")
 
 if start_date:
@@ -46,22 +47,42 @@ if start_date:
 if end_date:
     end_date = pd.Timestamp(end_date)
 
+
+
+
 col1, col2 = st.columns([2,1])
 c = st.container()
+
+
 
 if start_date or end_date:
 
     if 'data' in df.columns:
+        
+        if start_date is not None:
+            dia_start = str(start_date.day)
+            mes_start = str(start_date.month)
+            ano_start = str(start_date.year)
+
+        if end_date is not None:
+            
+            dia_end = str(end_date.day)
+            mes_end = str(end_date.month)
+            ano_end = str(end_date.year)
         
         if start_date and end_date:
 
             if start_date > end_date:
                 st.warning('Data de início é maior que data de término!')
             else:
+                periodo = dia_start + "/" + mes_start + "/" + ano_start + " - " + dia_end + "/" + mes_end + "/" + ano_end
                 filtered_df = df[(df['data'] >= start_date) & (df['data'] <= end_date)]
         elif start_date:
+            periodo = dia_start + "/" + mes_start + "/" + ano_start
             filtered_df = df[(df['data'] == start_date)]
+            periodo
         elif end_date:
+            periodo = dia_end + "/" + mes_end + "/" + ano_end
             filtered_df = df[(df['data'] == end_date)]
 
         #################### Tabela Demostrativo Período ########################
@@ -124,7 +145,7 @@ if start_date or end_date:
                 align='center'))
             ])
 
-        fig.update_layout(title={ 'text': "Demostrativo | Período", 'y':0.76, 'x':0.0, 'xanchor': 'left', 'yanchor': 'top'})
+        fig.update_layout(title={ 'text': "Demostrativo: " + periodo, 'y':0.76, 'x':0.0, 'xanchor': 'left', 'yanchor': 'top'})
         fig.update_layout(margin=dict(r=10,t=140))
         col1.plotly_chart(fig, use_container_width=True)
 
