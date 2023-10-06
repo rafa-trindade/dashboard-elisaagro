@@ -135,31 +135,47 @@ if start_date or end_date:
         data_frame = data_frame.append(sums, ignore_index=True)
 
         fig = go.Figure(data=[go.Table(
-            header=dict(values=list(data_frame.columns),
-                fill_color='firebrick',
-                line_color="lightgrey",
-                font_color="white",
-                align='center'),
-            cells=dict(values=[data_frame.Fazenda, data_frame.Café, data_frame.Almoço, data_frame.Lanche, data_frame.Janta],
-                fill=dict(color=['linen', 'white','whitesmoke','white','whitesmoke']),                                
-                line_color="lightgrey",
-                font_color="black",
-                align='center'))
-            ])
+                    header=dict(
+                        values=list(data_frame.columns),
+                        fill_color='firebrick',
+                        line_color="lightgrey",
+                        font_color="white",
+                        align='center',
+                        height=25  # Ajusta a altura do cabeçalho
+                    ),
+                    cells=dict(
+                        values=[data_frame.Fazenda, data_frame.Café, data_frame.Almoço, data_frame.Lanche, data_frame.Janta],
+                        fill=dict(color=['linen', 'white','whitesmoke','white','whitesmoke']),
+                        line_color="lightgrey",
+                        font_color="black",
+                        align='center',
+                        height=25  # Ajusta a altura das células
+                    ))
+                ])
 
         fig.update_layout(title={ 'text': "Demostrativo: " + periodo, 'y':0.76, 'x':0.0, 'xanchor': 'left', 'yanchor': 'top'})
-        fig.update_layout(height = 420, margin=dict(r=10,t=140))
+        fig.update_layout(height = 460, margin=dict(r=10,t=140))
         col1.plotly_chart(fig, use_container_width=True, automargin=True)
 
         
 
         #################### Gráfico Fazenda Período ########################
+
+        # Cálculo dos totais
         fazenda_total = filtered_df.groupby("fazenda")[["total"]].sum().reset_index()
-        fig_venda_fazenda = px.pie(fazenda_total, names="fazenda", values="total",color_discrete_sequence=px.colors.sequential.RdBu)
-        fig_venda_fazenda.update_layout(width=600, height=400)
+
+        # Adicionando uma coluna com os valores formatados em R$
+        fazenda_total['total_formatado'] = fazenda_total['total'].apply(lambda x: f"R$ {x:,.2f}".replace('.', '@').replace(',', '.').replace('@', ','))
+
+        # Criando o gráfico
+        fig_venda_fazenda = px.pie(fazenda_total, names="fazenda", values="total", color_discrete_sequence=px.colors.sequential.RdBu,
+                                hover_data=['total_formatado'], hover_name='fazenda')
+
+        # Configurações adicionais
         fig_venda_fazenda.update_traces(textposition='inside', textinfo='percent+label')
-        fig_venda_fazenda.update_layout(margin=dict(l=10, b=50,t=140))
+        fig_venda_fazenda.update_layout(width=600, height=460, margin=dict(l=10, b=50, t=130))
         col2.plotly_chart(fig_venda_fazenda, use_container_width=True)
+
 
         #################### Gráfico Visão Geral Mensal ########################
         # Convertendo a coluna 'data' para o tipo datetime
