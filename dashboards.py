@@ -7,10 +7,10 @@ from datetime import datetime
 import locale
 import calendar
 
-try:
-    locale.setlocale(locale.LC_TIME, 'pt_BR.UTF-8')
-except locale.Error:
-    st.warning("pt_BR locale não está instalado no sistema. Mostrando nomes de meses em inglês.")
+#try:
+#    locale.setlocale(locale.LC_TIME, 'pt_BR.UTF-8')
+#except locale.Error:
+#    st.warning("pt_BR locale não está instalado no sistema. Mostrando nomes de meses em inglês.")
 
 
 st.set_page_config(layout="wide", page_title="Restaurante Dona Nize", initial_sidebar_state="expanded", page_icon="🧊")
@@ -57,8 +57,6 @@ if end_date:
 col1, col2 = st.columns([2,1])
 c1 = st.container()
 col3, col4 = st.columns([2,1])
-
-
 
 if start_date or end_date:
 
