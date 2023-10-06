@@ -4,16 +4,19 @@ import plotly.express as px
 import plotly.graph_objects as go
 import datetime as dt
 from datetime import datetime
+import locale
+import calendar
 
-
-base="light"
-backgroundColor="#e0d8d8"
-secondaryBackgroundColor="#b5a1a1"
+try:
+    locale.setlocale(locale.LC_TIME, 'pt_BR.UTF-8')
+except locale.Error:
+    st.warning("pt_BR locale não está instalado no sistema. Mostrando nomes de meses em inglês.")
 
 
 st.set_page_config(layout="wide", page_title="Restaurante Dona Nize", initial_sidebar_state="expanded", page_icon="🧊")
 
-st.sidebar.header("Restaurante Dona Nize | Elisa Agro")
+st.sidebar.markdown('<h2 style="text-align: center; text-decoration: underline;">Restaurante Dona Nize | Elisa Agro</h2>', unsafe_allow_html=True)
+
 
 df = pd.read_csv("databaseElisa.csv", sep=";", decimal=",", thousands=".",
                  usecols=['data','fazenda', 'almoco', 'janta', 'cafe','lanche', 'total'],
@@ -38,7 +41,7 @@ ano_atual = dt.datetime.today().year
 
 default_start_date = dt.date(ano_atual, mes_atual, 1)
 
-st.sidebar.markdown('<h3 style="margin-bottom:-30px; align: center;">Demostrativo</h3>', unsafe_allow_html=True)
+st.sidebar.markdown('<h3 style="text-align:center; margin-bottom:-30px;">Filtro Demostrativo</h3>', unsafe_allow_html=True)
 
 
 start_date = st.sidebar.date_input('DATA INÍCIO:', default_start_date, None, format="DD/MM/YYYY")
@@ -52,7 +55,10 @@ if end_date:
     end_date = pd.Timestamp(end_date)
 
 col1, col2 = st.columns([2,1])
-c = st.container()
+c1 = st.container()
+col3, col4 = st.columns([2,1])
+
+
 
 if start_date or end_date:
 
@@ -177,7 +183,7 @@ if start_date or end_date:
             12: "Dezembro"
         }
 
-        st.sidebar.markdown('<h3 style="margin-bottom:-30px;">Visão Geral Mensal</h3>', unsafe_allow_html=True)
+        st.sidebar.markdown('<h3 style="text-align:center; margin-bottom:-30px;">Filtro Visão Geral</h3>', unsafe_allow_html=True)
         
         # Determinando o mês e ano atuais
         mes_atual = meses[dt.datetime.now().month]
@@ -193,18 +199,133 @@ if start_date or end_date:
         # Filtrando o dataframe com base no mês e ano selecionados
         df_mes_filtrado = df[(df['data'].dt.month == mes_selecionado) & (df['data'].dt.year == selected_ano)]
 
-        if df_mes_filtrado.empty:
-            c.warning(f"Não há dados disponíveis para {selected_mes}/{selected_ano}.")
-        else:
-            # Agregando os dados
-            venda_total = df_mes_filtrado.groupby("data")[["total"]].sum().reset_index()
 
-            # Criando o gráfico
-            title = f"Visão Geral: {selected_mes}/{selected_ano}"
-            fig_venda_mes = px.bar(venda_total, x="data", y="total", color_discrete_sequence=px.colors.sequential.RdBu, title=title, text_auto='.2f')
-            fig_venda_mes.update_layout(margin=dict(t=50))
-            c.plotly_chart(fig_venda_mes, use_container_width=True)
+        if df_mes_filtrado.empty:
+            st.warning(f"Não há dados disponíveis para {selected_mes}/{selected_ano}.")
+        else:
+            # Agregando os dados por dia
+            venda_total = df_mes_filtrado.groupby("data")[["total"]].sum().reset_index()
+            
+            # Adicionando coluna com valores formatados em R$
+            venda_total['total_formatado'] = venda_total['total'].apply(lambda x: f"R$ {x:,.2f}".replace('.', '@').replace(',', '.').replace('@', ','))
+
+            # Formatando a coluna 'data' para o padrão dd/mm/aa
+            venda_total['data_formatada'] = venda_total['data'].dt.strftime('%d/%m/%y')
+
+            # Criando o gráfico e usando 'total_formatado' para os valores das barras e 'data_formatada' para o eixo x
+            title = f"Visão Diária: {selected_mes}/{selected_ano}"
+            fig_venda_mes = px.bar(venda_total, x="data_formatada", y="total", color_discrete_sequence=px.colors.sequential.RdBu, title=title, text='total_formatado')
+            
+            # Configurações de layout e formatação
+            fig_venda_mes.update_layout(
+                margin=dict(t=50),
+                yaxis_tickprefix="R$ ",
+                yaxis_showgrid=True,
+                yaxis_title="Faturamento",
+                xaxis_title="Dias"
+            )
+
+            # Formatação do eixo y
+            fig_venda_mes.update_yaxes(tickprefix="R$", tickformat=',.2f', showline=True, linewidth=1, linecolor='black', mirror=True)
+
+            c1.plotly_chart(fig_venda_mes, use_container_width=True)
          
+
+        #################### Gráfico Visão Geral Anual ########################
+
+        # Convertendo a coluna 'data' para o tipo datetime
+        df['data'] = pd.to_datetime(df['data'], errors='coerce')
+
+        # Extraindo mês e ano como números
+        df['mes_num'] = df['data'].dt.month
+        df['ano'] = df['data'].dt.year
+
+        # Usando o selected_ano para filtrar o dataframe
+        df_filtrado = df[df['ano'] == selected_ano]
+
+        # Agregando os dados por mês
+        venda_total_mensal = df_filtrado.groupby(['mes_num', 'ano'])[['total']].sum().reset_index()
+
+        # Ordenando pelo mês
+        venda_total_mensal = venda_total_mensal.sort_values(by='mes_num')
+
+        # Mapeando os números de volta para os nomes de meses e combinando com o ano
+        venda_total_mensal['mes'] = venda_total_mensal['mes_num'].map(meses)
+        venda_total_mensal['mes_ano'] = venda_total_mensal['mes'] + '/' + venda_total_mensal['ano'].astype(str)
+
+        # Adicionando uma coluna com os valores formatados em reais
+        venda_total_mensal['total_formatado'] = venda_total_mensal['total'].apply(lambda x: f"R$ {x:,.2f}".replace('.', '@').replace(',', '.').replace('@', ','))
+
+        # Criando o gráfico e outras configurações
+        title = f"Visão Mensal: {selected_ano}"
+        fig_venda_mes = px.bar(venda_total_mensal, x="mes_ano", y="total", color_discrete_sequence=px.colors.sequential.RdBu, title=title, text='total_formatado')
+
+        # Atualizando layout e formatação dos eixos
+        fig_venda_mes.update_layout(
+            margin=dict(t=50),
+            yaxis_tickprefix="R$ ",
+            yaxis_showgrid=True,
+            yaxis_title="Faturamento",
+            xaxis_title="Meses"  # Atualizando o título do eixo x
+        )
+
+        # Configurações adicionais do eixo y
+        fig_venda_mes.update_yaxes(
+            tickformat=',.2f',
+            separatethousands=True,
+            showline=True,
+            linewidth=1,
+            linecolor='black',
+            mirror=True
+        )
+
+        col3.plotly_chart(fig_venda_mes, use_container_width=True)
+
+
+
+        #################### Gráfico Visão Geral Total por ano ########################
+
+        # Convertendo a coluna 'data' para o tipo datetime
+        df['data'] = pd.to_datetime(df['data'], errors='coerce')
+
+        # Extraindo o ano como string
+        df['ano'] = df['data'].dt.year.astype(str)
+
+        # Agregando os dados por ano
+        venda_total_anual = df.groupby('ano')[['total']].sum().reset_index()
+
+        # Adicionando uma coluna com os valores formatados em reais
+        venda_total_anual['total_formatado'] = venda_total_anual['total'].apply(lambda x: f"R$ {x:,.2f}".replace('.', '@').replace(',', '.').replace('@', ','))
+
+        # Criando o gráfico e outras configurações
+        title = "Visão Geral Anual"
+        fig_venda_ano = px.bar(venda_total_anual, x="ano", y="total", color_discrete_sequence=px.colors.sequential.RdBu, title=title, text='total_formatado')
+
+        # Atualizando layout e formatação dos eixos
+        fig_venda_ano.update_layout(
+            margin=dict(t=50),
+            yaxis_tickprefix="R$ ",
+            yaxis_showgrid=True,
+            yaxis_title="Faturamento",
+            xaxis_title="Anos"  # Atualizando o título do eixo x para "Ano"
+        )
+
+        # Configurações adicionais do eixo y
+        fig_venda_ano.update_yaxes(
+            tickformat=',.2f',
+            separatethousands=True,
+            showline=True,
+            linewidth=1,
+            linecolor='black',
+            mirror=True
+        )
+
+        # Considerando que "c3" seja o novo container:
+        col4.plotly_chart(fig_venda_ano, use_container_width=True)
+
+
+
+
     else:
 
         st.warning('A coluna "data" não foi encontrada na base fornecida.')
