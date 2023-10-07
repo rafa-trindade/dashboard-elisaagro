@@ -17,7 +17,7 @@ col1_side, col2_side = st.sidebar.columns([2,1])
 
 col1_side.markdown('<h5 style="margin-bottom: -25px;">Início Prest. Serviço:</h5>', unsafe_allow_html=True)
 col1_side.markdown('<h5 style="margin-bottom: -25px;">Início Apurado:', unsafe_allow_html=True)
-col1_side.markdown('<h5 style="margin-bottom: 15px;">Contrato vigente:</h5>', unsafe_allow_html=True)
+col1_side.markdown('<h5 style="margin-bottom: 15px;">Contrato Vigente:</h5>', unsafe_allow_html=True)
 
 col2_side.markdown('<h5 style="margin-bottom: -25px;">01/09/2020</h5>', unsafe_allow_html=True)
 col2_side.markdown('<h5 style="margin-bottom: -25px;">01/01/2021</h5>', unsafe_allow_html=True)
