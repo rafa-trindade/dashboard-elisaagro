@@ -30,7 +30,7 @@ st.sidebar.markdown(f'''
     <h4>
         <a href="{link_url}" target="_blank" style="color: firebrick; text-decoration: none;" 
            onmouseover="this.style.textDecoration='none';" onmouseout="this.style.textDecoration='none';">
-           📂 Drive fechamentos diários
+           📂 Drive Fechamentos Diários
         </a>
     </h4>
     <style>
