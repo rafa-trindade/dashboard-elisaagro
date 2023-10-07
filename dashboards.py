@@ -50,8 +50,8 @@ df = pd.read_csv("databaseElisa.csv", sep=";", decimal=",", thousands=".", useco
 df['data'] = pd.to_datetime(df['data'], format='%d/%m/%Y', errors='coerce')
 df['data'] = df['data'].dt.date
 
-col1_side.markdown('<h5 style="">Última Atualização:</h5>', unsafe_allow_html=True)
-col2_side.markdown('<h5 style="">' + str(df['data'].max().strftime('%d/%m/%Y'))+ '</h5>', unsafe_allow_html=True)
+col1_side.markdown('<h5 style="color: firebrick;">Última Atualização:</h5>', unsafe_allow_html=True)
+col2_side.markdown('<h5 style="color: firebrick;">' + str(df['data'].max().strftime('%d/%m/%Y'))+ '</h5>', unsafe_allow_html=True)
 
 
 mes_atual = dt.datetime.today().month
