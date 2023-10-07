@@ -8,7 +8,7 @@ import calendar
 
 st.set_page_config(layout="wide", page_title="Restaurante Dona Nize", initial_sidebar_state="expanded", page_icon="📊")
 
-st.sidebar.markdown('<h2 style="color: firebrick;margin-bottom: -40px; text-align: center;">Dona Nize | Elisa Agro</h2>', unsafe_allow_html=True)
+st.sidebar.markdown('<h2 style="color: firebrick; margin-bottom: -40px; text-align: center;">Dona Nize | Elisa Agro</h2>', unsafe_allow_html=True)
 st.sidebar.markdown('<h4 style="margin-bottom: -200px; text-align: center;">(Fornecimento Alimentação)</h4>', unsafe_allow_html=True)
 
 st.sidebar.write("____")
@@ -17,7 +17,7 @@ col1_side, col2_side = st.sidebar.columns([2,1])
 
 col1_side.markdown('<h5 style="margin-bottom: -25px;">Início Prest. Serviço:</h5>', unsafe_allow_html=True)
 col1_side.markdown('<h5 style="margin-bottom: -25px;">Início Apurado:', unsafe_allow_html=True)
-col1_side.markdown('<h5 style="margin-bottom: 15px;">Contrato Vigente:</h5>', unsafe_allow_html=True)
+col1_side.markdown('<h5 style="margin-bottom: 15px;">Contrato vigente:</h5>', unsafe_allow_html=True)
 
 col2_side.markdown('<h5 style="margin-bottom: -25px;">01/09/2020</h5>', unsafe_allow_html=True)
 col2_side.markdown('<h5 style="margin-bottom: -25px;">01/01/2021</h5>', unsafe_allow_html=True)
@@ -59,18 +59,18 @@ ano_atual = dt.datetime.today().year
 
 mes_inicial_padrão = dt.date(ano_atual, mes_atual, 1)
 
-tab1, tab2, tab3 = st.tabs(["📊 Visão Mensal", "📊 Visão Geral", "📅 Fechametos Diários"])
+tab1, tab2, tab3 = st.tabs(["📅 Fechametos Diários", "📊 Visão Mensal", "📊 Visão Geral"])
 
 with tab1:
-    col1_filtro1, col2_filtro1 = st.columns(2)  
-    c1 = st.container()    
+    col_data_ini, col_data_fim = st.columns(2)
+    col1, col2 = st.columns([2,1])
 with tab2:
+    col1_filtro1, col2_filtro1 = st.columns(2)  
+    c1 = st.container()
+with tab3:
     cfiltro2 = st.container()
     col3, col4 = st.columns([3,1])
     c2 = st.container()
-with tab3:
-    col_data_ini, col_data_fim = st.columns(2)
-    col1, col2 = st.columns([2,1]) 
 
 data_inicial = col_data_ini.date_input('DATA INÍCIO:', mes_inicial_padrão, None, format="DD/MM/YYYY")
 data_fim = col_data_fim.date_input('DATA FIM:', None, format="DD/MM/YYYY")
