@@ -89,13 +89,10 @@ if start_date or end_date:
 
         #################### Tabela Demostrativo Período ########################
         lista_fazenda = df['fazenda'].unique().tolist()
-                
+
         qtd_almoco = filtered_df.groupby("fazenda")[["almoco"]].sum()
-
         qtd_janta = filtered_df.groupby("fazenda")[["janta"]].sum()
-
         qtd_cafe = filtered_df.groupby("fazenda")[["cafe"]].sum()
-
         qtd_lanche = filtered_df.groupby("fazenda")[["lanche"]].sum()
 
         qtd_almoco = qtd_almoco.reindex(lista_fazenda)
@@ -107,12 +104,6 @@ if start_date or end_date:
         lista_janta = qtd_janta["janta"].tolist()
         lista_cafe = qtd_cafe["cafe"].tolist()
         lista_lanche = qtd_lanche["lanche"].tolist()
-                    
-        #del(lista_fazenda[7])
-        #del(lista_almoco[7])
-        #del(lista_janta[7])
-        #del(lista_cafe[7])
-        #del(lista_lanche[7])  
 
         data = {
             "Fazenda": lista_fazenda,
@@ -124,38 +115,43 @@ if start_date or end_date:
 
         data_frame = pd.DataFrame(data)
 
+        # Filtrar o data_frame para incluir apenas linhas onde algum dos valores não é NaN
+        data_frame = data_frame.dropna(subset=["Café", "Almoço", "Lanche", "Janta"], how='all')
+
         sums = {
             "Fazenda": "<b>TOTAL</b>",
             "Café": "<b>" + str('{0:,}'.format(int(data_frame["Café"].sum())).replace(',','.')) + "</b>",
             "Almoço": "<b>" + str('{0:,}'.format(int(data_frame["Almoço"].sum())).replace(',','.')) + "</b>",
             "Lanche": "<b>" + str('{0:,}'.format(int(data_frame["Lanche"].sum())).replace(',','.')) + "</b>",
             "Janta": "<b>" + str('{0:,}'.format(int(data_frame["Janta"].sum())).replace(',','.')) + "</b>"
-                }
+        }
 
         data_frame = data_frame.append(sums, ignore_index=True)
 
         fig = go.Figure(data=[go.Table(
-                    header=dict(
-                        values=list(data_frame.columns),
-                        fill_color='firebrick',
-                        line_color="lightgrey",
-                        font_color="white",
-                        align='center',
-                        height=25  # Ajusta a altura do cabeçalho
-                    ),
-                    cells=dict(
-                        values=[data_frame.Fazenda, data_frame.Café, data_frame.Almoço, data_frame.Lanche, data_frame.Janta],
-                        fill=dict(color=['linen', 'white','whitesmoke','white','whitesmoke']),
-                        line_color="lightgrey",
-                        font_color="black",
-                        align='center',
-                        height=25  # Ajusta a altura das células
-                    ))
-                ])
+                        header=dict(
+                            values=list(data_frame.columns),
+                            fill_color='firebrick',
+                            line_color="lightgrey",
+                            font_color="white",
+                            align='center',
+                            height=25  # Ajusta a altura do cabeçalho
+                        ),
+                        cells=dict(
+                            values=[data_frame.Fazenda, data_frame.Café, data_frame.Almoço, data_frame.Lanche, data_frame.Janta],
+                            fill=dict(color=['linen', 'white','whitesmoke','white','whitesmoke']),
+                            line_color="lightgrey",
+                            font_color="black",
+                            align='center',
+                            height=25  # Ajusta a altura das células
+                        ))
+                    ])
 
-        fig.update_layout(title={ 'text': "Demostrativo: " + periodo, 'y':0.76, 'x':0.0, 'xanchor': 'left', 'yanchor': 'top'})
-        fig.update_layout(height = 460, margin=dict(r=10,t=140))
+        fig.update_layout(title={ 'text': "Demostrativo: " + periodo, 'y':0.79, 'x':0.0, 'xanchor': 'left', 'yanchor': 'top'})
+        fig.update_layout(height = 530, margin=dict(r=10,t=140))
         col1.plotly_chart(fig, use_container_width=True, automargin=True)
+
+
 
         #################### Gráfico Fazenda Período ########################
 
