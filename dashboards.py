@@ -55,7 +55,7 @@ col2_side.markdown('<h5 style="color: firebrick;">' + str(df['data'].max().strft
 mes_atual = dt.datetime.today().month
 ano_atual = dt.datetime.today().year
 
-mes_inicial_padrão = df['data'].max()
+mes_inicial_padrão = dt.date(ano_atual, mes_atual, 1)
 
 tab1, tab2, tab3 = st.tabs(["📅 Fechametos Diários", "📊 Visão Mensal", "📊 Visão Geral"])
 
@@ -275,7 +275,7 @@ if data_inicial or data_fim:
         date_difference = max_date - min_date
 
         # Se a diferença for maior ou igual a seis meses, incluir a linha total
-        if date_difference >= pd.Timedelta(days=2*30):  # Considerando uma média de 30 dias por mês
+        if date_difference >= pd.Timedelta(days=5*30):  # Considerando uma média de 30 dias por mês
             traces = [bar_refeicoes, bar_lanches, line_total]
         else:
             traces = [bar_refeicoes, bar_lanches]
