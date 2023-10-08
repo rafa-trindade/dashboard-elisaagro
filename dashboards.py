@@ -57,7 +57,7 @@ ano_atual = dt.datetime.today().year
 
 mes_inicial_padrão = dt.date(ano_atual, mes_atual, 1)
 
-tab1, tab2, tab3 = st.tabs(["📅 Fechametos Diários", "📊 Visão Mensal", "📊 Visão Geral"])
+tab1, tab2, tab3 = st.tabs(["📅 Fechametos Diários", "📊 Visão Mensal", "📊 Visão Anual"])
 
 with tab1:
     col_data_ini, col_data_fim = st.columns(2)
@@ -67,10 +67,12 @@ with tab1:
 with tab2:
     col1_filtro1, col2_filtro1 = st.columns(2)  
     c1 = st.container()
+    c5 = st.container()
 with tab3:
     cfiltro2 = st.container()
-    col3, col4 = st.columns([3,1])
+    col3, col4 = st.columns([1,3])
     c2 = st.container()
+    c4 = st.container()
 
 data_inicial = col_data_ini.date_input('DATA INÍCIO:', mes_inicial_padrão, None, format="DD/MM/YYYY")
 data_fim = col_data_fim.date_input('DATA FIM:', None, format="DD/MM/YYYY")
@@ -261,7 +263,7 @@ if data_inicial or data_fim:
             x=df_agregado['data'],
             y=df_agregado['total'],
             mode='lines',
-            name='Margem',
+            name='Qualitativo',
             line=dict(
                 color='red',
                 shape='linear'  
@@ -426,7 +428,7 @@ if data_inicial or data_fim:
             linewidth=0.5
         )
 
-        col3.plotly_chart(fig_venda_mes, use_container_width=True)
+        c5.plotly_chart(fig_venda_mes, use_container_width=True)
 
 
 
@@ -466,7 +468,7 @@ if data_inicial or data_fim:
 
 
         # Considerando que "c3" seja o novo container:
-        col4.plotly_chart(fig_venda_ano, use_container_width=True)
+        col3.plotly_chart(fig_venda_ano, use_container_width=True)
 
 
 
@@ -498,7 +500,7 @@ if data_inicial or data_fim:
         # Criando o Gráfico de Barras Agrupadas
         fig_barras = px.bar(venda_total_mensal, x="month_name", y="total", color="year", barmode='group',
                             labels={"total": "Faturamento", "month_name": "Mês", "year": "Ano"},
-                            title="-Comparativo Mensal")
+                            title="-Comparativo Anual")
 
         fig_barras.update_layout(
             margin=dict(t=50),
@@ -517,6 +519,80 @@ if data_inicial or data_fim:
 
         # Considerando que "c2" seja o novo container (ajuste o nome do container conforme necessário):
         c2.plotly_chart(fig_barras, use_container_width=True)
+
+
+
+        #################### Gráfico Comparativo Faturamento/Quantidade ########################
+
+        # Convertendo a coluna 'data' para o tipo datetime
+        df['data'] = pd.to_datetime(df['data'], errors='coerce')
+
+        # Extraindo o ano como string
+        df['ano'] = df['data'].dt.year.astype(str)
+
+        # Agregando os dados por ano e somando as colunas de interesse
+        df['Refeições'] = df['almoco'] + df['janta']
+        df['Lanches'] = df['cafe'] + df['lanche']
+
+        venda_total_anual = df.groupby('ano')[['total', 'Refeições', 'Lanches']].sum().reset_index()
+
+
+        colors = px.colors.diverging.RdBu
+
+        # Criando as barras para 'Total', 'Refeições' e 'Lanches'
+        bar_total = go.Bar(
+            x=venda_total_anual['ano'],
+            y=venda_total_anual['total'],
+            name='Faturamento',
+            text=venda_total_anual['total'].apply(lambda x: f"R$ {x:,.2f}".replace('.', '@').replace(',', '.').replace('@', ',')),
+            textposition='inside',
+            marker=dict(color=colors[1])
+        )
+
+        bar_refeicoes = go.Bar(
+            x=venda_total_anual['ano'],
+            y=venda_total_anual['Refeições'],
+            name='Refeições',
+            yaxis='y2',
+            marker=dict(color=colors[7])
+        )
+
+        bar_lanches = go.Bar(
+            x=venda_total_anual['ano'],
+            y=venda_total_anual['Lanches'],
+            name='Lanches',
+            yaxis='y2',
+            marker=dict(color=colors[8])
+        )
+
+        # Combinando as barras em uma única figura
+        fig_venda_ano = go.Figure(data=[bar_total, bar_refeicoes, bar_lanches])
+
+        # Atualizando layout e formatação dos eixos
+        fig_venda_ano.update_layout(
+            title="-Relação Qualitativa",
+            margin=dict(t=50),
+            yaxis_showgrid=True,
+            yaxis_title="Faturamento",
+            xaxis_title="Anos",
+            barmode='group',  # Para agrupar as barras por ano
+            yaxis2=dict(
+                overlaying='y',
+                side='right',
+                showgrid=False,
+                title='Quantidade'
+            )
+        )
+
+        # Configurações adicionais do eixo y
+        fig_venda_ano.update_yaxes(
+            showline=True,
+            linecolor="Grey",
+            linewidth=0.5
+        )
+
+        # Considerando que "col4" seja o novo container:
+        col4.plotly_chart(fig_venda_ano, use_container_width=True)
 
     else:
 
