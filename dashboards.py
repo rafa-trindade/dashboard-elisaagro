@@ -67,7 +67,6 @@ with tab1:
 with tab2:
     col1_filtro1, col2_filtro1 = st.columns(2)  
     c1 = st.container()
-    st.write("_____")
     c5 = st.container()
 with tab3:
     cfiltro2 = st.container()
@@ -384,7 +383,7 @@ if data_inicial or data_fim:
             mes_nome = meses[int(mes_selecionado)]
             # Criando o gráfico e usando 'total_formatado' para os valores das barras e 'data_formatada' para o eixo x
             title = f"-Exercido no mês de {mes_nome} de {ano_selecionado}"
-            fig_venda_mes = px.bar(venda_total, x="data_formatada", y="total", color_discrete_sequence=[px.colors.diverging.RdBu[0]], title=title, text='total_formatado')
+            fig_venda_mes = px.bar(venda_total, x="data_formatada", y="total", color_discrete_sequence=[px.colors.diverging.RdBu[1]], title=title, text='total_formatado')
             
             # Configurações de layout e formatação
             fig_venda_mes.update_layout(
@@ -434,7 +433,7 @@ if data_inicial or data_fim:
 
         # Criando o gráfico e outras configurações
         title = f"-Exercido no ano de {ano_selecionado}"
-        fig_venda_mes = px.bar(venda_total_mensal, x="mes_ano", y="total", color_discrete_sequence=[px.colors.diverging.RdBu[1]], title=title, text='total_formatado')
+        fig_venda_mes = px.bar(venda_total_mensal, x="mes_ano", y="total", color_discrete_sequence=[px.colors.diverging.RdBu[9]], title=title, text='total_formatado')
 
         # Atualizando layout e formatação dos eixos
         fig_venda_mes.update_layout(
