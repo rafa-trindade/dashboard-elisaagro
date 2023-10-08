@@ -55,7 +55,7 @@ col2_side.markdown('<h5 style="color: firebrick;">' + str(df['data'].max().strft
 mes_atual = dt.datetime.today().month
 ano_atual = dt.datetime.today().year
 
-mes_inicial_padrão = dt.date(ano_atual, mes_atual, 1)
+mes_inicial_padrão = df['data'].max()
 
 tab1, tab2, tab3 = st.tabs(["📅 Fechametos Diários", "📊 Visão Mensal", "📊 Visão Geral"])
 
@@ -264,18 +264,29 @@ if data_inicial or data_fim:
             name='Margem',
             line=dict(
                 color='red',
-                shape='linear'  # Mudando o shape da linha para spline
+                shape='linear'  
             ),
             yaxis='y2'  # Associando a linha ao segundo eixo y
         )
 
-        # Combinando as barras e a linha em uma única figura
-        fig_quantidade_dia = go.Figure(data=[bar_refeicoes, bar_lanches, line_total])
+        # Verificando a diferença entre a maior e a menor data
+        min_date = pd.to_datetime(df_agregado['data'].min(), format='%d/%m/%y')
+        max_date = pd.to_datetime(df_agregado['data'].max(), format='%d/%m/%y')
+        date_difference = max_date - min_date
+
+        # Se a diferença for maior ou igual a seis meses, incluir a linha total
+        if date_difference >= pd.Timedelta(days=2*30):  # Considerando uma média de 30 dias por mês
+            traces = [bar_refeicoes, bar_lanches, line_total]
+        else:
+            traces = [bar_refeicoes, bar_lanches]
+
+        # Combinando as barras e (possivelmente) a linha em uma única figura
+        fig_quantidade_dia = go.Figure(data=traces)
 
         # Ajustes gerais do gráfico
         fig_quantidade_dia.update_layout(
             margin=dict(t=50),
-            title='Quantidade de Refeições e Lanches por Dia',
+            title='-Quantidade de Refeições e Lanches por Dia',
             barmode='group',
             xaxis_title='Data',
             yaxis_title='Quantidade',
@@ -295,6 +306,7 @@ if data_inicial or data_fim:
         )
 
         c3.plotly_chart(fig_quantidade_dia, use_container_width=True, automargin=True)
+
 
 
 
