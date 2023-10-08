@@ -275,7 +275,7 @@ if data_inicial or data_fim:
         date_difference = max_date - min_date
 
         # Se a diferença for maior ou igual a seis meses, incluir a linha total
-        if date_difference >= pd.Timedelta(days=5*30):  # Considerando uma média de 30 dias por mês
+        if date_difference >= pd.Timedelta(days=2*30):  # Considerando uma média de 30 dias por mês
             traces = [bar_refeicoes, bar_lanches, line_total]
         else:
             traces = [bar_refeicoes, bar_lanches]
