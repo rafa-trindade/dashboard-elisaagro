@@ -222,33 +222,38 @@ if data_inicial or data_fim:
 
 
         
+        #################### Gráfico Qualitativo ########################
 
-        #################### Gráfico Quantidade Refeições e lanches por dia ########################
 
-        # 1. Certificando-se de que a coluna 'data' é do tipo datetime
+        # 1. Convertendo a coluna 'data' para datetime
         filtered_df['data'] = pd.to_datetime(filtered_df['data'], errors='coerce')
 
-        # Se houver valores nulos após a conversão, isso pode indicar problemas nos dados
+        # Verificar valores nulos
         if filtered_df['data'].isnull().any():
             st.warning('Existem valores inválidos na coluna data!')
 
-        # 2. Agregando os dados por data usando o método .sum()
+        # Agregando os dados
         filtered_df['Refeições'] = filtered_df['almoco'] + filtered_df['janta']
         filtered_df['Lanches'] = filtered_df['cafe'] + filtered_df['lanche']
-
-        # Agregar por data e somar as colunas de interesse
         df_agregado = filtered_df.groupby('data').sum()[['Refeições', 'Lanches', 'total']].reset_index()
-
-        # Transformando a coluna data para o formato desejado
         df_agregado['data'] = df_agregado['data'].dt.strftime('%d/%m/%y')
 
-        # Criando as barras separadamente para 'Refeições' e 'Lanches'
+        # Verificando a diferença de datas
+        min_date = pd.to_datetime(df_agregado['data'].min(), format='%d/%m/%y')
+        max_date = pd.to_datetime(df_agregado['data'].max(), format='%d/%m/%y')
+        date_difference = max_date - min_date
+
+        # Definindo cores
+        colors = px.colors.diverging.RdBu
+
+        # Criando traços
         bar_refeicoes = go.Bar(
             x=df_agregado['data'],
             y=df_agregado['Refeições'],
             name='Refeições',
             text=df_agregado['Refeições'],
-            textposition='inside'
+            textposition='inside',
+            marker=dict(color=colors[7])
         )
 
         bar_lanches = go.Bar(
@@ -256,59 +261,26 @@ if data_inicial or data_fim:
             y=df_agregado['Lanches'],
             name='Lanches',
             text=df_agregado['Lanches'],
-            textposition='inside'
+            textposition='inside',
+            marker=dict(color=colors[8])
         )
 
-        # Criando o trace para a linha que representa o 'total'
-        line_total = go.Scatter(
-            x=df_agregado['data'],
-            y=df_agregado['total'],
-            mode='lines',
-            name='Qualitativo',
-            line=dict(
-                color='red',
-                shape='linear'  
-            ),
-            yaxis='y2'  # Associando a linha ao segundo eixo y
-        )
-
-        # Verificando a diferença entre a maior e a menor data
-        min_date = pd.to_datetime(df_agregado['data'].min(), format='%d/%m/%y')
-        max_date = pd.to_datetime(df_agregado['data'].max(), format='%d/%m/%y')
-        date_difference = max_date - min_date
-
-        # Se a diferença for maior ou igual a seis meses, incluir a linha total
-        if date_difference >= pd.Timedelta(days=5*30):  # Considerando uma média de 30 dias por mês
+        # Condicionando a criação do traço da linha "Qualitativo"
+        if date_difference >= pd.Timedelta(days=6*30):  # Aproximando 6 meses
+            line_total = go.Scatter(
+                x=df_agregado['data'],
+                y=df_agregado['total'],
+                mode='lines',
+                name='Qualitativo',
+                line=dict(color='red', shape='linear'),
+                yaxis='y2'
+            )
             traces = [bar_refeicoes, bar_lanches, line_total]
         else:
             traces = [bar_refeicoes, bar_lanches]
 
-        # Sequência de cores da paleta RdBu
-        colors = px.colors.diverging.RdBu
-
-        # Traço para Refeições
-        bar_refeicoes = go.Bar(
-            x=df_agregado['data'],
-            y=df_agregado['Refeições'],
-            name='Refeições',
-            marker=dict(color=colors[7])  # Especificando a cor para Refeições
-        )
-
-        # Traço para Lanches
-        bar_lanches = go.Bar(
-            x=df_agregado['data'],
-            y=df_agregado['Lanches'],
-            name='Lanches',
-            marker=dict(color=colors[8])  # Especificando a cor para Lanches
-        )
-
-        # Combine os traços em uma lista
-        traces = [bar_refeicoes, bar_lanches] 
-
-        # Combinando as barras e (possivelmente) a linha em uma única figura
+        # Construindo a figura
         fig_quantidade_dia = go.Figure(data=traces)
-
-        # Ajustes gerais do gráfico
         fig_quantidade_dia.update_layout(
             margin=dict(t=50),
             title='-Quantidade de Refeições e Lanches por Dia',
@@ -322,15 +294,15 @@ if data_inicial or data_fim:
                 title='Total'
             )
         )
-
-        # Configurações adicionais do eixo y
         fig_quantidade_dia.update_yaxes(
             showline=True,
             linecolor="Grey",
             linewidth=0.5
         )
 
+        # Exibindo o gráfico
         c3.plotly_chart(fig_quantidade_dia, use_container_width=True, automargin=True)
+
 
 
 
