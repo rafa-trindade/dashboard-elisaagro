@@ -220,7 +220,6 @@ if data_inicial or data_fim:
 
         
 
-
         #################### Gráfico Quantidade Refeições e lanches por dia ########################
 
         # 1. Certificando-se de que a coluna 'data' é do tipo datetime
@@ -235,7 +234,7 @@ if data_inicial or data_fim:
         filtered_df['Lanches'] = filtered_df['cafe'] + filtered_df['lanche']
 
         # Agregar por data e somar as colunas de interesse
-        df_agregado = filtered_df.groupby('data').sum()[['Refeições', 'Lanches']].reset_index()
+        df_agregado = filtered_df.groupby('data').sum()[['Refeições', 'Lanches', 'total']].reset_index()
 
         # Transformando a coluna data para o formato desejado
         df_agregado['data'] = df_agregado['data'].dt.strftime('%d/%m/%y')
@@ -245,38 +244,60 @@ if data_inicial or data_fim:
             x=df_agregado['data'],
             y=df_agregado['Refeições'],
             name='Refeições',
-            text=df_agregado['Refeições']
+            text=df_agregado['Refeições'],
+            textposition='inside'
         )
 
         bar_lanches = go.Bar(
             x=df_agregado['data'],
             y=df_agregado['Lanches'],
             name='Lanches',
-            text=df_agregado['Lanches']
+            text=df_agregado['Lanches'],
+            textposition='inside'
         )
 
-        # Combinando as barras em uma única figura
-        fig_quantidade_dia = go.Figure(data=[bar_refeicoes, bar_lanches])
+        # Criando o trace para a linha que representa o 'total'
+        line_total = go.Scatter(
+            x=df_agregado['data'],
+            y=df_agregado['total'],
+            mode='lines',
+            name='Margem',
+            line=dict(
+                color='red',
+                shape='linear'  # Mudando o shape da linha para spline
+            ),
+            yaxis='y2'  # Associando a linha ao segundo eixo y
+        )
 
-        # Ajuste para exibir os textos dentro das barras
-        fig_quantidade_dia.update_traces(texttemplate='%{text}', textposition='inside', insidetextanchor='middle')
-        
+        # Combinando as barras e a linha em uma única figura
+        fig_quantidade_dia = go.Figure(data=[bar_refeicoes, bar_lanches, line_total])
+
+        # Ajustes gerais do gráfico
         fig_quantidade_dia.update_layout(
             margin=dict(t=50),
-            title='-Quantidade de Refeições e Lanches por Dia',
+            title='Quantidade de Refeições e Lanches por Dia',
             barmode='group',
             xaxis_title='Data',
-            yaxis_title='Quantidade'
+            yaxis_title='Quantidade',
+            yaxis2=dict(
+                overlaying='y',
+                side='right',
+                showgrid=False,
+                title='Total'
+            )
         )
 
         # Configurações adicionais do eixo y
         fig_quantidade_dia.update_yaxes(
             showline=True,
-            linecolor = "Grey",
+            linecolor="Grey",
             linewidth=0.5
         )
 
         c3.plotly_chart(fig_quantidade_dia, use_container_width=True, automargin=True)
+
+
+
 
 
 
