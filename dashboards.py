@@ -8,7 +8,7 @@ import calendar
 
 st.set_page_config(layout="wide", page_title="Restaurante Dona Nize", initial_sidebar_state="expanded", page_icon="📊")
 
-st.sidebar.markdown('<h2 style="color: firebrick; margin-bottom: -40px; text-align: center;">Dona Nize | Elisa Agro</h2>', unsafe_allow_html=True)
+st.sidebar.markdown('<h2 style="color: #b2182b; margin-bottom: -40px; text-align: center;">Dona Nize | Elisa Agro</h2>', unsafe_allow_html=True)
 st.sidebar.markdown('<h4 style="margin-bottom: -200px; text-align: center;">(Fornecimento Alimentação)</h4>', unsafe_allow_html=True)
 
 st.sidebar.write("____")
@@ -26,7 +26,7 @@ st.sidebar.write("____")
 link_url = "https://drive.google.com/drive/folders/1N4V0ZJLiGAHxRrBpVPHv0hqkFJ3CwFsM"
 st.sidebar.markdown(f'''
     <h4>
-        <a href="{link_url}" target="_blank" style="color: firebrick; text-decoration: none;" 
+        <a href="{link_url}" target="_blank" style="color: #b2182b; text-decoration: none;" 
            onmouseover="this.style.textDecoration='none';" onmouseout="this.style.textDecoration='none';">
            📂 Drive Fechamentos Diários
         </a>
@@ -36,7 +36,7 @@ st.sidebar.markdown(f'''
             text-decoration: none !important;
         }}
         a:visited {{
-            color: firebrick;
+            color: #b2182b;
         }}
     </style>
 ''', unsafe_allow_html=True)
@@ -48,8 +48,8 @@ df = pd.read_csv("databaseElisa.csv", sep=";", decimal=",", thousands=".", useco
 df['data'] = pd.to_datetime(df['data'], format='%d/%m/%Y', errors='coerce')
 df['data'] = df['data'].dt.date
 
-col1_side.markdown('<h5 style="color: firebrick;">Última Atualização:</h5>', unsafe_allow_html=True)
-col2_side.markdown('<h5 style="color: firebrick;">' + str(df['data'].max().strftime('%d/%m/%Y'))+ '</h5>', unsafe_allow_html=True)
+col1_side.markdown('<h5 style="color: #b2182b;">Última Atualização:</h5>', unsafe_allow_html=True)
+col2_side.markdown('<h5 style="color: #b2182b;">' + str(df['data'].max().strftime('%d/%m/%Y'))+ '</h5>', unsafe_allow_html=True)
 
 
 mes_atual = dt.datetime.today().month
@@ -67,10 +67,12 @@ with tab1:
 with tab2:
     col1_filtro1, col2_filtro1 = st.columns(2)  
     c1 = st.container()
+    st.write("_____")
     c5 = st.container()
 with tab3:
     cfiltro2 = st.container()
     col3, col4 = st.columns([1,3])
+    st.write("_____")
     c2 = st.container()
     c4 = st.container()
 
@@ -159,7 +161,7 @@ if data_inicial or data_fim:
         fig_tabela_dia = go.Figure(data=[go.Table(
                         header=dict(
                             values=list(data_frame.columns),
-                            fill_color='firebrick',
+                            fill_color='#b2182b',
                             line_color="lightgrey",
                             font_color="white",
                             align='center',
@@ -167,7 +169,7 @@ if data_inicial or data_fim:
                         ),
                         cells=dict(
                             values=[data_frame.Fazenda, data_frame.Café, data_frame.Almoço, data_frame.Lanche, data_frame.Janta],
-                            fill=dict(color=['linen', 'white','whitesmoke','white','whitesmoke']),
+                            fill=dict(color=['linen', 'white','#f7f7f7','white','#f7f7f7']),
                             line_color="lightgrey",
                             font_color="black",
                             align='center',
@@ -282,6 +284,28 @@ if data_inicial or data_fim:
         else:
             traces = [bar_refeicoes, bar_lanches]
 
+        # Sequência de cores da paleta RdBu
+        colors = px.colors.diverging.RdBu
+
+        # Traço para Refeições
+        bar_refeicoes = go.Bar(
+            x=df_agregado['data'],
+            y=df_agregado['Refeições'],
+            name='Refeições',
+            marker=dict(color=colors[7])  # Especificando a cor para Refeições
+        )
+
+        # Traço para Lanches
+        bar_lanches = go.Bar(
+            x=df_agregado['data'],
+            y=df_agregado['Lanches'],
+            name='Lanches',
+            marker=dict(color=colors[8])  # Especificando a cor para Lanches
+        )
+
+        # Combine os traços em uma lista
+        traces = [bar_refeicoes, bar_lanches] 
+
         # Combinando as barras e (possivelmente) a linha em uma única figura
         fig_quantidade_dia = go.Figure(data=traces)
 
@@ -364,7 +388,7 @@ if data_inicial or data_fim:
             
             # Configurações de layout e formatação
             fig_venda_mes.update_layout(
-                margin=dict(t=50),
+                margin=dict(t=50, b=0),
                 #yaxis_tickprefix="R$ ",
                 yaxis_tickformat=",.0s",
                 yaxis_showgrid=True,
@@ -448,11 +472,11 @@ if data_inicial or data_fim:
 
         # Criando o gráfico e outras configurações
         title = "-Exercido Anual"
-        fig_venda_ano = px.bar(venda_total_anual, x="ano", y="total", color_discrete_sequence=[px.colors.diverging.RdGy_r[1]], title=title, text='total_formatado')
+        fig_venda_ano = px.bar(venda_total_anual, x="ano", y="total", color_discrete_sequence=[px.colors.diverging.RdBu[1]], title=title, text='total_formatado')
 
         # Atualizando layout e formatação dos eixos
         fig_venda_ano.update_layout(
-            margin=dict(t=50),
+            margin=dict(t=50,b=0),
             #yaxis_tickprefix="R$ ",
             yaxis_showgrid=True,
             yaxis_title="Faturamento",
@@ -497,13 +521,31 @@ if data_inicial or data_fim:
 
         venda_total_mensal['total_formatado'] = venda_total_mensal['total'].apply(lambda x: f"R$ {x:,.2f}".replace('.', '@').replace(',', '.').replace('@', ','))
 
+        # Sequência de cores da paleta RdBu
+        colors = px.colors.diverging.RdBu
+
+        # Mapeamento de cada ano para uma cor específica da paleta (como exemplo)
+        # Ajuste conforme necessário
+        color_map = {
+            '2021': px.colors.diverging.RdBu[1],
+            '2022': px.colors.diverging.RdBu[7],
+            '2023': px.colors.diverging.RdBu[8]
+        }
+
         # Criando o Gráfico de Barras Agrupadas
-        fig_barras = px.bar(venda_total_mensal, x="month_name", y="total", color="year", barmode='group',
-                            labels={"total": "Faturamento", "month_name": "Mês", "year": "Ano"},
-                            title="-Comparativo Anual")
+        fig_barras = px.bar(
+            venda_total_mensal, 
+            x="month_name", 
+            y="total", 
+            color="year",  
+            barmode='group',
+            labels={"total": "Faturamento", "month_name": "Mês", "year": "Ano"},
+            title="-Comparativo Anual",
+            color_discrete_map=color_map  # Aplicando o mapeamento de cores
+        )
 
         fig_barras.update_layout(
-            margin=dict(t=50),
+            margin=dict(t=50,b=0),
             #yaxis_tickprefix="R$ ",
             yaxis_showgrid=True,
             yaxis_title="Faturamento",
@@ -571,7 +613,7 @@ if data_inicial or data_fim:
         # Atualizando layout e formatação dos eixos
         fig_venda_ano.update_layout(
             title="-Relação Qualitativa",
-            margin=dict(t=50),
+            margin=dict(t=50,b=0),
             yaxis_showgrid=True,
             yaxis_title="Faturamento",
             xaxis_title="Anos",
