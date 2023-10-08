@@ -62,6 +62,8 @@ tab1, tab2, tab3 = st.tabs(["📅 Fechametos Diários", "📊 Visão Mensal", "�
 with tab1:
     col_data_ini, col_data_fim = st.columns(2)
     col1, col2 = st.columns([2,1])
+    st.write("_____")
+    c3 = st.container()
 with tab2:
     col1_filtro1, col2_filtro1 = st.columns(2)  
     c1 = st.container()
@@ -171,15 +173,13 @@ if data_inicial or data_fim:
                         ))
                     ])
 
-        fig_tabela_dia.update_layout(title={ 'text': "-Fechamento de " + periodo, 'y':0.88, 'x':0.0, 'xanchor': 'left', 'yanchor': 'top'})
-        fig_tabela_dia.update_layout(height = 530, margin=dict(r=10))
         fig_tabela_dia.update_layout(
                                     yaxis=dict(
                                         domain=[0.3, 1]  # Ajuste os valores conforme necessário
                                     ),
-                                    title={ 'text': "-Fechamento de " + periodo, 'y':0.88, 'x':0.0, 'xanchor': 'left', 'yanchor': 'top'},
-                                    height=530,
-                                    margin=dict(r=10, l=10)
+                                    title={ 'text': "-Fechamento de " + periodo, 'y':0.92, 'x':0.0, 'xanchor': 'left', 'yanchor': 'top'},
+                                    height=282,
+                                    margin=dict(r=10, t=50,b=0)
 )
         col1.plotly_chart(fig_tabela_dia, use_container_width=True, automargin=True)
 
@@ -214,8 +214,78 @@ if data_inicial or data_fim:
 
         # Configurações adicionais
         fig_venda_fazenda.update_traces(textposition='inside', textinfo='percent+label')
-        fig_venda_fazenda.update_layout(width=600, height=460, margin=dict(l=10))
+        fig_venda_fazenda.update_layout(width=600, height=282, margin=dict(l=10., t=50,b=0))
         col2.plotly_chart(fig_venda_fazenda, use_container_width=True)
+
+
+        
+
+
+        #################### Gráfico Quantidade Refeições e lanches por dia ########################
+
+        # 1. Certificando-se de que a coluna 'data' é do tipo datetime
+        filtered_df['data'] = pd.to_datetime(filtered_df['data'], errors='coerce')
+
+        # Se houver valores nulos após a conversão, isso pode indicar problemas nos dados
+        if filtered_df['data'].isnull().any():
+            st.warning('Existem valores inválidos na coluna data!')
+
+        # 2. Agregando os dados por data usando o método .sum()
+        filtered_df['Refeições'] = filtered_df['almoco'] + filtered_df['janta']
+        filtered_df['Lanches'] = filtered_df['cafe'] + filtered_df['lanche']
+
+        # Agregar por data e somar as colunas de interesse
+        df_agregado = filtered_df.groupby('data').sum()[['Refeições', 'Lanches']].reset_index()
+
+        # Transformando a coluna data para o formato desejado
+        df_agregado['data'] = df_agregado['data'].dt.strftime('%d/%m/%y')
+
+        # Criando as barras separadamente para 'Refeições' e 'Lanches'
+        bar_refeicoes = go.Bar(
+            x=df_agregado['data'],
+            y=df_agregado['Refeições'],
+            name='Refeições',
+            text=df_agregado['Refeições']
+        )
+
+        bar_lanches = go.Bar(
+            x=df_agregado['data'],
+            y=df_agregado['Lanches'],
+            name='Lanches',
+            text=df_agregado['Lanches']
+        )
+
+        # Combinando as barras em uma única figura
+        fig_quantidade_dia = go.Figure(data=[bar_refeicoes, bar_lanches])
+
+        # Ajuste para exibir os textos dentro das barras
+        fig_quantidade_dia.update_traces(texttemplate='%{text}', textposition='inside', insidetextanchor='middle')
+        
+        fig_quantidade_dia.update_layout(
+            margin=dict(t=50),
+            title='-Quantidade de Refeições e Lanches por Dia',
+            barmode='group',
+            xaxis_title='Data',
+            yaxis_title='Quantidade'
+        )
+
+        # Configurações adicionais do eixo y
+        fig_quantidade_dia.update_yaxes(
+            showline=True,
+            linecolor = "Grey",
+            linewidth=0.5
+        )
+
+        c3.plotly_chart(fig_quantidade_dia, use_container_width=True, automargin=True)
+
+
+
+
+
+
+
+
+
 
         #################### Gráfico Visão Geral Mensal ########################
         # Convertendo a coluna 'data' para o tipo datetime
