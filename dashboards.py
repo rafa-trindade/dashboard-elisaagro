@@ -262,14 +262,19 @@ if data_inicial or data_fim:
             # Configurações de layout e formatação
             fig_venda_mes.update_layout(
                 margin=dict(t=50),
-                yaxis_tickprefix="R$ ",
+                #yaxis_tickprefix="R$ ",
+                yaxis_tickformat=",.0s",
                 yaxis_showgrid=True,
                 yaxis_title="Faturamento",
-                xaxis_title="Dias"
+                xaxis_title="Dias" 
             )
 
-            # Formatação do eixo y
-            fig_venda_mes.update_yaxes(tickprefix="R$", tickformat=',.2f', showline=True, linewidth=1, linecolor='black', mirror=True)
+            # Configurações adicionais do eixo y
+            fig_venda_mes.update_yaxes(
+                showline=True,
+                linecolor = "Grey",
+                linewidth=0.5
+            )
 
             c1.plotly_chart(fig_venda_mes, use_container_width=True)
 
@@ -307,20 +312,17 @@ if data_inicial or data_fim:
         # Atualizando layout e formatação dos eixos
         fig_venda_mes.update_layout(
             margin=dict(t=50),
-            yaxis_tickprefix="R$ ",
+            #yaxis_tickprefix="R$ ",
             yaxis_showgrid=True,
             yaxis_title="Faturamento",
-            xaxis_title="Meses"  # Atualizando o título do eixo x
+            xaxis_title="Meses"  # Atualizando o título do eixo x para "Meses"
         )
 
         # Configurações adicionais do eixo y
         fig_venda_mes.update_yaxes(
-            tickformat=',.2f',
-            separatethousands=True,
             showline=True,
-            linewidth=1,
-            linecolor='black',
-            mirror=True
+            linecolor = "Grey",
+            linewidth=0.5
         )
 
         col3.plotly_chart(fig_venda_mes, use_container_width=True)
@@ -348,7 +350,7 @@ if data_inicial or data_fim:
         # Atualizando layout e formatação dos eixos
         fig_venda_ano.update_layout(
             margin=dict(t=50),
-            yaxis_tickprefix="R$ ",
+            #yaxis_tickprefix="R$ ",
             yaxis_showgrid=True,
             yaxis_title="Faturamento",
             xaxis_title="Anos"  # Atualizando o título do eixo x para "Ano"
@@ -356,13 +358,11 @@ if data_inicial or data_fim:
 
         # Configurações adicionais do eixo y
         fig_venda_ano.update_yaxes(
-            tickformat=',.2f',
-            separatethousands=True,
             showline=True,
-            linewidth=1,
-            linecolor='black',
-            mirror=True
+            linecolor = "Grey",
+            linewidth=0.5
         )
+
 
         # Considerando que "c3" seja o novo container:
         col4.plotly_chart(fig_venda_ano, use_container_width=True)
@@ -392,18 +392,27 @@ if data_inicial or data_fim:
 
         venda_total_mensal['month_name'] = venda_total_mensal['month'].map(meses)
 
+        venda_total_mensal['total_formatado'] = venda_total_mensal['total'].apply(lambda x: f"R$ {x:,.2f}".replace('.', '@').replace(',', '.').replace('@', ','))
+
         # Criando o Gráfico de Barras Agrupadas
         fig_barras = px.bar(venda_total_mensal, x="month_name", y="total", color="year", barmode='group',
                             labels={"total": "Faturamento", "month_name": "Mês", "year": "Ano"},
-                            title="-Comparativo mensal ao longo dos anos")
+                            title="-Comparativo Mensal")
 
-        # Atualizando layout
         fig_barras.update_layout(
-            yaxis_tickprefix="R$ ",
-            yaxis_tickformat=",.",
-            xaxis_title="Meses",
-            yaxis_title="Faturamento"
+            margin=dict(t=50),
+            #yaxis_tickprefix="R$ ",
+            yaxis_showgrid=True,
+            yaxis_title="Faturamento",
+            xaxis_title=""  # Atualizando o título do eixo x para "Meses"
         )
+
+        # Configurações adicionais do eixo y
+        fig_barras.update_yaxes(
+            showline=True,
+            linecolor = "Grey",
+            linewidth=0.5
+        )        
 
         # Considerando que "c2" seja o novo container (ajuste o nome do container conforme necessário):
         c2.plotly_chart(fig_barras, use_container_width=True)
