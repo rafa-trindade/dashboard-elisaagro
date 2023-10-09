@@ -75,7 +75,6 @@ with tab2:
     c3 = st.container()
 with tab3:
     col3, col4 = st.columns([1,3])
-    c4 = st.container()
 
 
 
@@ -89,6 +88,7 @@ mes_inicial_padrão = dt.date(ano_atual, mes_atual, 1)
 
 data_inicial = col_data_ini.date_input('DATA INÍCIO:', mes_inicial_padrão, None, format="DD/MM/YYYY")
 data_fim = col_data_fim.date_input('DATA FIM:', None, format="DD/MM/YYYY")
+date_difference = pd.Timedelta(0)
 
 if data_inicial:
     data_inicial = pd.Timestamp(data_inicial)
@@ -115,8 +115,9 @@ if data_inicial or data_fim:
             if data_inicial > data_fim:
                 st.warning('Data de início é maior que data de término!')
             else:
+                date_difference = data_fim - data_inicial
                 periodo = dia_start + "/" + mes_start + "/" + ano_start + " A " + dia_end + "/" + mes_end + "/" + ano_end
-                filtered_df = df[(df['data'] >= data_inicial) & (df['data'] <= data_fim)]
+                filtered_df = df[(df['data'] >= data_inicial) & (df['data'] <= data_fim)]     
         elif data_inicial:
             periodo = dia_start + "/" + mes_start + "/" + ano_start
             filtered_df = df[(df['data'] == data_inicial)]
@@ -217,20 +218,20 @@ if data_inicial or data_fim:
         
 #################### Gráfico Qualitativo ########################
 
-        # Convertendo a coluna 'data' para datetime
-        df['data'] = pd.to_datetime(df['data'], errors='coerce')
+        # 1. Convertendo a coluna 'data' para datetime
+        filtered_df['data'] = pd.to_datetime(filtered_df['data'], errors='coerce')
 
         # Verificar valores nulos
-        if df['data'].isnull().any():
+        if filtered_df['data'].isnull().any():
             st.warning('Existem valores inválidos na coluna data!')
 
         # Agregando os dados
-        df['Refeições'] = df['almoco'] + df['janta']
-        df['Lanches'] = df['cafe'] + df['lanche']
-
-        # Group by data
-        df_agregado = df.groupby('data').sum()[['Refeições', 'Lanches', 'total']].reset_index()
+        filtered_df['Refeições'] = filtered_df['almoco'] + filtered_df['janta']
+        filtered_df['Lanches'] = filtered_df['cafe'] + filtered_df['lanche']
+        df_agregado = filtered_df.groupby('data').sum()[['Refeições', 'Lanches', 'total']].reset_index()
         df_agregado['data'] = df_agregado['data'].dt.strftime('%d/%m/%y')
+
+
 
         # Definindo cores
         colors = px.colors.diverging.RdBu
@@ -254,43 +255,25 @@ if data_inicial or data_fim:
             marker=dict(color=colors[8])
         )
 
-        line_total = go.Scatter(
-            x=df_agregado['data'],
-            y=df_agregado['total'],
-            mode='lines',
-            name='Qualitativo',
-            line=dict(color='red', shape='linear'),
-            yaxis='y2',
-            visible=True  # Inicialmente visível
-        )
-
-        traces = [bar_refeicoes, bar_lanches, line_total]
+        # Condicionando a criação do traço da linha "Qualitativo"
+        if date_difference >= pd.Timedelta(days=6*30):  # Aproximando 6 meses
+            line_total = go.Scatter(
+                x=df_agregado['data'],
+                y=df_agregado['total'],
+                mode='lines',
+                name='Qualitativo',
+                line=dict(color='red', shape='linear'),
+                yaxis='y2'
+            )
+            traces = [bar_refeicoes, bar_lanches, line_total]
+        else:
+            traces = [bar_refeicoes, bar_lanches]
 
         # Construindo a figura
         fig_quantidade_dia = go.Figure(data=traces)
-
-        # Adicionando botão para mostrar/ocultar a linha "Qualitativo"
         fig_quantidade_dia.update_layout(
-            updatemenus=[
-                dict(
-                    type="buttons",
-                    showactive=True,
-                    x=1.1,            # À extrema direita
-                    xanchor='right', # Ancoragem à direita
-                    y=0,            # Na parte inferior
-                    yanchor='bottom',  # Ancoragem na parte inferior
-                    buttons=[
-                        dict(label="Mostrar",
-                            method="update",
-                            args=[{"visible": [True, True, True]}]),
-                        dict(label="Ocultar",
-                            method="update",
-                            args=[{"visible": [True, True, False]}])
-                    ]
-                )
-            ],
             margin=dict(t=50),
-            title="-REPRESENTAÇÃO QUANTI-QUALITATIVA DE TODO PERÍODO",
+            title= "-TOTAL REFEIÇÕES DE " + periodo + " (representação qualitativa a partir de 6 meses)",
             barmode='group',
             xaxis_title='Dias',
             yaxis_title='Quantidade',
@@ -301,7 +284,6 @@ if data_inicial or data_fim:
                 title='Total'
             )
         )
-
         fig_quantidade_dia.update_yaxes(
             showline=True,
             linecolor="Grey",
@@ -457,7 +439,7 @@ if data_inicial or data_fim:
 
         # Atualizando layout e formatação dos eixos
         fig_venda_ano.update_layout(
-            margin=dict(t=50,b=0),
+            margin=dict(t=50),
             #yaxis_tickprefix="R$ ",
             yaxis_showgrid=True,
             yaxis_title="Faturamento",
@@ -473,107 +455,6 @@ if data_inicial or data_fim:
 
         # Considerando que "c3" seja o novo container:
         col3.plotly_chart(fig_venda_ano, use_container_width=True)
-
-
-
-#################### Gráfico Comparativo Faturamento/Quantidade ########################
-
-
-
-
-        # Convertendo a coluna 'data' para o tipo datetime
-        df['data'] = pd.to_datetime(df['data'], errors='coerce')
-
-        # Extraindo o ano como string
-        df['ano'] = df['data'].dt.year.astype(str)
-
-        # Agregando os dados por ano e somando as colunas de interesse
-        df['Refeições'] = df['almoco'] + df['janta']
-        df['Lanches'] = df['cafe'] + df['lanche']
-
-        venda_total_anual = df.groupby('ano')[['total', 'Refeições', 'Lanches']].sum().reset_index()
-
-        # Calculando a diferença de proporção
-        venda_total_anual['Diferença Proporção'] = ((venda_total_anual['Refeições'] - venda_total_anual['total']) / venda_total_anual['total']) * 100
-
-        colors = px.colors.diverging.RdBu
-
-        # Criando as barras para 'Total', 'Refeições' e 'Lanches'
-        bar_total = go.Bar(
-            x=venda_total_anual['ano'],
-            y=venda_total_anual['total'],
-            name='Faturamento',
-            text=venda_total_anual['total'].apply(lambda x: f"R$ {x:,.2f}".replace('.', '@').replace(',', '.').replace('@', ',')),
-            textposition='inside',
-            marker=dict(color=colors[1])
-        )
-
-        bar_refeicoes = go.Bar(
-            x=venda_total_anual['ano'],
-            y=venda_total_anual['Refeições'],
-            name='Refeições',
-            yaxis='y2',
-            marker=dict(color=colors[7], opacity=0.75)
-        )
-
-        bar_lanches = go.Bar(
-            x=venda_total_anual['ano'],
-            y=venda_total_anual['Lanches'],
-            name='Lanches',
-            yaxis='y2',
-            marker=dict(color=colors[8], opacity=0.75)
-        )
-
-        # Traço para mostrar a diferença de proporção
-        line_diff = go.Scatter(
-            x=venda_total_anual['ano'],
-            y=venda_total_anual['Diferença Proporção'],
-            mode='lines+text',
-            name='Diferença Proporção (%)',
-            text=venda_total_anual['Diferença Proporção'].round(2).astype(str) + '%',
-            textposition='top center',
-            line=dict(color='purple', shape='linear'),
-            yaxis='y3'
-        )
-
-        # Combinando as barras e a linha em uma única figura
-        fig_venda_ano = go.Figure(data=[bar_total, bar_refeicoes, bar_lanches, line_diff])
-
-        # Atualizando layout e formatação dos eixos
-        fig_venda_ano.update_layout(
-            title="-RELAÇÃO QUALITATIVA",
-            margin=dict(t=50, b=0),
-            yaxis_showgrid=True,
-            yaxis_title="Faturamento",
-            xaxis_title="Anos",
-            barmode='group',  # Para agrupar as barras por ano
-            yaxis2=dict(
-                overlaying='y',
-                side='right',
-                showgrid=False,
-                title='Quantidade'
-            ),
-        yaxis3=dict(
-            overlaying='y',
-            side='right',
-            showgrid=False,
-            title='Diferença Proporção (%)'
-        )
-
-        )
-
-        # Configurações adicionais do eixo y
-        fig_venda_ano.update_yaxes(
-            showline=True,
-            linecolor="Grey",
-            linewidth=0.5
-        )
-
-        # Exibindo o gráfico (substitua col4 pela sua variável de exibição, caso necessário)
-        col4.plotly_chart(fig_venda_ano, use_container_width=True)
-
-
-
 
 #################### Gráfico de Barras Agrupadas por mês ########################
 
@@ -625,7 +506,7 @@ if data_inicial or data_fim:
         )
 
         fig_barras.update_layout(
-            margin=dict(t=50,b=0),
+            margin=dict(t=50),
             #yaxis_tickprefix="R$ ",
             yaxis_showgrid=True,
             yaxis_title="Faturamento",
@@ -640,7 +521,7 @@ if data_inicial or data_fim:
         )        
 
         # Considerando que "c2" seja o novo container (ajuste o nome do container conforme necessário):
-        c4.plotly_chart(fig_barras, use_container_width=True)
+        col4.plotly_chart(fig_barras, use_container_width=True)
 
 
 
