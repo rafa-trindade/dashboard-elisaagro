@@ -261,7 +261,7 @@ if data_inicial or data_fim:
         )
 
         # Condicionando a criação do traço da linha "Qualitativo"
-        if date_difference >= pd.Timedelta(days=6*30):  # Aproximando 6 meses
+        if date_difference >= (pd.Timedelta(days=(1*30)-1)-pd.Timedelta(1)):  # Aproximando 6 meses
             line_total = go.Scatter(
                 x=df_agregado['data'],
                 y=df_agregado['total'],
