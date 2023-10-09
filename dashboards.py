@@ -218,6 +218,8 @@ if data_inicial or data_fim:
         
 #################### Gráfico Qualitativo ########################
 
+
+
         # 1. Convertendo a coluna 'data' para datetime
         filtered_df['data'] = pd.to_datetime(filtered_df['data'], errors='coerce')
 
@@ -230,8 +232,6 @@ if data_inicial or data_fim:
         filtered_df['Lanches'] = filtered_df['cafe'] + filtered_df['lanche']
         df_agregado = filtered_df.groupby('data').sum()[['Refeições', 'Lanches', 'total']].reset_index()
         df_agregado['data'] = df_agregado['data'].dt.strftime('%d/%m/%y')
-
-
 
         # Definindo cores
         colors = px.colors.diverging.RdBu
@@ -269,11 +269,61 @@ if data_inicial or data_fim:
         else:
             traces = [bar_refeicoes, bar_lanches]
 
-        # Construindo a figura
+        # Filtrar a linha "Qualitativo" a partir de 01/09/2023
+        mask = (pd.to_datetime(df_agregado['data'], format='%d/%m/%y') >= '2023-09-01')
+        qualitativo_post_2023 = df_agregado[mask]
+
+        # Encontrar o valor máximo da linha "Qualitativo" APENAS após 01/09/2023
+        max_value_qualitativo_post_2023 = qualitativo_post_2023['total'].max()
+
+        # Obter o valor da coluna 'total' do último dia disponível
+        last_day_total_value = df_agregado['total'].iloc[-1]
+
+        # Criando a figura
         fig_quantidade_dia = go.Figure(data=traces)
+
+        # Se a diferença de datas for maior ou igual a aproximadamente 6 meses
+        if date_difference >= pd.Timedelta(days=6*30):
+            # Adicionar a linha horizontal no gráfico baseada no valor máximo pós 01/09/2023
+            fig_quantidade_dia.add_shape(
+                go.layout.Shape(
+                    type="line",
+                    xref="x",
+                    yref="y2",
+                    x0=df_agregado['data'].iloc[0],  # Início do eixo x
+                    x1=df_agregado['data'].iloc[-1],  # Final do eixo x
+                    y0=max_value_qualitativo_post_2023,
+                    y1=max_value_qualitativo_post_2023,
+                    line=dict(
+                        color="Purple",
+                        width=2,
+                        dash="dashdot",
+                    )
+                )
+            )
+            
+            # Adicionar a linha horizontal baseada no valor do último dia disponível
+            fig_quantidade_dia.add_shape(
+                go.layout.Shape(
+                    type="line",
+                    xref="x",
+                    yref="y2",
+                    x0=df_agregado['data'].iloc[0],  # Início do eixo x
+                    x1=df_agregado['data'].iloc[-1],  # Final do eixo x
+                    y0=last_day_total_value,
+                    y1=last_day_total_value,
+                    line=dict(
+                        color="Green",
+                        width=2,
+                        dash="dashdot",
+                    )
+                )
+            )
+
+        # Atualizar layout e exibir gráfico
         fig_quantidade_dia.update_layout(
             margin=dict(t=50),
-            title= "-TOTAL REFEIÇÕES DE " + periodo + " (representação quanti-qualitativa a partir de 6 meses)",
+            title= "-TOTAL REFEIÇÕES DE " + periodo,
             barmode='group',
             xaxis_title='Dias',
             yaxis_title='Quantidade',
@@ -284,6 +334,8 @@ if data_inicial or data_fim:
                 title='Total'
             )
         )
+
+
         fig_quantidade_dia.update_yaxes(
             showline=True,
             linecolor="Grey",
@@ -292,6 +344,7 @@ if data_inicial or data_fim:
 
         # Exibindo o gráfico
         c1.plotly_chart(fig_quantidade_dia, use_container_width=True, automargin=True)
+
 
 
 
