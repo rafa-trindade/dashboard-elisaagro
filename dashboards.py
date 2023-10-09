@@ -217,24 +217,20 @@ if data_inicial or data_fim:
         
 #################### Gráfico Qualitativo ########################
 
-
-        # 1. Convertendo a coluna 'data' para datetime
-        filtered_df['data'] = pd.to_datetime(filtered_df['data'], errors='coerce')
+        # Convertendo a coluna 'data' para datetime
+        df['data'] = pd.to_datetime(df['data'], errors='coerce')
 
         # Verificar valores nulos
-        if filtered_df['data'].isnull().any():
+        if df['data'].isnull().any():
             st.warning('Existem valores inválidos na coluna data!')
 
         # Agregando os dados
-        filtered_df['Refeições'] = filtered_df['almoco'] + filtered_df['janta']
-        filtered_df['Lanches'] = filtered_df['cafe'] + filtered_df['lanche']
-        df_agregado = filtered_df.groupby('data').sum()[['Refeições', 'Lanches', 'total']].reset_index()
-        df_agregado['data'] = df_agregado['data'].dt.strftime('%d/%m/%y')
+        df['Refeições'] = df['almoco'] + df['janta']
+        df['Lanches'] = df['cafe'] + df['lanche']
 
-        # Verificando a diferença de datas
-        min_date = pd.to_datetime(df_agregado['data'].min(), format='%d/%m/%y')
-        max_date = pd.to_datetime(df_agregado['data'].max(), format='%d/%m/%y')
-        date_difference = max_date - min_date
+        # Group by data
+        df_agregado = df.groupby('data').sum()[['Refeições', 'Lanches', 'total']].reset_index()
+        df_agregado['data'] = df_agregado['data'].dt.strftime('%d/%m/%y')
 
         # Definindo cores
         colors = px.colors.diverging.RdBu
@@ -258,25 +254,43 @@ if data_inicial or data_fim:
             marker=dict(color=colors[8])
         )
 
-        # Condicionando a criação do traço da linha "Qualitativo"
-        if date_difference >= pd.Timedelta(days=6*30):  # Aproximando 6 meses
-            line_total = go.Scatter(
-                x=df_agregado['data'],
-                y=df_agregado['total'],
-                mode='lines',
-                name='Qualitativo',
-                line=dict(color='red', shape='linear'),
-                yaxis='y2'
-            )
-            traces = [bar_refeicoes, bar_lanches, line_total]
-        else:
-            traces = [bar_refeicoes, bar_lanches]
+        line_total = go.Scatter(
+            x=df_agregado['data'],
+            y=df_agregado['total'],
+            mode='lines',
+            name='Qualitativo',
+            line=dict(color='red', shape='linear'),
+            yaxis='y2',
+            visible=True  # Inicialmente visível
+        )
+
+        traces = [bar_refeicoes, bar_lanches, line_total]
 
         # Construindo a figura
         fig_quantidade_dia = go.Figure(data=traces)
+
+        # Adicionando botão para mostrar/ocultar a linha "Qualitativo"
         fig_quantidade_dia.update_layout(
+            updatemenus=[
+                dict(
+                    type="buttons",
+                    showactive=True,
+                    x=1.1,            # À extrema direita
+                    xanchor='right', # Ancoragem à direita
+                    y=0,            # Na parte inferior
+                    yanchor='bottom',  # Ancoragem na parte inferior
+                    buttons=[
+                        dict(label="Mostrar",
+                            method="update",
+                            args=[{"visible": [True, True, True]}]),
+                        dict(label="Ocultar",
+                            method="update",
+                            args=[{"visible": [True, True, False]}])
+                    ]
+                )
+            ],
             margin=dict(t=50),
-            title= "-TOTAL REFEIÇÕES DE " + periodo,
+            title="-REPRESENTAÇÃO QUANTI-QUALITATIVA DE TODO PERÍODO",
             barmode='group',
             xaxis_title='Dias',
             yaxis_title='Quantidade',
@@ -287,6 +301,7 @@ if data_inicial or data_fim:
                 title='Total'
             )
         )
+
         fig_quantidade_dia.update_yaxes(
             showline=True,
             linecolor="Grey",
@@ -464,6 +479,8 @@ if data_inicial or data_fim:
 #################### Gráfico Comparativo Faturamento/Quantidade ########################
 
 
+
+
         # Convertendo a coluna 'data' para o tipo datetime
         df['data'] = pd.to_datetime(df['data'], errors='coerce')
 
@@ -475,6 +492,9 @@ if data_inicial or data_fim:
         df['Lanches'] = df['cafe'] + df['lanche']
 
         venda_total_anual = df.groupby('ano')[['total', 'Refeições', 'Lanches']].sum().reset_index()
+
+        # Calculando a diferença de proporção
+        venda_total_anual['Diferença Proporção'] = ((venda_total_anual['Refeições'] - venda_total_anual['total']) / venda_total_anual['total']) * 100
 
         colors = px.colors.diverging.RdBu
 
@@ -504,13 +524,25 @@ if data_inicial or data_fim:
             marker=dict(color=colors[8], opacity=0.75)
         )
 
-        # Combinando as barras em uma única figura
-        fig_venda_ano = go.Figure(data=[bar_total, bar_refeicoes, bar_lanches])
+        # Traço para mostrar a diferença de proporção
+        line_diff = go.Scatter(
+            x=venda_total_anual['ano'],
+            y=venda_total_anual['Diferença Proporção'],
+            mode='lines+text',
+            name='Diferença Proporção (%)',
+            text=venda_total_anual['Diferença Proporção'].round(2).astype(str) + '%',
+            textposition='top center',
+            line=dict(color='purple', shape='linear'),
+            yaxis='y3'
+        )
+
+        # Combinando as barras e a linha em uma única figura
+        fig_venda_ano = go.Figure(data=[bar_total, bar_refeicoes, bar_lanches, line_diff])
 
         # Atualizando layout e formatação dos eixos
         fig_venda_ano.update_layout(
             title="-RELAÇÃO QUALITATIVA",
-            margin=dict(t=50,b=0),
+            margin=dict(t=50, b=0),
             yaxis_showgrid=True,
             yaxis_title="Faturamento",
             xaxis_title="Anos",
@@ -520,7 +552,14 @@ if data_inicial or data_fim:
                 side='right',
                 showgrid=False,
                 title='Quantidade'
-            )
+            ),
+        yaxis3=dict(
+            overlaying='y',
+            side='right',
+            showgrid=False,
+            title='Diferença Proporção (%)'
+        )
+
         )
 
         # Configurações adicionais do eixo y
@@ -530,8 +569,9 @@ if data_inicial or data_fim:
             linewidth=0.5
         )
 
-        # Considerando que "col4" seja o novo container:
+        # Exibindo o gráfico (substitua col4 pela sua variável de exibição, caso necessário)
         col4.plotly_chart(fig_venda_ano, use_container_width=True)
+
 
 
 
