@@ -116,8 +116,13 @@ if data_inicial or data_fim:
                 st.warning('Data de início é maior que data de término!')
             else:
                 date_difference = data_fim - data_inicial
-                periodo = dia_start + "/" + mes_start + "/" + ano_start + " A " + dia_end + "/" + mes_end + "/" + ano_end
-                filtered_df = df[(df['data'] >= data_inicial) & (df['data'] <= data_fim)]     
+                filtered_df = df[(df['data'] >= data_inicial) & (df['data'] <= data_fim)] 
+
+                if data_inicial == data_fim:
+                    periodo = dia_start + "/" + mes_start + "/" + ano_start                
+                else:
+                    periodo = dia_start + "/" + mes_start + "/" + ano_start + " A " + dia_end + "/" + mes_end + "/" + ano_end
+        
         elif data_inicial:
             periodo = dia_start + "/" + mes_start + "/" + ano_start
             filtered_df = df[(df['data'] == data_inicial)]
@@ -579,5 +584,4 @@ if data_inicial or data_fim:
 
 
     else:
-
         st.warning('A coluna "data" não foi encontrada na base fornecida.')
