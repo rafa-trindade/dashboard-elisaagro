@@ -296,7 +296,7 @@ if data_inicial or data_fim:
                     y1=max_value_qualitativo_post_2023,
                     line=dict(
                         color="Purple",
-                        width=1,
+                        width=1.5,
                         dash="dashdot",
                     )
                 )
@@ -314,7 +314,7 @@ if data_inicial or data_fim:
                     y1=last_day_total_value,
                     line=dict(
                         color="Green",
-                        width=1,
+                        width=1.5,
                         dash="dashdot",
                     )
                 )
