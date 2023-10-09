@@ -273,7 +273,7 @@ if data_inicial or data_fim:
         fig_quantidade_dia = go.Figure(data=traces)
         fig_quantidade_dia.update_layout(
             margin=dict(t=50),
-            title= "-TOTAL REFEIÇÕES DE " + periodo + " (representação qualitativa a partir de 6 meses)",
+            title= "-TOTAL REFEIÇÕES DE " + periodo + " (representação quanti-qualitativa a partir de 6 meses)",
             barmode='group',
             xaxis_title='Dias',
             yaxis_title='Quantidade',
