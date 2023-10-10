@@ -2,7 +2,9 @@ import streamlit as st
 import pandas as pd
 import plotly.express as px
 import plotly.graph_objects as go
+import numpy as np
 import datetime as dt
+
 
 st.set_page_config(layout="wide", page_title="Restaurante Dona Nize", initial_sidebar_state="expanded", page_icon="📊")
 
@@ -79,24 +81,25 @@ with tab4:
     col_data_ini_quali, col_data_fim_quali = st.columns(2)
     c4 = st.container()
 with tab5:
-    col_filtro_comb_mes, col_filtro_comb_ano = st.columns(2)
+    col_filtro_comb_mes, col_filtro_comb_ano, col_posto, col_centrocusto, col_veiculo, col_motorista = st.columns([2,1,2,2,2,2])
+    c5 = st.container()
 
 
 # Dicionário para mapear número do mês ao nome em português com a primeira letra maiúscula
 meses = {
-    1: "JANEIRO",
-    2: "FEVEREIRO",
-    3: "MARÇO",
-    4: "ABRIL",
-    5: "MAIO",
-    6: "JUNHO",
-    7: "JULHO",
-    8: "AGOSTO",
-    9: "SETEMBRO",
-    10: "OUTUBRO",
-    11: "NOVEMBRO",
-    12: "DEZEMBRO"
-}   
+    1: "Janeiro",
+    2: "Fevereiro",
+    3: "Março",
+    4: "Abril",
+    5: "Maio",
+    6: "Junho",
+    7: "Julho",
+    8: "Agosto",
+    9: "Setembro",
+    10: "Outubro",
+    11: "Novembro",
+    12: "Dezembro"
+}
 
 colors = px.colors.diverging.RdBu
 
@@ -218,7 +221,8 @@ if data_inicial or data_fim:
                                     title={ 'text': "-FECHAMENTO DE " + periodo, 'y':0.92, 'x':0.0, 'xanchor': 'left', 'yanchor': 'top'},
                                     height=282,
                                     margin=dict(r=10, t=50,b=0)
-)
+        )
+        
         col1.plotly_chart(fig_tabela_dia, use_container_width=True, automargin=True)
 
 
@@ -376,8 +380,8 @@ if data_inicial or data_fim:
         ano_atual = dt.datetime.now().year
 
         # Criação dos selectbox para o mês e ano, com valores padrão sendo o mês e ano atuais
-        mes_selecionado = col_filtro_mes.selectbox("Mês", list(meses.values()), index=list(meses.values()).index(mes_atual))
-        ano_selecionado = col_filtro_ano.selectbox("Ano", sorted(df['data'].dt.year.unique(), reverse=True), index=0)
+        mes_selecionado = col_filtro_mes.selectbox("Mês", list(meses.values()), index=list(meses.values()).index(mes_atual), key="mes_selecionado")
+        ano_selecionado = col_filtro_ano.selectbox("Ano", sorted(df['data'].dt.year.unique(), reverse=True), index=0,  key="ano_selecionado")
 
         # Convertendo a seleção de mês de volta para o número do mês
         mes_selecionado = [key for key, value in meses.items() if value == mes_selecionado][0]
@@ -399,7 +403,7 @@ if data_inicial or data_fim:
 
             mes_nome = meses[int(mes_selecionado)]
             # Criando o gráfico e usando 'total_formatado' para os valores das barras e 'data_formatada' para o eixo x
-            title = f"-EXERCIDO NO MÊS DE {mes_nome} DE {ano_selecionado}"
+            title = f"-EXERCIDO NO MÊS DE {mes_nome.upper()} DE {ano_selecionado}"
             fig_venda_mes = px.bar(venda_total, x="data_formatada", y="total", color_discrete_sequence=[px.colors.diverging.RdBu[1]], title=title, text='total_formatado')
             
             # Configurações de layout e formatação
@@ -746,7 +750,6 @@ if data_inicial_quali or data_fim_quali:
             )
         )
 
-
         fig_quantidade_dia.update_yaxes(
             showline=True,
             linecolor="Grey",
@@ -758,3 +761,157 @@ if data_inicial_quali or data_fim_quali:
 
     else:
         st.warning('A coluna "data" não foi encontrada na base fornecida.')
+
+
+
+
+##########################################COMBUSTIVEL##################################
+
+df_combustivel = pd.read_csv("consumo_combustivel.csv", sep=";", decimal=",", thousands=".", index_col=None) 
+
+# Processamento inicial do dataframe
+df_combustivel['data_hora'] = pd.to_datetime(df_combustivel['data'] + ' ' + df_combustivel['hora'], format='%d/%m/%Y %H:%M')
+df_combustivel.drop(columns=['data', 'hora'], inplace=True)
+
+# Criando um DataFrame temporário
+df_temp = df_combustivel.copy()
+
+
+
+
+# Selectboxes e filtragem de dataframe
+posto_selecionado = col_posto.selectbox("Posto:", ["Todos"] + sorted(df_combustivel['posto'].unique().tolist()))
+if posto_selecionado != "Todos":
+    df_combustivel = df_combustivel[df_combustivel['posto'] == posto_selecionado]
+
+centrocusto_selecionado = col_centrocusto.selectbox("Centro Custo:", ["Todos"] + sorted(df_combustivel['centro_custo'].unique().tolist()))
+if centrocusto_selecionado != "Todos":
+    df_combustivel = df_combustivel[df_combustivel['centro_custo'] == centrocusto_selecionado]
+
+veiculo_selecionado = col_veiculo.selectbox("Veículo:", ["Todos"] + sorted(df_combustivel['veiculo'].unique().tolist()))
+if veiculo_selecionado != "Todos":
+    df_combustivel = df_combustivel[df_combustivel['veiculo'] == veiculo_selecionado]
+
+motorista_selecionado = col_motorista.selectbox("Motorista:", ["Todos"] + sorted(df_combustivel['motorista'].unique().tolist()))
+if motorista_selecionado != "Todos":
+    df_combustivel = df_combustivel[df_combustivel['motorista'] == motorista_selecionado]
+
+ano_selecionado_comb = col_filtro_comb_ano.selectbox("Ano", sorted(df_combustivel['data_hora'].dt.year.unique().tolist(), reverse=True))
+df_combustivel = df_combustivel[df_combustivel['data_hora'].dt.year == ano_selecionado_comb]
+
+mes_selecionado_comb = col_filtro_comb_mes.selectbox("Mês", [meses[month] for month in sorted(df_combustivel['data_hora'].dt.month.unique().tolist())])
+mes_selecionado_num = list(meses.keys())[list(meses.values()).index(mes_selecionado_comb)]
+
+
+df_combustivel = df_combustivel[df_combustivel['data_hora'].dt.month == mes_selecionado_num]
+
+# Reordenar as colunas
+col_order = ["data_hora", "posto", "centro_custo", "veiculo", "tipo_combustivel", "quantidade", "preco_litro", "total", "odometro", "motorista"]
+df_combustivel = df_combustivel[col_order]
+
+
+# Garantindo que os hifens são tratados como valores NaN
+df_combustivel['odometro'] = df_combustivel['odometro'].replace('-', np.nan)
+
+# Garantindo que as colunas são tratadas como float ou int antes da formatação
+df_combustivel['total'] = df_combustivel['total'].astype(float)
+df_combustivel['preco_litro'] = df_combustivel['preco_litro'].astype(float)
+df_combustivel['quantidade'] = df_combustivel['quantidade'].astype(float)
+
+# Convertemos a coluna odometro para float primeiro para lidar com NaNs, depois preenchemos NaNs com 0 e finalmente convertemos para int
+df_combustivel['odometro'] = df_combustivel['odometro'].astype(float).fillna(0).astype(int)
+
+# Formatação das colunas específicas
+df_combustivel['total'] = df_combustivel['total'].apply(lambda x: f"R$ {x:,.2f}".replace('.', '!').replace(',', '.').replace('!', ','))
+df_combustivel['preco_litro'] = df_combustivel['preco_litro'].apply(lambda x: f"R$ {x:,.2f}".replace('.', '!').replace(',', '.').replace('!', ','))
+df_combustivel['quantidade'] = df_combustivel['quantidade'].apply(lambda x: f"{x:,.2f}".replace('.', '!').replace(',', '.').replace('!', ','))
+df_combustivel['odometro'] = df_combustivel['odometro'].apply(lambda x: f"{x:,.0f}".replace(',', '.'))
+
+
+
+
+
+# Renomear as colunas conforme especificado
+df_combustivel = df_combustivel.rename(columns={
+    'data_hora': 'Data e Hora',
+    'posto': 'Posto',
+    'centro_custo': 'Centro Custo',
+    'veiculo': 'Veículo',
+    'tipo_combustivel': 'Combustível',
+    'quantidade': 'Litros',
+    'preco_litro': 'Preço Litro',
+    'total': 'Total',
+    'odometro': 'Odômetro',
+    'motorista': 'Motorista'
+})
+
+# Formate a coluna 'data_hora' para mostrar data e hora em linhas diferentes
+df_combustivel['Data e Hora'] = df_combustivel['Data e Hora'].apply(lambda x: x.strftime("Data: %d/%m/%Y<br>Hora: %H:%M hrs"))
+
+
+# Função para converter string com formatos monetários para float
+def currency_to_float(value):
+    value = value.replace('R$', '').replace('.', '').replace(',', '.')
+    try:
+        return float(value)
+    except ValueError:
+        return np.nan
+
+# Convertendo a coluna 'Total' para float após tratamento
+df_combustivel['Total_Float'] = df_combustivel['Total'].apply(currency_to_float)
+
+# Calculando o total
+total_sum = df_combustivel['Total_Float'].sum()
+
+# Formatando o total no formato de moeda R$
+total_sum_str = f"R$ {total_sum:,.2f}".replace('.', '!').replace(',', '.').replace('!', ',')
+
+# Removendo a coluna 'Total_Float' que usamos apenas para cálculos
+df_combustivel.drop(columns=['Total_Float'], inplace=True)
+
+
+
+# Criação e exibição da tabela
+tabela_combustivel = go.Figure(data=[go.Table(
+    header=dict(
+        values=list(df_combustivel.columns),
+        fill_color='#b2182b',
+        line_color="lightgrey",
+        font_color="white",
+        align='center',
+        height=25
+    ),
+    cells=dict(
+        values=[df_combustivel[col] for col in df_combustivel.columns],
+        fill=dict(color=['linen', 'white','#f7f7f7','white','#f7f7f7', 'white','#f7f7f7','white','#f7f7f7', 'white']),
+        line_color="lightgrey",
+        font_color="black",
+        align='center',
+        height=25
+    ))
+])
+
+
+
+table_height = len(df_combustivel) * 25 + 359
+
+# Calcule a posição y do título de acordo com a altura da tabela.
+# Esta fórmula precisa ser ajustada de acordo com suas necessidades específicas.
+y_position = 1 - (18 / table_height)  # 50 é uma estimativa da altura do título; ajuste conforme necessário
+
+
+
+tabela_combustivel.update_layout(
+    yaxis=dict(
+        domain=[0.3, 1]
+    ),
+    title={
+        'text': f"-CONSUMO COMBUSTÍVEL MÊS DE {mes_selecionado_comb.upper()} DE {ano_selecionado_comb} - <span style='color:red;'>TOTAL: {total_sum_str}</span>",
+        'y': y_position, 'x': 0.0,
+        'xanchor': 'left', 'yanchor': 'top'
+    },
+    height=table_height,  # Atualizando a altura aqui
+    margin=dict(r=10, t=50, b=0)
+)
+c5.plotly_chart(tabela_combustivel, use_container_width=True, automargin=True)
+
