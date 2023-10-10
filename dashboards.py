@@ -65,7 +65,7 @@ st.sidebar.markdown(f'''
 
 
 
-tab1, tab2, tab3, tab4, tab5 = st.tabs(["📅 Fechametos Diários", "📊 Visão Mensal", "📊 Visão Anual", "📈 Análise Quanti-Qualitativa", "⛽ Consumo Combustível"])
+tab1, tab2, tab3, tab4, tab5 = st.tabs(["📅 Fechamentos Diários", "📊 Visão Mensal", "📊 Visão Anual", "📈 Análise Quanti-Qualitativa", "⛽ Consumo Combustível"])
 
 with tab1:
     col_data_ini, col_data_fim = st.columns(2)
