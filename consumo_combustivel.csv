@@ -1,0 +1,14 @@
+﻿posto;veiculo;quantidade;tipo_combustivel;data;hora;preco_litro;centro_custo;total;odometro;motorista
+Posto Silo Gasolina;Conteiner Dona Nize;19,7;Gasolina;01/09/2023;7:47;5,46;SILO 10;107,562;;José Henrique
+Posto Silo Gasolina;Conteiner Dona Nize;12,79;Gasolina;02/09/2023;7:52;5,46;SILO 10;69,8334;;José Henrique
+Posto Silo Gasolina;Conteiner Dona Nize;54,03;Gasolina;02/09/2023;14:19;5,46;SILO 10;295,0038;;José Henrique
+Posto Silo Gasolina;Conteiner Dona Nize;187,06;Gasolina;04/09/2023;7:33;5,46;;1021,3476;;José Henrique
+Posto Silo Gasolina;Conteiner Dona Nize;200,79;Gasolina;08/09/2023;8:40;5,46;FAZENDA SANTA ELISA 01;1096,3134;;José Henrique
+Posto Silo Gasolina;Conteiner Dona Nize;206,32;Gasolina;11/09/2023;8:45;5,46;SILO 10;1126,5072;;José Henrique
+Posto Silo Gasolina;Conteiner Dona Nize;220,31;Gasolina;15/09/2023;8:52;5,46;SILO 10;1202,8926;;José Henrique
+Posto Silo Gasolina;Conteiner Dona Nize;253,64;Gasolina;20/09/2023;13:49;5,46;SILO 10;1384,8744;;José Henrique
+Comboio;RNS0E64 - S10 DONA NIZE;60,95;Diesel S10;06/09/2023;8:22;5,78;FAZENDA 3 MARIA 02;352,291;111043;Mário Humberto
+Comboio;RNS0E64 - S10 DONA NIZE;31,02;Diesel S10;16/09/2023;7:29;5,78;FAZENDA SANTA ELISA 01;179,2956;111281;Mário Humberto
+Comboio;RNS0E64 - S10 DONA NIZE;57,82;Diesel S10;17/09/2023;17:09;5,78;FAZENDA SANTA ELISA 01;334,1996;111843;Mário Humberto
+Comboio;RNS0E64 - S10 DONA NIZE;53,14;Diesel S10;19/09/2023;9:10;5,78;FAZENDA SANTA ELISA 01;307,1492;112393;Mário Humberto
+Posto Silo Diesel;RNS0E64 - S10 DONA NIZE;47,09;Diesel S10;20/09/2023;13:23;5,78;FAZENDA SANTA ELISA 01;272,1802;112865;Mário Humberto
