@@ -413,7 +413,7 @@ if data_inicial or data_fim:
                 yaxis_tickformat=",.0s",
                 yaxis_showgrid=True,
                 yaxis_title="Faturamento",
-                xaxis_title="Dias" 
+                xaxis_title=f"{mes_nome} de {ano_selecionado}" 
             )
 
             # Configurações adicionais do eixo y
@@ -463,7 +463,7 @@ if data_inicial or data_fim:
             #yaxis_tickprefix="R$ ",
             yaxis_showgrid=True,
             yaxis_title="Faturamento",
-            xaxis_title="Meses"  # Atualizando o título do eixo x para "Meses"
+            xaxis_title=f"{ano_selecionado}"  # Atualizando o título do eixo x para "Meses"
         )
 
         # Configurações adicionais do eixo y
