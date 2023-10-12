@@ -80,11 +80,11 @@ tab1, tab2, tab3, tab4, tab5 = st.tabs(["📅 Fechamentos Diários", "📊 Visã
 with tab1:
     col_data_ini, col_data_fim = st.columns(2)
     col1, col2 = st.columns([2,1])
+    st.write("---")
     c1 = st.container()
 with tab2:
     col_filtro_mes, col_filtro_ano = st.columns(2)  
-    c2 = st.container()
-    c3 = st.container()
+    col5, col6 = st.columns([2,1])
 with tab3:
     col3, col4 = st.columns([1,3])
 with tab4:
@@ -216,7 +216,7 @@ if data_inicial or data_fim:
                         ),
                         cells=dict(
                             values=[data_frame.Fazenda, data_frame.Café, data_frame.Almoço, data_frame.Lanche, data_frame.Janta],
-                            fill=dict(color=['linen', 'white','#f7f7f7','white','#f7f7f7']),
+                            fill=dict(color=['#DEE6EF', 'white','#f7f7f7','white','#f7f7f7']),
                             line_color="lightgrey",
                             font_color="black",
                             align='center',
@@ -400,7 +400,7 @@ if data_inicial or data_fim:
         df_mes_filtrado = df[(df['data'].dt.month == mes_selecionado) & (df['data'].dt.year == ano_selecionado)]
 
         if df_mes_filtrado.empty:
-            c2.warning(f"Não há dados disponíveis para {mes_selecionado}/{ano_selecionado}.")
+            col5.warning(f"Não há dados disponíveis para {mes_selecionado}/{ano_selecionado}.")
         else:
             # Agregando os dados por dia
             venda_total = df_mes_filtrado.groupby("data")[["total"]].sum().reset_index()
@@ -433,7 +433,7 @@ if data_inicial or data_fim:
                 linewidth=0.5
             )
 
-            c2.plotly_chart(fig_venda_mes, use_container_width=True)
+            col5.plotly_chart(fig_venda_mes, use_container_width=True)
 
 
 
@@ -465,11 +465,20 @@ if data_inicial or data_fim:
 
         # Criando o gráfico e outras configurações
         title = f"-EXERCIDO NO ANO DE {ano_selecionado}"
-        fig_venda_mes = px.bar(venda_total_mensal, x="mes_ano", y="total", color_discrete_sequence=[px.colors.diverging.RdBu[9]], title=title, text='total_formatado')
+        
+        fig_venda_mes = px.bar(
+            venda_total_mensal, 
+            x="mes_ano",
+            y="total", 
+            color_discrete_sequence=[px.colors.diverging.RdBu[9]], 
+            title=title, 
+            text='total_formatado'
+        )
 
         # Atualizando layout e formatação dos eixos
         fig_venda_mes.update_layout(
             margin=dict(t=50),
+            height=517,
             #yaxis_tickprefix="R$ ",
             yaxis_showgrid=True,
             yaxis_title="Faturamento",
@@ -483,7 +492,7 @@ if data_inicial or data_fim:
             linewidth=0.5
         )
 
-        c3.plotly_chart(fig_venda_mes, use_container_width=True)
+        col6.plotly_chart(fig_venda_mes, use_container_width=True)
 
 
 
@@ -885,7 +894,7 @@ df_combustivel.drop(columns=['Total_Float'], inplace=True)
 tabela_combustivel = go.Figure(data=[go.Table(
     header=dict(
         values=list(df_combustivel.columns),
-        fill_color='#053061',
+        fill_color='#004d72',
         line_color="lightgrey",
         font_color="white",
         align='center',
@@ -893,7 +902,7 @@ tabela_combustivel = go.Figure(data=[go.Table(
     ),
     cells=dict(
         values=[df_combustivel[col] for col in df_combustivel.columns],
-        fill=dict(color=['linen', 'white','#f7f7f7','white','#f7f7f7', 'white','#f7f7f7','white','#f7f7f7', 'white']),
+        fill=dict(color=['#DEE6EF', 'white','#f7f7f7','white','#f7f7f7', 'white','#f7f7f7','white','#f7f7f7', 'white']),
         line_color="lightgrey",
         font_color="black",
         align='center',
