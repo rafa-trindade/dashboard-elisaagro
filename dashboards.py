@@ -6,6 +6,7 @@ import numpy as np
 import datetime as dt
 
 
+
 st.set_page_config(layout="wide", page_title="Restaurante Dona Nize", initial_sidebar_state="expanded", page_icon="📊")
 
 hide_st_style = """
