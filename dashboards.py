@@ -8,6 +8,15 @@ import datetime as dt
 
 st.set_page_config(layout="wide", page_title="Restaurante Dona Nize", initial_sidebar_state="expanded", page_icon="📊")
 
+hide_st_style = """
+                <style>
+                #MainMenu {visibility: hidden;}    
+                footer {visibility: hidden;}
+                header {visibility: hidden;} 
+                </style>
+                """
+st.markdown(hide_st_style, unsafe_allow_html=True)
+
 df = pd.read_csv("databaseElisa.csv", sep=";", decimal=",", thousands=".", usecols=['data','fazenda', 'almoco', 'janta', 'cafe','lanche', 'vlrCafe', 'vlrAlmoco', 'total'], index_col=None) 
 
 # Convertendo a coluna 'data' para o tipo datetime após carregar o dataframe
