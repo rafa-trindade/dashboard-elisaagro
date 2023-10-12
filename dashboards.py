@@ -60,7 +60,7 @@ st.sidebar.markdown(f'''
     <h4 style="text-align: center;">
         <a href="{link_url}" target="_blank" style="text-align: center; color: #053061; text-decoration: none;" 
            onmouseover="this.style.textDecoration='none';" onmouseout="this.style.textDecoration='none';">
-           📂 Drive Fechamentos Diários
+           ☁️ Drive Fechamentos Diários
         </a>
     </h4>
     <style>
