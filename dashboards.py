@@ -34,8 +34,8 @@ col1_side, col2_side = st.sidebar.columns([2,1])
 col1_side.markdown('<h5 style="margin-bottom: -25px;">Início Apurado:', unsafe_allow_html=True)
 col2_side.markdown('<h5 style="text-align: end; margin-bottom: -25px;">01/01/2021</h5>', unsafe_allow_html=True)
 
-col1_side.markdown('<h5 style="margin-bottom: 15px; color: #b2182b;">Última Atualização:</h5>', unsafe_allow_html=True)
-col2_side.markdown('<h5 style="margin-bottom: 15px; text-align: end; color: #b2182b;">' + str(df['data'].max().strftime('%d/%m/%Y'))+ '</h5>', unsafe_allow_html=True)
+col1_side.markdown('<h5 style="margin-bottom: 15px; color: #004d72;">Última Atualização:</h5>', unsafe_allow_html=True)
+col2_side.markdown('<h5 style="margin-bottom: 15px; text-align: end; color: #004d72;">' + str(df['data'].max().strftime('%d/%m/%Y'))+ '</h5>', unsafe_allow_html=True)
 
 
 col1_side.markdown('<h5 style="margin-bottom: -25px;">Contrato Vigente:</h5>', unsafe_allow_html=True)
@@ -58,7 +58,7 @@ st.sidebar.write("____")
 link_url = "https://drive.google.com/drive/folders/1N4V0ZJLiGAHxRrBpVPHv0hqkFJ3CwFsM"
 st.sidebar.markdown(f'''
     <h4 style="text-align: center;">
-        <a href="{link_url}" target="_blank" style="text-align: center; color: #b2182b; text-decoration: none;" 
+        <a href="{link_url}" target="_blank" style="text-align: center; color: #004d72; text-decoration: none;" 
            onmouseover="this.style.textDecoration='none';" onmouseout="this.style.textDecoration='none';">
            📂 Drive Fechamentos Diários
         </a>
