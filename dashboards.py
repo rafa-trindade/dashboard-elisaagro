@@ -671,7 +671,7 @@ if data_inicial_quali or data_fim_quali:
             name='Almoço | Janta',
             text=df_agregado['Refeições'],
             textposition='inside',
-            marker=dict(color=colors[1])
+            marker=dict(color=colors[-4])
         )
 
         bar_lanches = go.Bar(
@@ -720,7 +720,7 @@ if data_inicial_quali or data_fim_quali:
                 y0=max_value_qualitativo_post_2023,
                 y1=max_value_qualitativo_post_2023,
                 line=dict(
-                    color="Purple",
+                    color="white",
                     width=1.5,
                     dash="dashdot",
                 )
@@ -738,7 +738,7 @@ if data_inicial_quali or data_fim_quali:
                 y0=last_day_total_value,
                 y1=last_day_total_value,
                 line=dict(
-                    color="Green",
+                    color="white",
                     width=1.5,
                     dash="dashdot",
                 )
