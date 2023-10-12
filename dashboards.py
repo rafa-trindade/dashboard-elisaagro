@@ -23,7 +23,7 @@ df = pd.read_csv("databaseElisa.csv", sep=";", decimal=",", thousands=".", useco
 df['data'] = pd.to_datetime(df['data'], format='%d/%m/%Y', errors='coerce')
 df['data'] = df['data'].dt.date
 
-st.sidebar.markdown('<h2 style="color: #b2182b; margin-bottom: -40px; text-align: center;">Dona Nize | Elisa Agro</h2>', unsafe_allow_html=True)
+st.sidebar.markdown('<h2 style="color: #053061; margin-bottom: -40px; text-align: center;">Dona Nize | Elisa Agro</h2>', unsafe_allow_html=True)
 st.sidebar.markdown('<h4 style="margin-bottom: -200px; text-align: center;">(Fornecimento Alimentação)</h4>', unsafe_allow_html=True)
 
 st.sidebar.write("____")
@@ -67,7 +67,7 @@ st.sidebar.markdown(f'''
             text-decoration: none !important;
         }}
         a:visited {{
-            color: #b2182b;
+            color: #053061;
         }}
     </style>
 ''', unsafe_allow_html=True)
@@ -207,7 +207,7 @@ if data_inicial or data_fim:
         fig_tabela_dia = go.Figure(data=[go.Table(
                         header=dict(
                             values=list(data_frame.columns),
-                            fill_color='#b2182b',
+                            fill_color='#004d72',
                             line_color="lightgrey",
                             font_color="white",
                             align='center',
@@ -884,7 +884,7 @@ df_combustivel.drop(columns=['Total_Float'], inplace=True)
 tabela_combustivel = go.Figure(data=[go.Table(
     header=dict(
         values=list(df_combustivel.columns),
-        fill_color='#b2182b',
+        fill_color='#053061',
         line_color="lightgrey",
         font_color="white",
         align='center',
