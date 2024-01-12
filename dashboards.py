@@ -75,7 +75,7 @@ st.sidebar.markdown(f'''
 
 
 
-tab1, tab2, tab3, tab4, tab5 = st.tabs(["📅 Fechamentos Diários", "📊 Visão Mensal", "📊 Visão Anual", "📈 Análise Quanti-Qualitativa", "⛽ Consumo Combustível"])
+tab1, tab2, tab3, tab4, tab5 = st.tabs(["📅 Fechamentos Diários", "📊 Visão Mensal", "📊 Visão Anual", "📈 Análise Quanti-Qualitativa", "🚗 Despesas Transporte"])
 
 with tab1:
     col_data_ini, col_data_fim = st.columns(2)
@@ -789,7 +789,7 @@ if data_inicial_quali or data_fim_quali:
 
 ##########################################COMBUSTIVEL##################################
 
-df_combustivel = pd.read_csv("consumo_combustivel.csv", sep=";", decimal=",", thousands=".", index_col=None) 
+df_combustivel = pd.read_csv("despesas_trasnporte.csv", sep=";", decimal=",", thousands=".", index_col=None) 
 
 # Processamento inicial do dataframe
 df_combustivel['data_hora'] = pd.to_datetime(df_combustivel['data'] + ' ' + df_combustivel['hora'], format='%d/%m/%Y %H:%M')
@@ -928,7 +928,7 @@ tabela_combustivel.update_layout(
         domain=[0.3, 1]
     ),
     title={
-        'text': f"-CONSUMO COMBUSTÍVEL MÊS DE {mes_selecionado_comb.upper()} DE {ano_selecionado_comb} - <span style='color:red;'>TOTAL: {total_sum_str}</span>",
+        'text': f"-DESPESAS COM TRANSPORTE MÊS DE {mes_selecionado_comb.upper()} DE {ano_selecionado_comb} - <span style='color:red;'>TOTAL: {total_sum_str}</span>",
         'y': y_position, 'x': 0.0,
         'xanchor': 'left', 'yanchor': 'top'
     },
