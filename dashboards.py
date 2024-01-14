@@ -91,7 +91,7 @@ with tab4:
     col_data_ini_quali, col_data_fim_quali = st.columns(2)
     c4 = st.container()
 with tab5:
-    col_filtro_comb_mes, col_filtro_comb_ano, col_posto, col_centrocusto, col_veiculo, col_motorista = st.columns([2,1,2,2,2,2])
+    col_filtro_comb_ano, col_filtro_comb_mes, col_tipo_despesa, col_veiculo, col_col_fornecedor = st.columns([1,2,2,2,2])
     c5 = st.container()
 
 
@@ -789,151 +789,105 @@ if data_inicial_quali or data_fim_quali:
 
 ##########################################COMBUSTIVEL##################################
 
-df_combustivel = pd.read_csv("despesas_trasnporte.csv", sep=";", decimal=",", thousands=".", index_col=None) 
+# Carregar o arquivo CSV
+df_transporte = pd.read_csv("despesas_transporte.csv", sep=";", decimal=",", thousands=".", index_col=None)
 
-# Processamento inicial do dataframe
-df_combustivel['data_hora'] = pd.to_datetime(df_combustivel['data'] + ' ' + df_combustivel['hora'], format='%d/%m/%Y %H:%M')
-df_combustivel.drop(columns=['data', 'hora'], inplace=True)
+# Converter a coluna 'data' para o formato de data
+df_transporte['data'] = pd.to_datetime(df_transporte['data'], format='%d/%m/%Y')
 
-# Criando um DataFrame temporário
-df_temp = df_combustivel.copy()
+# Adicionar filtros de mês e ano
+anos_disponiveis = df_transporte['data'].dt.year.unique()
+anos_disponiveis = [int(ano) for ano in anos_disponiveis if not pd.isna(ano)]
 
+# Permitir ao usuário selecionar o ano
+ano_selecionado = col_filtro_comb_ano.selectbox("Selecione o Ano", anos_disponiveis)
 
+# Filtrar meses disponíveis de acordo com o ano selecionado
+meses_disponiveis = df_transporte[df_transporte['data'].dt.year == ano_selecionado]['data'].dt.month.unique()
+meses_disponiveis = sorted(meses_disponiveis)
 
+# Mapeamento de nomes dos meses em português
+mapa_meses = {
+    1: "Janeiro",
+    2: "Fevereiro",
+    3: "Março",
+    4: "Abril",
+    5: "Maio",
+    6: "Junho",
+    7: "Julho",
+    8: "Agosto",
+    9: "Setembro",
+    10: "Outubro",
+    11: "Novembro",
+    12: "Dezembro"
+}
 
-# Selectboxes e filtragem de dataframe
-posto_selecionado = col_posto.selectbox("Posto:", ["Todos"] + sorted(df_combustivel['posto'].unique().tolist()))
-if posto_selecionado != "Todos":
-    df_combustivel = df_combustivel[df_combustivel['posto'] == posto_selecionado]
+# Obter nomes dos meses em português
+nomes_meses = [mapa_meses[mes] for mes in meses_disponiveis]
 
-centrocusto_selecionado = col_centrocusto.selectbox("Centro Custo:", ["Todos"] + sorted(df_combustivel['centro_custo'].unique().tolist()))
-if centrocusto_selecionado != "Todos":
-    df_combustivel = df_combustivel[df_combustivel['centro_custo'] == centrocusto_selecionado]
+# Definir o último mês disponível como índice inicial da combobox
+mes_selecionado = col_filtro_comb_mes.selectbox("Selecione o Mês", nomes_meses, index=len(nomes_meses)-1)
 
-veiculo_selecionado = col_veiculo.selectbox("Veículo:", ["Todos"] + sorted(df_combustivel['veiculo'].unique().tolist()))
-if veiculo_selecionado != "Todos":
-    df_combustivel = df_combustivel[df_combustivel['veiculo'] == veiculo_selecionado]
+# Adicionar filtros para tipo_despesa, veiculo e fornecedor
+tipo_despesa_opcoes = ['Todos'] + df_transporte['tipo_despesa'].fillna('Todos').unique().tolist()
+tipo_despesa_selecionado = col_tipo_despesa.selectbox("Selecione o Tipo de Despesa", tipo_despesa_opcoes)
 
-motorista_selecionado = col_motorista.selectbox("Motorista:", ["Todos"] + sorted(df_combustivel['motorista'].unique().tolist()))
-if motorista_selecionado != "Todos":
-    df_combustivel = df_combustivel[df_combustivel['motorista'] == motorista_selecionado]
+# Filtrar opções de veículo com base no tipo de despesa selecionado
+veiculo_opcoes = ['Todos'] + df_transporte[df_transporte['tipo_despesa'] == tipo_despesa_selecionado]['veiculo'].fillna('Todos').unique().tolist()
+veiculo_selecionado = col_veiculo.selectbox("Selecione o Veículo", veiculo_opcoes)
 
-ano_selecionado_comb = col_filtro_comb_ano.selectbox("Ano", sorted(df_combustivel['data_hora'].dt.year.unique().tolist(), reverse=True))
-df_combustivel = df_combustivel[df_combustivel['data_hora'].dt.year == ano_selecionado_comb]
+# Filtrar opções de fornecedor com base no tipo de despesa e veículo selecionados
+fornecedor_opcoes = ['Todos'] + df_transporte[(df_transporte['tipo_despesa'] == tipo_despesa_selecionado) & (df_transporte['veiculo'] == veiculo_selecionado)]['fornecedor'].fillna('Todos').unique().tolist()
+fornecedor_selecionado = col_col_fornecedor.selectbox("Selecione o Fornecedor", fornecedor_opcoes)
 
-mes_selecionado_comb = col_filtro_comb_mes.selectbox("Mês", [meses[month] for month in sorted(df_combustivel['data_hora'].dt.month.unique().tolist())])
-mes_selecionado_num = list(meses.keys())[list(meses.values()).index(mes_selecionado_comb)]
+# Filtrar o DataFrame com base nos filtros selecionados
+filtered_df = df_transporte[
+    (df_transporte['data'].dt.month == meses_disponiveis[nomes_meses.index(mes_selecionado)]) &
+    (df_transporte['data'].dt.year == ano_selecionado) &
+    ((tipo_despesa_selecionado == 'Todos') | (df_transporte['tipo_despesa'] == tipo_despesa_selecionado)) &
+    ((veiculo_selecionado == 'Todos') | (df_transporte['veiculo'] == veiculo_selecionado)) &
+    ((fornecedor_selecionado == 'Todos') | (df_transporte['fornecedor'] == fornecedor_selecionado))
+]
 
+# Formatar as datas para o formato "dd/mm/aa"
+filtered_df['data_formatada'] = filtered_df['data'].dt.strftime('%d/%m/%y')
 
-df_combustivel = df_combustivel[df_combustivel['data_hora'].dt.month == mes_selecionado_num]
+# Calcular a soma da coluna valor_total por dia
+sum_valor_total_por_dia = filtered_df.groupby(filtered_df['data_formatada'])['valor_total'].sum().reset_index()
 
-# Reordenar as colunas
-col_order = ["data_hora", "posto", "centro_custo", "veiculo", "tipo_combustivel", "quantidade", "preco_litro", "total", "odometro", "motorista"]
-df_combustivel = df_combustivel[col_order]
+total_formatado = f'R$ {sum_valor_total_por_dia["valor_total"].sum():,.2f}'.replace('.', '@').replace(',', '.').replace('@', ',')
 
+# Exibir o gráfico de barras
+fig = px.bar(data_frame=sum_valor_total_por_dia, x='data_formatada', y='valor_total',
+             labels={'x': 'Dia', 'y': 'Valor Total'},
+             title = f'Despesas de Transporte - {mes_selecionado} {ano_selecionado} - Total: {total_formatado}',
+             text=sum_valor_total_por_dia['valor_total'].apply(lambda x: f'R$ {x:,.2f}'),
+             )
 
-# Garantindo que os hifens são tratados como valores NaN
-df_combustivel['odometro'] = df_combustivel['odometro'].replace('-', np.nan)
+# Formatar o eixo y
+fig.update_layout(yaxis_tickprefix='R$', yaxis_tickformat=',.2f',
+                    margin=dict(t=50,b=0),
+                    xaxis_title= f"{mes_selecionado} de {ano_selecionado}",
+                    yaxis_title='Total',
+                    yaxis2=dict(
+                        overlaying='y',
+                        side='right',
+                        showgrid=False,
+                        title='Total'
+                    )
+                  )
 
-# Garantindo que as colunas são tratadas como float ou int antes da formatação
-df_combustivel['total'] = df_combustivel['total'].astype(float)
-df_combustivel['preco_litro'] = df_combustivel['preco_litro'].astype(float)
-df_combustivel['quantidade'] = df_combustivel['quantidade'].astype(float)
-
-# Convertemos a coluna odometro para float primeiro para lidar com NaNs, depois preenchemos NaNs com 0 e finalmente convertemos para int
-df_combustivel['odometro'] = df_combustivel['odometro'].astype(float).fillna(0).astype(int)
-
-# Formatação das colunas específicas
-df_combustivel['total'] = df_combustivel['total'].apply(lambda x: f"R$ {x:,.2f}".replace('.', '!').replace(',', '.').replace('!', ','))
-df_combustivel['preco_litro'] = df_combustivel['preco_litro'].apply(lambda x: f"R$ {x:,.2f}".replace('.', '!').replace(',', '.').replace('!', ','))
-df_combustivel['quantidade'] = df_combustivel['quantidade'].apply(lambda x: f"{x:,.2f}".replace('.', '!').replace(',', '.').replace('!', ','))
-df_combustivel['odometro'] = df_combustivel['odometro'].apply(lambda x: f"{x:,.0f}".replace(',', '.'))
-
-
-
-
-
-# Renomear as colunas conforme especificado
-df_combustivel = df_combustivel.rename(columns={
-    'data_hora': 'Data e Hora',
-    'posto': 'Posto',
-    'centro_custo': 'Centro Custo',
-    'veiculo': 'Veículo',
-    'tipo_combustivel': 'Combustível',
-    'quantidade': 'Litros',
-    'preco_litro': 'Preço Litro',
-    'total': 'Total',
-    'odometro': 'Odômetro',
-    'motorista': 'Motorista'
-})
-
-# Formate a coluna 'data_hora' para mostrar data e hora em linhas diferentes
-df_combustivel['Data e Hora'] = df_combustivel['Data e Hora'].apply(lambda x: x.strftime("Data: %d/%m/%Y<br>Hora: %H:%M hrs"))
-
-
-# Função para converter string com formatos monetários para float
-def currency_to_float(value):
-    value = value.replace('R$', '').replace('.', '').replace(',', '.')
-    try:
-        return float(value)
-    except ValueError:
-        return np.nan
-
-# Convertendo a coluna 'Total' para float após tratamento
-df_combustivel['Total_Float'] = df_combustivel['Total'].apply(currency_to_float)
-
-# Calculando o total
-total_sum = df_combustivel['Total_Float'].sum()
-
-# Formatando o total no formato de moeda R$
-total_sum_str = f"R$ {total_sum:,.2f}".replace('.', '!').replace(',', '.').replace('!', ',')
-
-# Removendo a coluna 'Total_Float' que usamos apenas para cálculos
-df_combustivel.drop(columns=['Total_Float'], inplace=True)
+fig.update_yaxes(
+            showline=True,
+            linecolor="Grey",
+            linewidth=0.5
+        )
 
 
 
-# Criação e exibição da tabela
-tabela_combustivel = go.Figure(data=[go.Table(
-    header=dict(
-        values=list(df_combustivel.columns),
-        fill_color='#004d72',
-        line_color="lightgrey",
-        font_color="white",
-        align='center',
-        height=25
-    ),
-    cells=dict(
-        values=[df_combustivel[col] for col in df_combustivel.columns],
-        fill=dict(color=['#DEE6EF', 'white','#f7f7f7','white','#f7f7f7', 'white','#f7f7f7','white','#f7f7f7', 'white']),
-        line_color="lightgrey",
-        font_color="black",
-        align='center',
-        height=25
-    ))
-])
 
+# Adicionar a soma da coluna valor_total ao título do gráfico
+total_value = sum_valor_total_por_dia['valor_total'].sum()
+fig.update_layout(title_text=f'Despesas de Transporte - {mes_selecionado} {ano_selecionado} - Total: R$ {total_value:,.2f}')
 
-
-table_height = len(df_combustivel) * 25 + 359
-
-# Calcule a posição y do título de acordo com a altura da tabela.
-# Esta fórmula precisa ser ajustada de acordo com suas necessidades específicas.
-y_position = 1 - (18 / table_height)  # 50 é uma estimativa da altura do título; ajuste conforme necessário
-
-
-
-tabela_combustivel.update_layout(
-    yaxis=dict(
-        domain=[0.3, 1]
-    ),
-    title={
-        'text': f"-DESPESAS COM TRANSPORTE MÊS DE {mes_selecionado_comb.upper()} DE {ano_selecionado_comb} - <span style='color:red;'>TOTAL: {total_sum_str}</span>",
-        'y': y_position, 'x': 0.0,
-        'xanchor': 'left', 'yanchor': 'top'
-    },
-    height=table_height,  # Atualizando a altura aqui
-    margin=dict(r=10, t=50, b=0)
-)
-c5.plotly_chart(tabela_combustivel, use_container_width=True, automargin=True)
-
+st.plotly_chart(fig, use_container_width=True, automargin=True)
