@@ -1,11 +1,21 @@
-﻿data;tipo_despesa;veiculo;detalhes;responsavel;fornecedor;valor_total;
-01/01/2024;Combustível;;;;;;
-01/01/2024;Revisão;;;;;;
-01/01/2024;Manutenção;;;;;;
-01/01/2024;IPVA;;;;;;
-01/01/2024;Lava Jato;;;;;;
-01/01/2024;Combustível;;;;;;
-01/01/2024;Aluguel;S10;;Dona Nize;Elisa Agro;3816;
-;;;;;;;
-;;;;;;;
-;;;;;;;
+﻿data;tipo_despesa;veiculo;detalhes;responsavel;fornecedor;valor_total
+02/01/2024;Combustível;Moto;;José Henrique;Posto Lago dos Tigres;63,73
+02/01/2024;Combustível;Cross Fox;;José Henrique;Posto Lago dos Tigres;194,98
+04/01/2024;Combustível;Gol;;José Henrique;Posto Lago dos Tigres;300,11
+05/01/2024;Combustível;Cross Fox;;José Henrique;Posto Lago dos Tigres;208,35
+08/01/2024;Combustível;Cross Fox;;Mário Humberto;Posto Lago dos Tigres;234,23
+09/01/2024;Combustível;Cross Fox;;Antônio Peixoto;Posto Lago dos Tigres;227,61
+10/01/2024;Combustível;S10;;Mário Humberto;Posto Lago dos Tigres;418,14
+01/01/2024;Combustível;S10;;Mário Humberto;Posto Lago dos Tigres;330,19
+06/01/2024;Combustível;S10;;Mário Humberto;Posto Lago dos Tigres;428,17
+10/01/2024;Combustível;Moto;;José Henrique;Posto Lago dos Tigres;55,93
+12/01/2024;Combustível;S10;;Mário Humberto;Posto Lago dos Tigres;416,87
+13/01/2024;Combustível;Cross Fox;;José Henrique;Posto Lago dos Tigres;219,61
+28/12/2023;Combustível;Cross Fox;;Mário Humberto;Posto Lago dos Tigres;253,03
+27/12/2023;Combustível;Gol;;Mário Humberto;Posto Lago dos Tigres;57,92
+28/12/2023;Combustível;S10;;Antônio Peixoto;Posto Lago dos Tigres;458,27
+01/01/2024;Aluguel;S10;;Dona Nize;Elisa Agro;3816
+01/09/2023;Aluguel;S10;;Dona Nize;Elisa Agro;3816
+01/10/2023;Aluguel;S10;;Dona Nize;Elisa Agro;3816
+01/11/2023;Aluguel;S10;;Dona Nize;Elisa Agro;3816
+01/12/2023;Aluguel;S10;;Dona Nize;Elisa Agro;3816
