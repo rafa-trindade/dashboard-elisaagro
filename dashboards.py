@@ -840,7 +840,7 @@ monthly_expenses = filtered_df.groupby('Month')['valor_total'].sum().reset_index
 ordered_months = list(meses_pt.values())
 
 # Cria o gráfico usando Plotly Express
-fig_comb_ano = px.bar(monthly_expenses, x='Month', y='valor_total', title=f'Despesa Mensal com Transporte em {selected_year}',
+fig_comb_ano = px.bar(monthly_expenses, x='Month', y='valor_total', title=f'-DESPESA MENSAL COM TRANSPORTE EM {selected_year}',
              labels={'valor_total': 'Valor Total', 'Month': 'Mês'},
              category_orders={'Month': ordered_months})
 
@@ -938,7 +938,7 @@ total_formatado = f'R$ {sum_valor_total_por_dia["valor_total"].sum():,.2f}'.repl
 fig = px.bar(data_frame=sum_valor_total_por_dia, x='data_formatada', y='valor_total',
              color_discrete_sequence=[px.colors.diverging.RdBu[1]],
              labels={'x': 'Dia', 'y': 'Valor Total'},
-             title = f'Despesas com Transporte - {mes_selecionado} {ano_selecionado} - Total: {total_formatado}',
+             title = f'DESEPESA COM TRANSPORTE EM {mes_selecionado.upper()} DE {ano_selecionado}: {total_formatado}',
              text=sum_valor_total_por_dia['valor_total'].apply(lambda x: f'R$ {x:,.2f}'),
              )
 
@@ -966,6 +966,6 @@ fig.update_yaxes(
 
 # Adicionar a soma da coluna valor_total ao título do gráfico
 total_value = sum_valor_total_por_dia['valor_total'].sum()
-fig.update_layout(title_text=f'Despesas de Transporte - {mes_selecionado} {ano_selecionado} - Total: R$ {total_value:,.2f}')
+fig.update_layout(title_text=f'-DESEPESA COM TRANSPORTE EM {mes_selecionado.upper()} DE {ano_selecionado}: {total_formatado}')
 
 c5.plotly_chart(fig, use_container_width=True, automargin=True)
