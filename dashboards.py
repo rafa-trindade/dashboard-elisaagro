@@ -574,7 +574,9 @@ if data_inicial or data_fim:
         color_map = {
             '2021': px.colors.diverging.RdBu[8],
             '2022': px.colors.diverging.RdBu[7],
-            '2023': px.colors.diverging.RdBu[1]
+            '2023': px.colors.diverging.RdBu[1],
+            '2024': px.colors.diverging.RdBu[2]
+
         }
 
         # Criando o Gráfico de Barras Agrupadas
