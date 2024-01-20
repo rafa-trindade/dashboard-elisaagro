@@ -4,6 +4,8 @@ import plotly.express as px
 import plotly.graph_objects as go
 import numpy as np
 import datetime as dt
+from datetime import datetime
+
 
 
 
@@ -91,8 +93,9 @@ with tab4:
     col_data_ini_quali, col_data_fim_quali = st.columns(2)
     c4 = st.container()
 with tab5:
-    col_filtro_comb_ano, col_filtro_comb_mes, col_tipo_despesa, col_veiculo, col_col_fornecedor = st.columns([1,2,2,2,2])
-    c5 = st.container()
+    col_filtro_comb_ano,col_filtro_comb_mes, col_tipo_despesa, col_veiculo, col_col_fornecedor = st.columns([1,2,2,2,2])
+    c7,c5 = st.columns([1,2])
+
 
 
 # Dicionário para mapear número do mês ao nome em português com a primeira letra maiúscula
@@ -788,19 +791,93 @@ if data_inicial_quali or data_fim_quali:
 
 
 ##########################################COMBUSTIVEL##################################
-
-# Carregar o arquivo CSV
+        
+# Carrega o arquivo CSV
 df_transporte = pd.read_csv("despesas_transporte.csv", sep=";", decimal=",", thousands=".", index_col=None)
 
 # Converter a coluna 'data' para o formato de data
 df_transporte['data'] = pd.to_datetime(df_transporte['data'], format='%d/%m/%Y')
+
+# Adiciona uma coluna 'Month' para facilitar a agrupamento
+df_transporte['Month'] = df_transporte['data'].dt.month_name()
+
+# Obtém o ano atual
+ano_atual = datetime.now().year
+
+# Remove os valores NaN antes de converter para int
+anos = df_transporte['data'].dt.year.dropna().astype(int).unique()
+
+
+# Adiciona um seletor de ano com o ano atual como padrão
+selected_year = col_filtro_comb_ano.selectbox('Selecione o ano:', anos, index=len(anos) - 1)
+
+# Mapa de tradução para os meses em português
+meses_pt = {
+    'January': 'Janeiro',
+    'February': 'Fevereiro',
+    'March': 'Março',
+    'April': 'Abril',
+    'May': 'Maio',
+    'June': 'Junho',
+    'July': 'Julho',
+    'August': 'Agosto',
+    'September': 'Setembro',
+    'October': 'Outubro',
+    'November': 'Novembro',
+    'December': 'Dezembro'
+}
+
+# Aplica a tradução dos meses
+df_transporte['Month'] = df_transporte['Month'].map(meses_pt)
+
+# Filtra o DataFrame para o ano selecionado
+filtered_df = df_transporte[df_transporte['data'].dt.year == selected_year]
+
+# Agrupa por mês e calcula a soma do valor_total
+monthly_expenses = filtered_df.groupby('Month')['valor_total'].sum().reset_index()
+
+# Ordena os meses em ordem crescente
+ordered_months = list(meses_pt.values())
+
+# Cria o gráfico usando Plotly Express
+fig_comb_ano = px.bar(monthly_expenses, x='Month', y='valor_total', title=f'Despesa Mensal com Transporte em {selected_year}',
+             labels={'valor_total': 'Valor Total', 'Month': 'Mês'},
+             category_orders={'Month': ordered_months})
+
+# Adiciona os valores dentro das barras no formato de moeda brasileira
+fig_comb_ano.update_traces(texttemplate='R$ %{y:,.2f}', textposition='inside')
+
+# Formatar o eixo y
+fig_comb_ano.update_layout(yaxis_tickprefix='R$', yaxis_tickformat=',.2f',
+                    margin=dict(t=50, b=0),
+                    xaxis_title=f"Resumo Mesal de {selected_year}",
+                    yaxis_title='Total',
+                    yaxis2=dict(
+                        overlaying='y',
+                        side='right',
+                        showgrid=False,
+                        title='Total'
+                    )
+                  )
+
+fig_comb_ano.update_yaxes(
+            showline=True,
+            linecolor="Grey",
+            linewidth=0.5
+        )
+
+# Exibe o gráfico
+c7.plotly_chart(fig_comb_ano, use_container_width=True, automargin=True)
+
+
+######################
 
 # Adicionar filtros de mês e ano
 anos_disponiveis = df_transporte['data'].dt.year.unique()
 anos_disponiveis = [int(ano) for ano in anos_disponiveis if not pd.isna(ano)]
 
 # Permitir ao usuário selecionar o ano
-ano_selecionado = col_filtro_comb_ano.selectbox("Selecione o Ano", anos_disponiveis)
+ano_selecionado = selected_year
 
 # Filtrar meses disponíveis de acordo com o ano selecionado
 meses_disponiveis = df_transporte[df_transporte['data'].dt.year == ano_selecionado]['data'].dt.month.unique()
@@ -859,8 +936,9 @@ total_formatado = f'R$ {sum_valor_total_por_dia["valor_total"].sum():,.2f}'.repl
 
 # Exibir o gráfico de barras
 fig = px.bar(data_frame=sum_valor_total_por_dia, x='data_formatada', y='valor_total',
+             color_discrete_sequence=[px.colors.diverging.RdBu[1]],
              labels={'x': 'Dia', 'y': 'Valor Total'},
-             title = f'Despesas de Transporte - {mes_selecionado} {ano_selecionado} - Total: {total_formatado}',
+             title = f'Despesas com Transporte - {mes_selecionado} {ano_selecionado} - Total: {total_formatado}',
              text=sum_valor_total_por_dia['valor_total'].apply(lambda x: f'R$ {x:,.2f}'),
              )
 
@@ -890,4 +968,4 @@ fig.update_yaxes(
 total_value = sum_valor_total_por_dia['valor_total'].sum()
 fig.update_layout(title_text=f'Despesas de Transporte - {mes_selecionado} {ano_selecionado} - Total: R$ {total_value:,.2f}')
 
-st.plotly_chart(fig, use_container_width=True, automargin=True)
+c5.plotly_chart(fig, use_container_width=True, automargin=True)
