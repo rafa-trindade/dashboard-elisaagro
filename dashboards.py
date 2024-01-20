@@ -850,7 +850,7 @@ fig_comb_ano.update_traces(texttemplate='R$ %{y:,.2f}', textposition='inside')
 # Formatar o eixo y
 fig_comb_ano.update_layout(yaxis_tickprefix='R$', yaxis_tickformat=',.2f',
                     margin=dict(t=50, b=0),
-                    xaxis_title=f"Resumo Mesal de {selected_year}",
+                    xaxis_title=f"Total Mesal em {selected_year}",
                     yaxis_title='Total',
                     yaxis2=dict(
                         overlaying='y',
@@ -945,7 +945,7 @@ fig = px.bar(data_frame=sum_valor_total_por_dia, x='data_formatada', y='valor_to
 # Formatar o eixo y
 fig.update_layout(yaxis_tickprefix='R$', yaxis_tickformat=',.2f',
                     margin=dict(t=50,b=0),
-                    xaxis_title= f"{mes_selecionado} de {ano_selecionado}",
+                    xaxis_title= f"Total Diário em {mes_selecionado} de {ano_selecionado}",
                     yaxis_title='Total',
                     yaxis2=dict(
                         overlaying='y',
