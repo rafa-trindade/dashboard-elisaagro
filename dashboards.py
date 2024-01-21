@@ -846,11 +846,11 @@ fig_comb_ano = px.bar(monthly_expenses, x='Month', y='valor_total', title=f'-DES
              labels={'valor_total': 'Valor Total', 'Month': 'Mês'},
              category_orders={'Month': ordered_months})
 
-# Adiciona os valores dentro das barras no formato de moeda brasileira
-fig_comb_ano.update_traces(texttemplate='R$ %{y:,.2f}', textposition='inside')
+monthly_expenses['formatted_valor_total'] = monthly_expenses['valor_total'].apply(lambda x: f"R$ {x:,.2f}".replace('.', '@').replace(',', '.').replace('@', ','))
+fig_comb_ano.update_traces(texttemplate=monthly_expenses['formatted_valor_total'])
 
 # Formatar o eixo y
-fig_comb_ano.update_layout(yaxis_tickprefix='R$', yaxis_tickformat=',.2f',
+fig_comb_ano.update_layout(yaxis_tickformat=',.0s',
                     margin=dict(t=50, b=0),
                     xaxis_title=f"Total Mesal em {selected_year}",
                     yaxis_title='Total',
@@ -934,18 +934,21 @@ filtered_df['data_formatada'] = filtered_df['data'].dt.strftime('%d/%m/%y')
 # Calcular a soma da coluna valor_total por dia
 sum_valor_total_por_dia = filtered_df.groupby(filtered_df['data_formatada'])['valor_total'].sum().reset_index()
 
-total_formatado = f'R$ {sum_valor_total_por_dia["valor_total"].sum():,.2f}'.replace('.', '@').replace(',', '.').replace('@', ',')
-
 # Exibir o gráfico de barras
 fig = px.bar(data_frame=sum_valor_total_por_dia, x='data_formatada', y='valor_total',
              color_discrete_sequence=[px.colors.diverging.RdBu[1]],
              labels={'x': 'Dia', 'y': 'Valor Total'},
-             title = f'DESEPESA COM TRANSPORTE EM {mes_selecionado.upper()} DE {ano_selecionado}: {total_formatado}',
-             text=sum_valor_total_por_dia['valor_total'].apply(lambda x: f'R$ {x:,.2f}'),
-             )
+             title=f'DESEPESA COM TRANSPORTE EM {mes_selecionado.upper()} DE {ano_selecionado}',
+             text=sum_valor_total_por_dia['valor_total'].apply(lambda x: f"R$ {x:,.2f}".replace('.', '@').replace(',', '.').replace('@', ',')),
+)
+
+total_formatado = f'R$ {sum_valor_total_por_dia["valor_total"].sum():,.2f}'.replace('.', '@').replace(',', '.').replace('@', ',')
+
+fig.update_layout(title_text=f'DESEPESA COM TRANSPORTE EM {mes_selecionado.upper()} DE {ano_selecionado}: {total_formatado}')
+
 
 # Formatar o eixo y
-fig.update_layout(yaxis_tickprefix='R$', yaxis_tickformat=',.2f',
+fig.update_layout(yaxis_tickformat='.,0s',
                     margin=dict(t=50,b=0),
                     xaxis_title= f"Total Diário em {mes_selecionado} de {ano_selecionado}",
                     yaxis_title='Total',
