@@ -907,9 +907,12 @@ nomes_meses = [mapa_meses[mes] for mes in meses_disponiveis]
 # Definir o último mês disponível como índice inicial da combobox
 mes_selecionado = col_filtro_comb_mes.selectbox("Selecione o Mês", nomes_meses, index=len(nomes_meses)-1)
 
-# Adicionar filtros para tipo_despesa, veiculo e fornecedor
+# Filtrar opções de tipo_despesa excluindo "Despesa Fixa"
 tipo_despesa_opcoes = ['Todos'] + df_transporte['tipo_despesa'].fillna('Todos').unique().tolist()
+tipo_despesa_opcoes = [opcao for opcao in tipo_despesa_opcoes if opcao != 'Despesa Fixa']
+# Criar a caixa de seleção tipo_despesa_selecionado
 tipo_despesa_selecionado = col_tipo_despesa.selectbox("Selecione o Tipo de Despesa", tipo_despesa_opcoes)
+
 
 # Filtrar opções de veículo com base no tipo de despesa selecionado
 veiculo_opcoes = ['Todos'] + df_transporte[df_transporte['tipo_despesa'] == tipo_despesa_selecionado]['veiculo'].fillna('Todos').unique().tolist()
@@ -919,13 +922,14 @@ veiculo_selecionado = col_veiculo.selectbox("Selecione o Veículo", veiculo_opco
 fornecedor_opcoes = ['Todos'] + df_transporte[(df_transporte['tipo_despesa'] == tipo_despesa_selecionado) & (df_transporte['veiculo'] == veiculo_selecionado)]['fornecedor'].fillna('Todos').unique().tolist()
 fornecedor_selecionado = col_col_fornecedor.selectbox("Selecione o Fornecedor", fornecedor_opcoes)
 
-# Filtrar o DataFrame com base nos filtros selecionados
+# Filtrar o DataFrame com base nos filtros selecionados, excluindo "Despesa Fixa"
 filtered_df = df_transporte[
     (df_transporte['data'].dt.month == meses_disponiveis[nomes_meses.index(mes_selecionado)]) &
     (df_transporte['data'].dt.year == ano_selecionado) &
     ((tipo_despesa_selecionado == 'Todos') | (df_transporte['tipo_despesa'] == tipo_despesa_selecionado)) &
     ((veiculo_selecionado == 'Todos') | (df_transporte['veiculo'] == veiculo_selecionado)) &
-    ((fornecedor_selecionado == 'Todos') | (df_transporte['fornecedor'] == fornecedor_selecionado))
+    ((fornecedor_selecionado == 'Todos') | (df_transporte['fornecedor'] == fornecedor_selecionado)) &
+    (df_transporte['tipo_despesa'] != 'Despesa Fixa')  # Excluir "Despesa Fixa"
 ]
 
 # Formatar as datas para o formato "dd/mm/aa"
@@ -934,21 +938,39 @@ filtered_df['data_formatada'] = filtered_df['data'].dt.strftime('%d/%m/%y')
 # Calcular a soma da coluna valor_total por dia
 sum_valor_total_por_dia = filtered_df.groupby(filtered_df['data_formatada'])['valor_total'].sum().reset_index()
 
+# Calcular a soma total para Despesa Fixa
+soma_despesa_fixa = df_transporte[df_transporte['tipo_despesa'] == 'Despesa Fixa']['valor_total'].sum()
+
+# Calcular a soma da coluna valor_total por dia
+sum_valor_total_por_dia = filtered_df.groupby(filtered_df['data_formatada'])['valor_total'].sum().reset_index()
+
 # Exibir o gráfico de barras
 fig = px.bar(data_frame=sum_valor_total_por_dia, x='data_formatada', y='valor_total',
              color_discrete_sequence=[px.colors.diverging.RdBu[1]],
              labels={'x': 'Dia', 'y': 'Valor Total'},
-             title=f'DESEPESA COM TRANSPORTE EM {mes_selecionado.upper()} DE {ano_selecionado}',
+             title=f'DESESPESA COM TRANSPORTE EM {mes_selecionado.upper()} DE {ano_selecionado}',
              text=sum_valor_total_por_dia['valor_total'].apply(lambda x: f"R$ {x:,.2f}".replace('.', '@').replace(',', '.').replace('@', ',')),
+)
+
+# Adicionar anotação para a soma de Despesa Fixa
+fig.add_annotation(
+    x=len(sum_valor_total_por_dia) - 1,  # Posição no eixo x (último dia)
+    yref="paper",  # Referência ao sistema de coordenadas da figura
+    y=1.05,  # Posição vertical relativa
+    text=f'Despesas Fixas: R$ {soma_despesa_fixa:,.2f}'.replace('.', '@').replace(',', '.').replace('@', ','),
+    showarrow=False,
 )
 
 total_formatado = f'R$ {sum_valor_total_por_dia["valor_total"].sum():,.2f}'.replace('.', '@').replace(',', '.').replace('@', ',')
 
-fig.update_layout(title_text=f'DESEPESA COM TRANSPORTE EM {mes_selecionado.upper()} DE {ano_selecionado}: {total_formatado}')
+# Adicionar a soma da coluna valor_total ao título do gráfico
+total_value = sum_valor_total_por_dia['valor_total'].sum() + soma_despesa_fixa
+total_formatado = f'R$ {total_value:,.2f}'.replace('.', '@').replace(',', '.').replace('@', ',')
+fig.update_layout(title_text=f'DESESPESA COM TRANSPORTE EM {mes_selecionado.upper()} DE {ano_selecionado}: {total_formatado}')
 
 
 # Formatar o eixo y
-fig.update_layout(yaxis_tickformat='.,0s',
+fig.update_layout(yaxis_tickformat=',.0s',
                     margin=dict(t=50,b=0),
                     xaxis_title= f"Total Diário em {mes_selecionado} de {ano_selecionado}",
                     yaxis_title='Total',
@@ -970,7 +992,8 @@ fig.update_yaxes(
 
 
 # Adicionar a soma da coluna valor_total ao título do gráfico
-total_value = sum_valor_total_por_dia['valor_total'].sum()
-fig.update_layout(title_text=f'-DESEPESA COM TRANSPORTE EM {mes_selecionado.upper()} DE {ano_selecionado}: {total_formatado}')
+total_value = filtered_df['valor_total'].sum()
+total_formatado = f'R$ {total_value:,.2f}'.replace('.', '@').replace(',', '.').replace('@', ',')
+fig.update_layout(title_text=f'DESPESA COM TRANSPORTE EM {mes_selecionado.upper()} DE {ano_selecionado}: {total_formatado}')
 
 c5.plotly_chart(fig, use_container_width=True, automargin=True)
