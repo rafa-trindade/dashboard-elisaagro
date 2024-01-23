@@ -842,7 +842,7 @@ monthly_expenses = filtered_df.groupby('Month')['valor_total'].sum().reset_index
 ordered_months = list(meses_pt.values())
 
 # Cria o gráfico usando Plotly Express
-fig_comb_ano = px.bar(monthly_expenses, x='Month', y='valor_total', title=f'-DESPESA MENSAL COM TRANSPORTE EM {selected_year}',
+fig_comb_ano = px.bar(monthly_expenses, x='Month', y='valor_total', title=f'-DESPESAS MENSAL {selected_year}',
              labels={'valor_total': 'Valor Total', 'Month': 'Mês'},
              category_orders={'Month': ordered_months})
 
@@ -852,7 +852,7 @@ fig_comb_ano.update_traces(texttemplate=monthly_expenses['formatted_valor_total'
 # Formatar o eixo y
 fig_comb_ano.update_layout(yaxis_tickformat=',.0s',
                     margin=dict(t=50, b=0),
-                    xaxis_title=f"Total Mesal em {selected_year}",
+                    xaxis_title=f"{selected_year}",
                     yaxis_title='Total',
                     yaxis2=dict(
                         overlaying='y',
@@ -972,7 +972,7 @@ fig.update_layout(title_text=f'DESESPESA COM TRANSPORTE EM {mes_selecionado.uppe
 # Formatar o eixo y
 fig.update_layout(yaxis_tickformat=',.0s',
                     margin=dict(t=50,b=0),
-                    xaxis_title= f"Total Diário em {mes_selecionado} de {ano_selecionado}",
+                    xaxis_title= f"{mes_selecionado}/{ano_selecionado}",
                     yaxis_title='Total',
                     yaxis2=dict(
                         overlaying='y',
@@ -994,6 +994,6 @@ fig.update_yaxes(
 # Adicionar a soma da coluna valor_total ao título do gráfico
 total_value = filtered_df['valor_total'].sum()
 total_formatado = f'R$ {total_value:,.2f}'.replace('.', '@').replace(',', '.').replace('@', ',')
-fig.update_layout(title_text=f'DESPESA COM TRANSPORTE EM {mes_selecionado.upper()} DE {ano_selecionado}: {total_formatado}')
+fig.update_layout(title_text=f'-DESPESAS {mes_selecionado.upper()} DE {ano_selecionado}: <span style="color:#b51e2e">{total_formatado}</span>')
 
 c5.plotly_chart(fig, use_container_width=True, automargin=True)
