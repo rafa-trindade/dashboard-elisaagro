@@ -124,10 +124,10 @@ mes_atual = dt.datetime.today().month
 ano_atual = dt.datetime.today().year
 
 
-if df['data'].max().day < 18:
+if df['data'].max().day < 20:
     mes_inicial_padrão = dt.date(ano_atual, mes_atual, 1)
 else:
-    mes_inicial_padrão = dt.date(ano_atual, mes_atual, 18)
+    mes_inicial_padrão = dt.date(ano_atual, mes_atual, 20)
 
 data_inicial = col_data_ini.date_input('DATA INÍCIO:', mes_inicial_padrão, None, format="DD/MM/YYYY",  key="data_inicio_key")
 data_fim = col_data_fim.date_input('DATA FIM:', None, format="DD/MM/YYYY", key="data_fim_key")
