@@ -41,7 +41,7 @@ col2_side.markdown('<h5 style="margin-bottom: 15px; text-align: end; color: #053
 
 
 col1_side.markdown('<h5 style="margin-bottom: -25px;">Contrato Vigente:</h5>', unsafe_allow_html=True)
-col2_side.markdown('<h5 style="text-align: end; margin-bottom: -25px;">31/08/2026</h5>', unsafe_allow_html=True)
+col2_side.markdown('<h5 style="text-align: end; margin-bottom: -25px;">02/2027</h5>', unsafe_allow_html=True)
 
 # Ordenar o DataFrame com base na coluna 'data' para obter a data mais recente e pegar a última linha
 linha_mais_recente = df.sort_values(by='data', ascending=False).iloc[0]
@@ -77,7 +77,7 @@ st.sidebar.markdown(f'''
 
 
 
-tab1, tab2, tab3, tab4, tab5 = st.tabs(["📅 Fechamentos Diários", "📊 Visão Mensal", "📊 Visão Anual", "📈 Análise Quanti-Qualitativa", "🚗 Despesas Transporte"])
+tab1, tab2, tab3, tab4 = st.tabs(["📅 Fechamentos Diários", "📊 Visão Mensal", "📊 Visão Anual", "📈 Análise Quanti-Qualitativa"])
 
 with tab1:
     col_data_ini, col_data_fim = st.columns(2)
@@ -92,9 +92,7 @@ with tab3:
 with tab4:
     col_data_ini_quali, col_data_fim_quali = st.columns(2)
     c4 = st.container()
-with tab5:
-    col_filtro_comb_ano,col_filtro_comb_mes, col_tipo_despesa, col_veiculo, col_col_fornecedor = st.columns([1,2,2,2,2])
-    c7,c5 = st.columns([1,2])
+
 
 
 
