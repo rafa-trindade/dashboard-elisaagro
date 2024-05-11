@@ -9,7 +9,7 @@ from datetime import datetime
 
 
 
-st.set_page_config(layout="wide", page_title="Mitre Agro", initial_sidebar_state="expanded", page_icon="📊")
+st.set_page_config(layout="wide", page_title="Elisa Agro", initial_sidebar_state="expanded", page_icon="📊")
 
 hide_st_style = """
                 <style>
