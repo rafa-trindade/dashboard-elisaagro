@@ -9,7 +9,7 @@ from datetime import datetime
 
 
 
-st.set_page_config(layout="wide", page_title="Elisa Agro", initial_sidebar_state="expanded", page_icon="📊")
+st.set_page_config(layout="wide", page_title="B2B Refeições | Elisa Agro", initial_sidebar_state="expanded", page_icon="📊")
 
 hide_st_style = """
                 <style>
@@ -20,16 +20,31 @@ hide_st_style = """
                 """
 st.markdown(hide_st_style, unsafe_allow_html=True)
 
+st.markdown(
+    """
+    <style>
+        [data-testid="stSidebarNav"] {
+            background-image: url(https://i.postimg.cc/52vw7RW6/streamlit-Logo2.png);
+            background-repeat: no-repeat;
+            padding-top: 37px;
+            background-position: 18px 55px;
+            position: relative;
+        }
+    </style>
+    """,
+    unsafe_allow_html=True,
+)
+
 df = pd.read_csv("databaseElisa.csv", sep=";", decimal=",", thousands=".", usecols=['data','fazenda', 'almoco', 'janta', 'cafe','lanche', 'vlrCafe', 'vlrAlmoco', 'total'], index_col=None) 
 
 # Convertendo a coluna 'data' para o tipo datetime após carregar o dataframe
 df['data'] = pd.to_datetime(df['data'], format='%d/%m/%Y', errors='coerce')
 df['data'] = df['data'].dt.date
 
-st.sidebar.markdown('<h2 style="color: #053061; margin-bottom: -40px; text-align: center;">B2B Refeições | Elisa Agro</h2>', unsafe_allow_html=True)
-st.sidebar.markdown('<h4 style="margin-bottom: -200px; text-align: center;">(Fornecimento Alimentação)</h4>', unsafe_allow_html=True)
+#st.sidebar.markdown('<h2 style="color: #053061; margin-bottom: -40px; text-align: center;">B2B Refeições | Elisa Agro</h2>', unsafe_allow_html=True)
+#st.sidebar.markdown('<h4 style="margin-bottom: -200px; text-align: center;">(Fornecimento Alimentação)</h4>', unsafe_allow_html=True)
 
-st.sidebar.write("____")
+#st.sidebar.write("____")
 
 col1_side, col2_side = st.sidebar.columns([2,1])
 
