@@ -2,12 +2,7 @@ import streamlit as st
 import pandas as pd
 import plotly.express as px
 import plotly.graph_objects as go
-import numpy as np
 import datetime as dt
-from datetime import datetime
-
-
-
 
 st.set_page_config(layout="wide", page_title="B2B Refeições | Elisa Agro", initial_sidebar_state="expanded", page_icon="📊")
 
@@ -90,9 +85,6 @@ with tab4:
     col_data_ini_quali, col_data_fim_quali = st.columns(2)
     c4 = st.container()
 
-
-
-
 # Dicionário para mapear número do mês ao nome em português com a primeira letra maiúscula
 meses = {
     1: "Janeiro",
@@ -111,18 +103,16 @@ meses = {
 
 colors = px.colors.diverging.RdBu
 
-
-
 #################### Tabela Demostrativo Período ########################
 
 mes_atual = dt.datetime.today().month
 ano_atual = dt.datetime.today().year
 
 
-if df['data'].max().day < 20:
-    mes_inicial_padrão = dt.date(ano_atual, mes_atual, 1)
-else:
-    mes_inicial_padrão = dt.date(ano_atual, mes_atual, 20)
+#if df['data'].max().day < 20:
+mes_inicial_padrão = dt.date(ano_atual, mes_atual, 1)
+#else:
+#    mes_inicial_padrão = dt.date(ano_atual, mes_atual, 20)
 
 data_inicial = col_data_ini.date_input('DATA INÍCIO:', mes_inicial_padrão, None, format="DD/MM/YYYY",  key="data_inicio_key")
 data_fim = col_data_fim.date_input('DATA FIM:', None, format="DD/MM/YYYY", key="data_fim_key")
