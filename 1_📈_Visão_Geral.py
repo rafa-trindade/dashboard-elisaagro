@@ -173,12 +173,18 @@ if data_inicial or data_fim:
         lista_cafe = qtd_cafe["cafe"].tolist()
         lista_lanche = qtd_lanche["lanche"].tolist()
 
+        # Criar cópias das listas para exibição com "-" no lugar de 0
+        lista_almoco_display = ['-' if v == 0 else v for v in lista_almoco]
+        lista_janta_display = ['-' if v == 0 else v for v in lista_janta]
+        lista_cafe_display = ['-' if v == 0 else v for v in lista_cafe]
+        lista_lanche_display = ['-' if v == 0 else v for v in lista_lanche]
+
         data = {
             "Fazenda": lista_fazenda,
-            "Café": lista_cafe,
-            "Almoço": lista_almoco,
-            "Lanche": lista_lanche,
-            "Janta": lista_janta
+            "Café": lista_cafe_display,
+            "Almoço": lista_almoco_display,
+            "Lanche": lista_lanche_display,
+            "Janta": lista_janta_display
         }
 
         data_frame = pd.DataFrame(data)
@@ -188,10 +194,10 @@ if data_inicial or data_fim:
 
         soma_colunas = {
             "Fazenda": "<b>TOTAL</b>",
-            "Café": "<b>" + str('{0:,}'.format(int(data_frame["Café"].sum())).replace(',','.')) + "</b>",
-            "Almoço": "<b>" + str('{0:,}'.format(int(data_frame["Almoço"].sum())).replace(',','.')) + "</b>",
-            "Lanche": "<b>" + str('{0:,}'.format(int(data_frame["Lanche"].sum())).replace(',','.')) + "</b>",
-            "Janta": "<b>" + str('{0:,}'.format(int(data_frame["Janta"].sum())).replace(',','.')) + "</b>"
+            "Café": "<b>" + str('{0:,}'.format(int(qtd_cafe.sum())).replace(',','.')) + "</b>",
+            "Almoço": "<b>" + str('{0:,}'.format(int(qtd_almoco.sum())).replace(',','.')) + "</b>",
+            "Lanche": "<b>" + str('{0:,}'.format(int(qtd_lanche.sum())).replace(',','.')) + "</b>",
+            "Janta": "<b>" + str('{0:,}'.format(int(qtd_janta.sum())).replace(',','.')) + "</b>"
         }
 
         data_frame = data_frame.append(soma_colunas, ignore_index=True)
