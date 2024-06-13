@@ -69,7 +69,7 @@ col2_side.markdown(f'<h5 style="text-align: end; margin-bottom: -25px;">{valor_l
 st.sidebar.write("____")
 
 
-tab1, tab2, tab3, tab4 = st.tabs(["📅 Fechamentos Diários", "📊 Visão Mensal", "📊 Visão Anual", "📈 Análise Quanti-Qualitativa"])
+tab1, tab2, tab3 = st.tabs(["📅 Fechamentos Diários", "📊 Visão Mensal", "📊 Visão Anual"])
 
 with tab1:
     col_data_ini, col_data_fim = st.columns(2)
@@ -81,9 +81,7 @@ with tab2:
     col5, col6 = st.columns([2,1])
 with tab3:
     col3, col4 = st.columns([1,3])
-with tab4:
-    col_data_ini_quali, col_data_fim_quali = st.columns(2)
-    c4 = st.container()
+
 
 # Dicionário para mapear número do mês ao nome em português com a primeira letra maiúscula
 meses = {
@@ -604,182 +602,4 @@ if data_inicial or data_fim:
 
     else:
         st.warning('A coluna "data" não foi encontrada na base fornecida.')
-
-#################### Gráfico Qualitativo ########################
-
-
-incio_data = dt.date(ano_atual, 1, 1)
-fim_data = df['data'].max()
-
-
-
-data_inicial_quali = col_data_ini_quali.date_input('DATA INÍCIO:', incio_data, None, format="DD/MM/YYYY")
-data_fim_quali = col_data_fim_quali.date_input('DATA FIM:', fim_data, None, format="DD/MM/YYYY")
-
-if data_inicial_quali:
-    data_inicial_quali = pd.Timestamp(data_inicial_quali)
-if data_fim_quali:
-    data_fim_quali = pd.Timestamp(data_fim_quali)
-
-if data_inicial_quali or data_fim_quali:
-
-    if 'data' in df.columns:
-        
-        if data_inicial_quali is not None:
-            dia_start2 = str(data_inicial_quali.day).zfill(2)
-            mes_start2 = str(data_inicial_quali.month).zfill(2)
-            ano_start2 = str(data_inicial_quali.year)
-
-        if data_fim_quali is not None:
-            
-            dia_end2 = str(data_fim_quali.day).zfill(2)
-            mes_end2 = str(data_fim_quali.month).zfill(2)
-            ano_end2 = str(data_fim_quali.year)
-        
-        if data_inicial_quali and data_fim_quali:
-
-            if data_inicial_quali > data_fim_quali:
-                st.warning('Data de início é maior que data de término!')
-            else:
-                date_difference = data_inicial_quali - data_fim_quali
-                filtrado_df = df[(df['data'] >= data_inicial_quali) & (df['data'] <= data_fim_quali)] 
-
-                if data_inicial_quali == data_fim_quali:
-                    periodo2 = dia_start2 + "/" + mes_start2 + "/" + ano_start2                
-                else:
-                    periodo2 = dia_start2 + "/" + mes_start2 + "/" + ano_start2 + " A " + dia_end2 + "/" + mes_end2 + "/" + ano_end2
-        
-        elif data_inicial_quali:
-            periodo2 = dia_start2 + "/" + mes_start2 + "/" + ano_start2
-            filtrado_df = df[(df['data'] == data_inicial_quali)]
-        elif data_fim_quali:
-            periodo2 = dia_end2 + "/" + mes_end + "/" + ano_end2
-            filtrado_df = df[(df['data'] == data_fim_quali)]
-
-        # 1. Convertendo a coluna 'data' para datetime
-        filtrado_df['data'] = pd.to_datetime(filtrado_df['data'], errors='coerce')
-
-        # Verificar valores nulos
-        if filtrado_df['data'].isnull().any():
-            st.warning('Existem valores inválidos na coluna data!')
-
-        # Agregando os dados
-        filtrado_df['Refeições'] = filtrado_df['almoco'] + filtrado_df['janta']
-        filtrado_df['Lanches'] = filtrado_df['cafe'] + filtrado_df['lanche']
-        df_agregado = filtrado_df.groupby('data').sum()[['Refeições', 'Lanches', 'total']].reset_index()
-        df_agregado['data'] = df_agregado['data'].dt.strftime('%d/%m/%y')
-
-        # Definindo cores
-        colors = px.colors.diverging.RdBu
-
-        # Criando traços
-        bar_refeicoes = go.Bar(
-            x=df_agregado['data'],
-            y=df_agregado['Refeições'],
-            name='Almoço | Janta',
-            text=df_agregado['Refeições'],
-            textposition='inside',
-            marker=dict(color=colors[-4])
-        )
-
-        bar_lanches = go.Bar(
-            x=df_agregado['data'],
-            y=df_agregado['Lanches'],
-            name='Café | Lanche',
-            text=df_agregado['Lanches'],
-            textposition='inside',
-            marker=dict(color=colors[-3])
-        )
-
-
-        line_total = go.Scatter(
-            x=df_agregado['data'],
-            y=df_agregado['total'],
-            mode='lines',
-            name='Qualitativo',
-            line=dict(color='red', shape='linear'),
-            yaxis='y2'
-        )
-        traces = [bar_refeicoes, bar_lanches, line_total]
-
-
-        # Filtrar a linha "Qualitativo" a partir de 01/09/2023
-        mask = (pd.to_datetime(df_agregado['data'], format='%d/%m/%y') >= '2023-09-01')
-        qualitativo_post_2023 = df_agregado[mask]
-
-        # Encontrar o valor máximo da linha "Qualitativo" APENAS após 01/09/2023
-        max_value_qualitativo_post_2023 = qualitativo_post_2023['total'].max()
-
-        # Obter o valor da coluna 'total' do último dia disponível
-        last_day_total_value = df_agregado['total'].iloc[-1]
-
-        # Criando a figura
-        fig_quantidade_dia = go.Figure(data=traces)
-
-
-        # Adicionar a linha horizontal no gráfico baseada no valor máximo pós 01/09/2023
-        fig_quantidade_dia.add_shape(
-            go.layout.Shape(
-                type="line",
-                xref="x",
-                yref="y2",
-                x0=df_agregado['data'].iloc[0],  # Início do eixo x
-                x1=df_agregado['data'].iloc[-1],  # Final do eixo x
-                y0=max_value_qualitativo_post_2023,
-                y1=max_value_qualitativo_post_2023,
-                line=dict(
-                    color="white",
-                    width=1.5,
-                    dash="dashdot",
-                )
-            )
-        )
-            
-        # Adicionar a linha horizontal baseada no valor do último dia disponível
-        fig_quantidade_dia.add_shape(
-            go.layout.Shape(
-                type="line",
-                xref="x",
-                yref="y2",
-                x0=df_agregado['data'].iloc[0],  # Início do eixo x
-                x1=df_agregado['data'].iloc[-1],  # Final do eixo x
-                y0=last_day_total_value,
-                y1=last_day_total_value,
-                line=dict(
-                    color="white",
-                    width=1.5,
-                    dash="dashdot",
-                )
-            )
-        )
-
-        # Atualizar layout e exibir gráfico
-        fig_quantidade_dia.update_layout(
-            margin=dict(t=50,b=0),
-            title= "-ANÁLISE QUANTI-QUALITATIVA NO " + periodo2,
-            barmode='group',
-            xaxis_title='Dias',
-            yaxis_title='Quantidade',
-            yaxis2=dict(
-                overlaying='y',
-                side='right',
-                showgrid=False,
-                title='Total'
-            )
-        )
-
-        fig_quantidade_dia.update_yaxes(
-            showline=True,
-            linecolor="Grey",
-            linewidth=0.5
-        )
-
-        # Exibindo o gráfico
-        c4.plotly_chart(fig_quantidade_dia, use_container_width=True, automargin=True)
-
-    else:
-        st.warning('A coluna "data" não foi encontrada na base fornecida.')
-
-
-
 
