@@ -19,20 +19,9 @@ hide_st_style = """
                 """
 st.markdown(hide_st_style, unsafe_allow_html=True)
 
-st.markdown(
-    """
-    <style>
-        [data-testid="stSidebarNav"] {
-            background-image: url(https://i.postimg.cc/52vw7RW6/streamlit-Logo2.png);
-            background-repeat: no-repeat;
-            padding-top: 37px;
-            background-position: 18px 55px;
-            position: relative;
-        }
-    </style>
-    """,
-    unsafe_allow_html=True,
-)
+sidebar_logo = "https://i.postimg.cc/Hk26YfrK/logo-elisa.png"
+main_body_logo = "https://i.postimg.cc/3xkGPmC6/streamlit02.png"
+st.logo(sidebar_logo, icon_image=main_body_logo)
 
 
 df = pd.read_csv("databaseElisa.csv", sep=";", decimal=",", thousands=".", usecols=['data','fazenda', 'almoco', 'janta', 'cafe','lanche', 'vlrCafe', 'vlrAlmoco', 'total'], index_col=None) 

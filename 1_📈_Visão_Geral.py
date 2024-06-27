@@ -15,20 +15,10 @@ hide_st_style = """
                 """
 st.markdown(hide_st_style, unsafe_allow_html=True)
 
-st.markdown(
-    """
-    <style>
-        [data-testid="stSidebarNav"] {
-            background-image: url(https://i.postimg.cc/52vw7RW6/streamlit-Logo2.png);
-            background-repeat: no-repeat;
-            padding-top: 37px;
-            background-position: 18px 55px;
-            position: relative;
-        }
-    </style>
-    """,
-    unsafe_allow_html=True,
-)
+
+sidebar_logo = "https://i.postimg.cc/Hk26YfrK/logo-elisa.png"
+main_body_logo = "https://i.postimg.cc/3xkGPmC6/streamlit02.png"
+st.logo(sidebar_logo, icon_image=main_body_logo)
 
 df = pd.read_csv("databaseElisa.csv", sep=";", decimal=",", thousands=".", usecols=['data','fazenda', 'almoco', 'janta', 'cafe','lanche', 'vlrCafe', 'vlrAlmoco', 'total'], index_col=None) 
 
@@ -120,6 +110,8 @@ if data_inicial:
 if data_fim:
     data_fim = pd.Timestamp(data_fim)
 
+df['data'] = pd.to_datetime(df['data'])
+
 if data_inicial or data_fim:
 
     if 'data' in df.columns:
@@ -156,10 +148,13 @@ if data_inicial or data_fim:
 
         lista_fazenda = df['fazenda'].unique().tolist()
 
+
         qtd_almoco = filtered_df.groupby("fazenda")[["almoco"]].sum()
         qtd_janta = filtered_df.groupby("fazenda")[["janta"]].sum()
         qtd_cafe = filtered_df.groupby("fazenda")[["cafe"]].sum()
         qtd_lanche = filtered_df.groupby("fazenda")[["lanche"]].sum()
+
+        
 
         qtd_almoco = qtd_almoco.reindex(lista_fazenda)
         qtd_janta = qtd_janta.reindex(lista_fazenda)
@@ -192,14 +187,19 @@ if data_inicial or data_fim:
 
         soma_colunas = {
             "Fazenda": "<b>TOTAL</b>",
-            "Café": "<b>" + str('{0:,}'.format(int(qtd_cafe.sum())).replace(',','.')) + "</b>",
-            "Almoço": "<b>" + str('{0:,}'.format(int(qtd_almoco.sum())).replace(',','.')) + "</b>",
-            "Lanche": "<b>" + str('{0:,}'.format(int(qtd_lanche.sum())).replace(',','.')) + "</b>",
-            "Janta": "<b>" + str('{0:,}'.format(int(qtd_janta.sum())).replace(',','.')) + "</b>"
+            "Café": f"<b>{int(qtd_cafe.sum(numeric_only=True).iloc[0]):,}".replace(',', '.') + "</b>",
+            "Almoço": f"<b>{int(qtd_almoco.sum(numeric_only=True).iloc[0]):,}".replace(',', '.') + "</b>",
+            "Lanche": f"<b>{int(qtd_lanche.sum(numeric_only=True).iloc[0]):,}".replace(',', '.') + "</b>",
+            "Janta": f"<b>{int(qtd_janta.sum(numeric_only=True).iloc[0]):,}".replace(',', '.') + "</b>"
         }
 
-        data_frame = data_frame.append(soma_colunas, ignore_index=True)
+        # Convertendo o dicionário para um DataFrame
+        soma_colunas_df = pd.DataFrame([soma_colunas])
 
+        
+
+        data_frame = pd.concat([data_frame, soma_colunas_df], ignore_index=True)
+        
         fig_tabela_dia = go.Figure(data=[go.Table(
                         header=dict(
                             values=list(data_frame.columns),
@@ -224,7 +224,7 @@ if data_inicial or data_fim:
                                         domain=[0.3, 1]  # Ajuste os valores conforme necessário
                                     ),
                                     title={ 'text': "-FECHAMENTO DE " + periodo, 'y':0.92, 'x':0.0, 'xanchor': 'left', 'yanchor': 'top'},
-                                    height=282,
+                                    height=285,
                                     margin=dict(r=10, t=50,b=0)
         )
         
@@ -236,7 +236,7 @@ if data_inicial or data_fim:
 
 
         # Cálculo dos totais
-        fazenda_total = filtered_df.groupby("fazenda")[["total"]].sum().reset_index()
+        fazenda_total = filtered_df.groupby("fazenda")[["total"]].sum(numeric_only=True).reset_index()
 
         # Adicionando uma coluna com os valores formatados em R$
         fazenda_total['total_formatado'] = fazenda_total['total'].apply(lambda x: f"R$ {x:,.2f}".replace('.', '@').replace(',', '.').replace('@', ','))
@@ -265,7 +265,7 @@ if data_inicial or data_fim:
         df["mes"] = df["data"].dt.month
 
         # Agrupar os dados por ano e mês
-        df_grouped = df.groupby(["ano", "mes"]).sum().reset_index()
+        df_grouped = df.groupby(["ano", "mes"]).sum(numeric_only=True).reset_index()
 
         # Criar uma nova coluna com o formato "Mês/Ano"
         df_grouped["Mês/Ano"] = df_grouped.apply(lambda row: f"{meses[row['mes']]}/{int(row['ano'])}", axis=1)
@@ -398,7 +398,7 @@ if data_inicial or data_fim:
             col5.warning(f"Não há dados disponíveis para {mes_selecionado}/{ano_selecionado}.")
         else:
             # Agregando os dados por dia
-            venda_total = df_mes_filtrado.groupby("data")[["total"]].sum().reset_index()
+            venda_total = df_mes_filtrado.groupby("data")[["total"]].sum(numeric_only=True).reset_index()
             
             # Adicionando coluna com valores formatados em R$
             venda_total['total_formatado'] = venda_total['total'].apply(lambda x: f"R$ {x:,.2f}".replace('.', '@').replace(',', '.').replace('@', ','))
@@ -446,7 +446,7 @@ if data_inicial or data_fim:
         df_filtrado = df[df['ano'] == ano_selecionado]
 
         # Agregando os dados por mês
-        venda_total_mensal = df_filtrado.groupby(['mes_num', 'ano'])[['total']].sum().reset_index()
+        venda_total_mensal = df_filtrado.groupby(['mes_num', 'ano'])[['total']].sum(numeric_only=True).reset_index()
 
         # Ordenando pelo mês
         venda_total_mensal = venda_total_mensal.sort_values(by='mes_num')
@@ -501,7 +501,7 @@ if data_inicial or data_fim:
         df['ano'] = df['data'].dt.year.astype(str)
 
         # Agregando os dados por ano
-        venda_total_anual = df.groupby('ano')[['total']].sum().reset_index()
+        venda_total_anual = df.groupby('ano')[['total']].sum(numeric_only=True).reset_index()
 
         # Adicionando uma coluna com os valores formatados em reais
         venda_total_anual['total_formatado'] = venda_total_anual['total'].apply(lambda x: f"R$ {x:,.2f}".replace('.', '@').replace(',', '.').replace('@', ','))
@@ -545,7 +545,7 @@ if data_inicial or data_fim:
         df_filtered = df[df['ano_mes'] != current_month]
 
         # Agregando os dados por ano e mês
-        venda_total_mensal = df_filtered.groupby('ano_mes')[['total']].sum().reset_index()
+        venda_total_mensal = df_filtered.groupby('ano_mes')[['total']].sum(numeric_only=True).reset_index()
 
         # Criando colunas separadas para o mês e o ano
         venda_total_mensal['year'] = venda_total_mensal['ano_mes'].dt.year.astype(str)
