@@ -180,24 +180,48 @@ if data_inicial or data_fim:
 
         data_frame = pd.concat([data_frame, soma_colunas_df], ignore_index=True)
         
+        # Inicializar listas de cores para as células com as cores padrões
+        fill_colors = [
+            ['#247BA0'] * len(data_frame), 
+            ['white'] * len(data_frame), 
+            ['#e8ecec'] * len(data_frame), 
+            ['white'] * len(data_frame), 
+            ['#e8ecec'] * len(data_frame),
+        ]
+        font_colors = [
+            ['white'] * len(data_frame),
+            ['black'] * len(data_frame),
+            ['black'] * len(data_frame),
+            ['black'] * len(data_frame),
+            ['black'] * len(data_frame)
+        ]
+
+        # Iterar sobre todas as células e aplicar estilo se contiver <b>
+        for i, col in enumerate(data_frame.columns):
+            for j, cell_value in enumerate(data_frame[col]):
+                if '<b>' in str(cell_value):  # Verificar se a string <b> está presente no valor da célula
+                    fill_colors[i][j] = '#006494'  # Cor de fundo
+                    font_colors[i][j] = 'white'  # Cor da fonte
+
+        # Criar a tabela
         fig_tabela_dia = go.Figure(data=[go.Table(
-                        header=dict(
-                            values=list(data_frame.columns),
-                            fill_color='#004d72',
-                            line_color="lightgrey",
-                            font_color="white",
-                            align='center',
-                            height=32  # Ajusta a altura do cabeçalho
-                        ),
-                        cells=dict(
-                            values=[data_frame.Fazenda, data_frame.Café, data_frame.Almoço, data_frame.Lanche, data_frame.Janta],
-                            fill=dict(color=['#DEE6EF', 'white','#f7f7f7','white','#f7f7f7']),
-                            line_color="lightgrey",
-                            font_color="black",
-                            align='center',
-                            height=32  # Ajusta a altura das células
-                        ))
-                    ])
+            header=dict(
+                values=list(data_frame.columns),
+                fill_color='#124b70',
+                line_color="lightgrey",
+                font_color="white",
+                align='center',
+                height=32  # Ajusta a altura do cabeçalho
+            ),
+            cells=dict(
+                values=[data_frame[col] for col in data_frame.columns],
+                fill=dict(color=fill_colors),
+                line_color="lightgrey",
+                font=dict(color=font_colors),
+                align='center',
+                height=32  # Ajusta a altura das células
+            ))
+        ])
 
         fig_tabela_dia.update_layout(
                                     yaxis=dict(
@@ -207,7 +231,8 @@ if data_inicial or data_fim:
                                     height=310,
                                     margin=dict(r=0, t=20,b=0)
         )
-        
+
+
         # Convertendo colunas relevantes para tipo numérico (se necessário)
         data_frame['Café'] = pd.to_numeric(data_frame['Café'], errors='coerce')
         data_frame['Almoço'] = pd.to_numeric(data_frame['Almoço'], errors='coerce')
@@ -230,7 +255,7 @@ if data_inicial or data_fim:
             text=valores,
             textposition='auto',
             texttemplate='%{y:.0f}',  # Formato do texto (inteiro sem casas decimais)
-            marker_color='#004d72',  # Cor das barras
+            marker_color="#006494",  # Cor das barras
             textangle = 0
 
         ))
@@ -243,7 +268,7 @@ if data_inicial or data_fim:
             title_text='-QUANTIDADE TOTAL DE REFEIÇÕES NO PERÍODO SELECIONADO',
             title_x=0.01,
             title_y=0.94,
-            title_font_color="rgb(98,83,119)",
+            title_font_color="rgb(98,83,119)"
 
         )
         fig_barras.update_yaxes(showline=True, linecolor="Grey", linewidth=0.1, gridcolor='lightgrey')
@@ -275,7 +300,7 @@ if data_inicial or data_fim:
         # Criando o gráfico de rosca
         fig_venda_fazenda = px.pie(fazenda_total, names='fazenda', values='porcentagem', 
                                 color='fazenda', 
-                                color_discrete_sequence=px.colors.diverging.RdBu_r, 
+                                color_discrete_sequence=px.colors.sequential.PuBu_r, 
                                 hover_data=['porcentagem_formatada'])
 
         # Configurações adicionais
@@ -392,19 +417,7 @@ if data_inicial or data_fim:
             mode='lines+markers',  # Corrigido
             name="Café | Lanche",
             fill='tozeroy',
-            marker_color=colors[-1],
-            fillcolor=colors[-3]
+            marker_color=px.colors.sequential.PuBu_r[0],
+            fillcolor=px.colors.sequential.PuBu_r[2]
         ))
                
-
-
-
-        # Configuração do gráfico
-        fig.update_yaxes(showline=True, linecolor="Grey", linewidth=0.1, gridcolor='lightgrey')
-        fig.update_xaxes(showline=True, linecolor="Grey", linewidth=0.1, gridcolor='lightgrey')
-        fig.update_layout(margin=dict(t=50), height=400, title="-HISTÓRICO QUANTIDADE DE REFEIÇÕES AGRUPADAS", title_font_color="rgb(98,83,119)", yaxis_title="Quantidade")
-
-        # Exibir o gráfico no Streamlit
-        c1.plotly_chart(fig, use_container_width=True, automargin=True)
-
-
