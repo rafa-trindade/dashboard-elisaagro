@@ -20,7 +20,7 @@ hide_st_style = """
 st.markdown(hide_st_style, unsafe_allow_html=True)
 
 
-sidebar_logo = "https://i.postimg.cc/Hk26YfrK/logo-elisa.png"
+sidebar_logo = "https://i.postimg.cc/qMCqD23q/logo-elisa.png"
 main_body_logo = "https://i.postimg.cc/3xkGPmC6/streamlit02.png"
 st.logo(sidebar_logo, icon_image=main_body_logo)
 
