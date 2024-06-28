@@ -5,7 +5,7 @@ import plotly.graph_objects as go
 import numpy as np
 
 st.set_page_config(
-    layout="wide",
+    layout="centered",
     page_title="Gestão e Análise | Rafael Trindade", 
     initial_sidebar_state="expanded", 
     page_icon="📊")
@@ -24,7 +24,7 @@ main_body_logo = "https://i.postimg.cc/3xkGPmC6/streamlit02.png"
 st.logo(sidebar_logo, icon_image=main_body_logo)
 
 
-df = pd.read_csv("databaseElisa.csv", sep=";", decimal=",", thousands=".", usecols=['data','fazenda', 'almoco', 'janta', 'cafe','lanche', 'vlrCafe', 'vlrAlmoco', 'total'], index_col=None) 
+df = pd.read_csv("data/databaseElisa.csv", sep=";", decimal=",", thousands=".", usecols=['data','fazenda', 'almoco', 'janta', 'cafe','lanche', 'vlrCafe', 'vlrAlmoco', 'total'], index_col=None) 
 
 # Convertendo a coluna 'data' para o tipo datetime após carregar o dataframe
 df['data'] = pd.to_datetime(df['data'], format='%d/%m/%Y', errors='coerce')
@@ -58,21 +58,25 @@ col2_side.markdown(f'<h5 style="text-align: end; margin-bottom: -25px;">{valor_l
 
 st.sidebar.write("____")
 
+
+
 link_url = "https://drive.google.com/drive/folders/1N4V0ZJLiGAHxRrBpVPHv0hqkFJ3CwFsM"
-st.markdown(f'''
-    <h4 style="text-align: center;">
-        <a href="{link_url}" target="_blank" style="text-align: center; color: #053061; text-decoration: none;" 
-           onmouseover="this.style.textDecoration='none';" onmouseout="this.style.textDecoration='none';">
-           ☁️ Drive Fechamentos Diários
-        </a>
-    </h4>
-    <style>
-        a:hover {{
-            text-decoration: none !important;
-        }}
-        a:visited {{
-            color: #053061;
-        }}
-    </style>
-''', unsafe_allow_html=True)
+
+with st.container(border=True, height=80):
+    st.markdown(f'''
+        <h4 style="text-align: center; vertical-align: middle;">
+            <a href="{link_url}" target="_blank" style="text-align: center; color: #053061; text-decoration: none;" 
+            onmouseover="this.style.textDecoration='none';" onmouseout="this.style.textDecoration='none';">
+            ☁️ Drive Fechamentos Diários
+            </a>
+        </h4>
+        <style>
+            a:hover {{
+                text-decoration: none !important;
+            }}
+            a:visited {{
+                color: #053061;
+            }}
+        </style>
+    ''', unsafe_allow_html=True)
  
