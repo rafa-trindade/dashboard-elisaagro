@@ -75,8 +75,7 @@ with tab1:
 
 
 
-colors = px.colors.diverging.RdBu
-
+colors = px.colors.sequential.Bluyl_r
 
 ########################################################################################
 ####### ABA FECHAMENTOS DIÁRIOS ########################################################
@@ -182,7 +181,7 @@ if data_inicial or data_fim:
         
         # Inicializar listas de cores para as células com as cores padrões
         fill_colors = [
-            ['#247BA0'] * len(data_frame), 
+            ['#0e7089'] * len(data_frame), 
             ['white'] * len(data_frame), 
             ['#e8ecec'] * len(data_frame), 
             ['white'] * len(data_frame), 
@@ -255,7 +254,7 @@ if data_inicial or data_fim:
             text=valores,
             textposition='auto',
             texttemplate='%{y:.0f}',  # Formato do texto (inteiro sem casas decimais)
-            marker_color="#006494",  # Cor das barras
+            marker_color=px.colors.sequential.Bluyl_r,  # Cor das barras
             textangle = 0
 
         ))
@@ -300,7 +299,7 @@ if data_inicial or data_fim:
         # Criando o gráfico de rosca
         fig_venda_fazenda = px.pie(fazenda_total, names='fazenda', values='porcentagem', 
                                 color='fazenda', 
-                                color_discrete_sequence=px.colors.sequential.PuBu_r[1:], 
+                                color_discrete_sequence=px.colors.sequential.Bluyl_r, 
                                 hover_data=['porcentagem_formatada'])
 
         # Configurações adicionais
