@@ -421,3 +421,11 @@ if data_inicial or data_fim:
             fillcolor=px.colors.sequential.PuBu_r[2]
         ))
                
+
+        # Configuração do gráfico
+        fig.update_yaxes(showline=True, linecolor="Grey", linewidth=0.1, gridcolor='lightgrey')
+        fig.update_xaxes(showline=True, linecolor="Grey", linewidth=0.1, gridcolor='lightgrey')
+        fig.update_layout(margin=dict(t=50), height=400, title="-HISTÓRICO QUANTIDADE DE REFEIÇÕES AGRUPADAS", title_font_color="rgb(98,83,119)", yaxis_title="Quantidade")
+
+        # Exibir o gráfico no Streamlit
+        c1.plotly_chart(fig, use_container_width=True, automargin=True)
