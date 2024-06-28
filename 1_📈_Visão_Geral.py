@@ -230,7 +230,9 @@ if data_inicial or data_fim:
             text=valores,
             textposition='auto',
             texttemplate='%{y:.0f}',  # Formato do texto (inteiro sem casas decimais)
-            marker_color='#004d72'  # Cor das barras
+            marker_color='#004d72',  # Cor das barras
+            textangle = 0
+
         ))
 
         fig_barras.update_layout(
@@ -241,7 +243,7 @@ if data_inicial or data_fim:
             title_text='-QUANTIDADE TOTAL DE REFEIÇÕES NO PERÍODO SELECIONADO',
             title_x=0.01,
             title_y=0.94,
-            title_font_color="rgb(98,83,119)"
+            title_font_color="rgb(98,83,119)",
 
         )
         fig_barras.update_yaxes(showline=True, linecolor="Grey", linewidth=0.1, gridcolor='lightgrey')
