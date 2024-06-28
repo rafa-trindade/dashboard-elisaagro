@@ -300,7 +300,7 @@ if data_inicial or data_fim:
         # Criando o gráfico de rosca
         fig_venda_fazenda = px.pie(fazenda_total, names='fazenda', values='porcentagem', 
                                 color='fazenda', 
-                                color_discrete_sequence=px.colors.sequential.PuBu_r, 
+                                color_discrete_sequence=px.colors.sequential.PuBu_r[1:], 
                                 hover_data=['porcentagem_formatada'])
 
         # Configurações adicionais
@@ -308,6 +308,7 @@ if data_inicial or data_fim:
             texttemplate='%{label}<br>%{value:.2f}%', 
             textposition='inside'
         )
+        
         fig_venda_fazenda.update_layout(
             #width=200, 
             height=310, 
@@ -418,7 +419,7 @@ if data_inicial or data_fim:
             name="Café | Lanche",
             fill='tozeroy',
             marker_color=px.colors.sequential.PuBu_r[0],
-            fillcolor=px.colors.sequential.PuBu_r[2]
+            fillcolor="#006494"
         ))
                
 
