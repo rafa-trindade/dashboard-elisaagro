@@ -62,7 +62,7 @@ col2_side.markdown(f'<h5 style="text-align: end; margin-bottom: -25px;">{valor_l
 st.sidebar.write("____")
 
 
-tab1, tab2 = st.tabs(["📅 Fechamentos Diários", "📊 Faturado Mensal"])
+tab1, tab2 = st.tabs(["📅 Fechamentos Diários", "\t"])
 
 with tab1:
 
@@ -72,13 +72,7 @@ with tab1:
     with st.container(border=True):
         c1 = st.container()
 
-with tab2:
-    with st.container(border=True):
-        col_filtro_mes, col_filtro_ano = st.columns(2)  
-        col4, col5 = st.columns([2,1])
 
-    with st.container(border=True):
-        col6, col7 = st.columns([1,3])
 
 
 colors = px.colors.diverging.RdBu
