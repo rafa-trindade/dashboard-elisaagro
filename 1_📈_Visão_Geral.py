@@ -24,21 +24,33 @@ sidebar_logo = "https://i.postimg.cc/j5mwCcfV/logo-elisa.png"
 main_body_logo = "https://i.postimg.cc/3xkGPmC6/streamlit02.png"
 st.logo(sidebar_logo, icon_image=main_body_logo)
 
-df = pd.read_csv("data/databaseElisa.csv", sep=";", decimal=",", thousands=".", usecols=['data','fazenda', 'almoco', 'janta', 'cafe','lanche', 'vlrCafe', 'vlrAlmoco', 'total'], index_col=None) 
+# Define a data de início como um Timestamp
+data_inicio = pd.Timestamp('2024-03-01')
+
+# Carregar o DataFrame a partir do CSV
+csv_url = "data/databaseElisa.csv"
+df_elisa = pd.read_csv(csv_url, sep=";", decimal=",", thousands=".", usecols=['data', 'fazenda', 'almoco', 'janta', 'cafe', 'lanche', 'vlrCafe', 'vlrAlmoco', 'total'], index_col=None)
 
 # Convertendo a coluna 'data' para o tipo datetime após carregar o dataframe
-df['data'] = pd.to_datetime(df['data'], format='%d/%m/%Y', errors='coerce')
-df['data'] = df['data'].dt.date
+df_elisa['data'] = pd.to_datetime(df_elisa['data'], format='%d/%m/%Y', errors='coerce')
 
-#st.sidebar.markdown('<h2 style="color: #053061; margin-bottom: -40px; text-align: center;">B2B Refeições | Elisa Agro</h2>', unsafe_allow_html=True)
-#st.sidebar.markdown('<h4 style="margin-bottom: -200px; text-align: center;">(Fornecimento Alimentação)</h4>', unsafe_allow_html=True)
-
-#st.sidebar.write("____")
+# Opção de seleção no Streamlit
+opcao = st.sidebar.selectbox(
+    "Selecione:",
+    ("Todas as datas", "Início Contrato Vigente")
+)
+# Filtrar o DataFrame conforme a opção selecionada
+if opcao == "Todas as datas":
+    df = df_elisa
+    data_menu = df['data'].min()
+else:
+    df = df_elisa[df_elisa['data'] >= data_inicio]
+    data_menu = df['data'].min()
 
 col1_side, col2_side = st.sidebar.columns([2,1])
 
 col1_side.markdown('<h5 style="margin-bottom: -25px;">Início Apurado:', unsafe_allow_html=True)
-col2_side.markdown('<h5 style="text-align: end; margin-bottom: -25px;">01/01/2021</h5>', unsafe_allow_html=True)
+col2_side.markdown(f'<h5 style="text-align: end; margin-bottom: -25px;">{data_menu.strftime("%d/%m/%Y")}</h5>', unsafe_allow_html=True)
 
 col1_side.markdown('<h5 style="margin-bottom: 15px; color: #053061;">Última Atualização:</h5>', unsafe_allow_html=True)
 col2_side.markdown('<h5 style="margin-bottom: 15px; text-align: end; color: #053061;">' + str(df['data'].max().strftime('%d/%m/%Y'))+ '</h5>', unsafe_allow_html=True)
@@ -87,7 +99,7 @@ if df['data'].max().day < 20:
 else:
     mes_inicial_padrão = dt.date(ano_atual, mes_atual, 20)
 
-data_inicial = col_data_ini.date_input('DATA INÍCIO:', mes_inicial_padrão, None, format="DD/MM/YYYY",  key="data_inicio_key")
+data_inicial = col_data_ini.date_input('DATA INÍCIO:', df['data'].max(), None, format="DD/MM/YYYY",  key="data_inicio_key")
 data_fim = col_data_fim.date_input('DATA FIM:', None, format="DD/MM/YYYY", key="data_fim_key")
 
 if data_inicial:
