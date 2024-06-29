@@ -75,7 +75,7 @@ with tab1:
 
 
 
-colors = px.colors.sequential.Bluyl_r
+colors = px.colors.sequential.RdBu
 
 ########################################################################################
 ####### ABA FECHAMENTOS DIÁRIOS ########################################################
@@ -254,7 +254,7 @@ if data_inicial or data_fim:
             text=valores,
             textposition='auto',
             texttemplate='%{y:.0f}',  # Formato do texto (inteiro sem casas decimais)
-            marker_color=px.colors.sequential.Bluyl_r,  # Cor das barras
+            marker_color=px.colors.sequential.Bluyl_r[0:2] + px.colors.sequential.Bluyl_r[0:2],  # Cor das barras
             textangle = 0
 
         ))
@@ -299,7 +299,7 @@ if data_inicial or data_fim:
         # Criando o gráfico de rosca
         fig_venda_fazenda = px.pie(fazenda_total, names='fazenda', values='porcentagem', 
                                 color='fazenda', 
-                                color_discrete_sequence=px.colors.sequential.Bluyl_r, 
+                                color_discrete_sequence= px.colors.sequential.RdBu_r[1:1] + px.colors.sequential.RdBu[1:2] + px.colors.sequential.Bluyl_r[0:], 
                                 hover_data=['porcentagem_formatada'])
 
         # Configurações adicionais
@@ -403,22 +403,22 @@ if data_inicial or data_fim:
         fig.add_trace(go.Scatter(
             x=df_grouped["Mês/Ano"],
             y=df_grouped["Almoço | Janta"],
-            mode='lines+markers',  # Corrigido
+            mode='lines+markers+text',  
             name="Almoço | Janta",
             fill='tozeroy',
-            marker_color=colors[1],
-            fillcolor=colors[3]
+            marker_color=colors[0],
+            #fillcolor="#b3112e"
         ))
 
         # Adicionar a área para Café | Lanche
         fig.add_trace(go.Scatter(
             x=df_grouped["Mês/Ano"],
             y=df_grouped["Café | Lanche"],
-            mode='lines+markers',  # Corrigido
+            mode='lines+markers+text',  # Corrigido
             name="Café | Lanche",
             fill='tozeroy',
             marker_color=px.colors.sequential.PuBu_r[0],
-            fillcolor="#006494"
+            fillcolor="#0e7089"
         ))
                
 
