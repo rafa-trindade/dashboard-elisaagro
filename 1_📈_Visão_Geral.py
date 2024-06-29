@@ -350,11 +350,13 @@ if data_inicial or data_fim:
             title_x=0.00,
             title_y=0.964,
             title_font_color="rgb(98,83,119)",
-            showlegend=False
+            showlegend=False,
+
         )
 
         fig_box.update_yaxes(showline=False, linecolor="Grey", linewidth=0.1, gridcolor='lightgrey', showticklabels=True, title_text='', range=[-10, df_agrupado['cafe'].max() + 30])
         fig_box.update_xaxes(showline=True, linecolor="Grey", linewidth=0.1, gridcolor='lightgrey', title_text='REFEIÇÕES')
+        fig_box.update_traces(marker=dict(size=3))
 
 
         col4.plotly_chart(fig_box, use_container_width=True)
