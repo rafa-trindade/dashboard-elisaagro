@@ -72,11 +72,6 @@ with tab1:
     with st.container(border=True):
         c1 = st.container()
 
-
-
-
-colors = px.colors.sequential.RdBu
-
 ########################################################################################
 ####### ABA FECHAMENTOS DIÁRIOS ########################################################
 ########################################################################################
@@ -299,7 +294,7 @@ if data_inicial or data_fim:
         # Criando o gráfico de rosca
         fig_venda_fazenda = px.pie(fazenda_total, names='fazenda', values='porcentagem', 
                                 color='fazenda', 
-                                color_discrete_sequence= px.colors.sequential.RdBu_r[1:1] + px.colors.sequential.RdBu[1:2] + px.colors.sequential.Bluyl_r[0:], 
+                                color_discrete_sequence=  px.colors.sequential.RdBu[1:2] + px.colors.sequential.Teal_r + px.colors.sequential.Teal_r[3:], 
                                 hover_data=['porcentagem_formatada'])
 
         # Configurações adicionais
@@ -364,7 +359,7 @@ if data_inicial or data_fim:
             x1=df_grouped["Mês/Ano"].iloc[-1],  # Termina no último ponto do eixo x
             y0=previous_almoco_janta_value,
             y1=previous_almoco_janta_value,
-            line=dict(color="red", width=1.5, dash="dashdot")
+            line=dict(color="#0e7089", width=1.5, dash="dashdot")
         )
 
         # Adicionar a linha horizontal ao gráfico
@@ -374,9 +369,8 @@ if data_inicial or data_fim:
             x1=df_grouped["Mês/Ano"].iloc[-1],  # Termina no último ponto do eixo x
             y0=previous_cafe_lanche_value,
             y1=previous_cafe_lanche_value,
-            line=dict(color="blue", width=1.5, dash="dashdot")
+            line=dict(color="#145073", width=1.5, dash="dashdot")
         )
-
 
         # Identificar o mês anterior ao atual
         current_month = pd.Timestamp.now().month
@@ -394,10 +388,8 @@ if data_inicial or data_fim:
                 x1=month_year_label,
                 y0=0,
                 y1=df_grouped["Almoço | Janta"].max(),  # Assumindo que isso cobre o máximo valor do gráfico
-                line=dict(color="grey", width=1, dash="dot")
+                line=dict(color="#b3112e", width=1, dash="dot")
             )
-
-
 
         # Adicionar a área para Almoço | Janta
         fig.add_trace(go.Scatter(
