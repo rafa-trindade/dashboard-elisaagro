@@ -69,7 +69,7 @@ with tab1:
         col_data_ini, col_data_fim = st.columns(2)
         col1, col2, col3 = st.columns([2,2,1])     
     with st.container(border=True):
-        col4 ,  col5= st.columns([1,2])
+        col4 ,  col5= st.columns([2,3])
 
 ########################################################################################
 ####### ABA FECHAMENTOS DIÁRIOS ########################################################
