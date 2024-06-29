@@ -4,11 +4,8 @@ import plotly.express as px
 import plotly.graph_objects as go
 import numpy as np
 
-st.set_page_config(
-    layout="centered",
-    page_title="Gestão e Análise | Rafael Trindade", 
-    initial_sidebar_state="expanded", 
-    page_icon="📊")
+st.set_page_config(layout="wide", page_title="B2B Refeições | Elisa Agro", initial_sidebar_state="expanded", page_icon="📊")
+
 
 hide_st_style = """
                 <style>
