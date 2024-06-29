@@ -65,12 +65,11 @@ st.sidebar.write("____")
 tab1, tab2 = st.tabs(["📅 Fechamentos Diários", "\t"])
 
 with tab1:
-
     with st.container(border=True):
         col_data_ini, col_data_fim = st.columns(2)
         col1, col2, col3 = st.columns([2,2,1])     
     with st.container(border=True):
-        c1 = st.container()
+        col4 ,  col5= st.columns([1,2])
 
 ########################################################################################
 ####### ABA FECHAMENTOS DIÁRIOS ########################################################
@@ -318,6 +317,50 @@ if data_inicial or data_fim:
 
 
 ########################################################################################
+####### GRAFICO BOX PLOT MENSAL ########################################################
+########################################################################################
+
+        # Filtrar os dados para incluir apenas o mês da data mais antiga
+        df_filtrado = df[(pd.to_datetime(df['data']).dt.month == data_inicial.month) &
+                         (pd.to_datetime(df['data']).dt.year == data_inicial.year)]
+        
+        # Agrupar e somar os valores por data
+        df_agrupado = df_filtrado.groupby('data').sum().reset_index()
+
+        df_long = df_agrupado.rename(columns={'cafe': 'Café', 'almoco': 'Almoço','lanche': 'Lanche', 'janta': 'Janta'})  
+
+        # Transformar o DataFrame para o formato longo
+        df_long = df_long.melt(id_vars=['data'], value_vars=['Café', 'Almoço', 'Lanche', 'Janta'], 
+                                var_name='Refeição', value_name='Valor')
+
+        # Criar o gráfico de box
+        fig_box = px.box(df_long,
+                         x='Refeição',
+                         y='Valor',
+                        color='Refeição',
+                        points="all",
+                        color_discrete_sequence=  px.colors.sequential.Bluyl_r[0:1]  + px.colors.sequential.RdBu[1:2] + px.colors.sequential.RdBu_r[1:1],
+                        )
+
+        fig_box.update_layout(
+            #title='Consumo Diário por Refeição',
+            height=359,
+            margin=dict(l=0, r=0, t=24, b=0),
+            title_text=f'-BOX PLOT QUANTIDADE DE REFEIÇÕES EM {data_utils.mapa_meses[data_inicial.month].upper()}/{data_inicial.year}',
+            title_x=0.00,
+            title_y=0.964,
+            title_font_color="rgb(98,83,119)",
+            showlegend=False
+        )
+
+        fig_box.update_yaxes(showline=False, linecolor="Grey", linewidth=0.1, gridcolor='lightgrey', showticklabels=True, title_text='', range=[-10, df_agrupado['cafe'].max() + 30])
+        fig_box.update_xaxes(showline=True, linecolor="Grey", linewidth=0.1, gridcolor='lightgrey', title_text='REFEIÇÕES')
+
+
+        col4.plotly_chart(fig_box, use_container_width=True)
+
+
+########################################################################################
 ####### GRAFICO AREA HISTORICO QUANTIDADES #############################################
 ########################################################################################
 
@@ -420,4 +463,4 @@ if data_inicial or data_fim:
         fig.update_layout(margin=dict(t=50), height=400, title="-HISTÓRICO QUANTIDADE DE REFEIÇÕES AGRUPADAS", title_font_color="rgb(98,83,119)", yaxis_title="Quantidade")
 
         # Exibir o gráfico no Streamlit
-        c1.plotly_chart(fig, use_container_width=True, automargin=True)
+        col5.plotly_chart(fig, use_container_width=True, automargin=True)
