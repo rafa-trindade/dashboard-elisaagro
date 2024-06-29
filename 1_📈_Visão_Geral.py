@@ -406,7 +406,7 @@ if data_inicial or data_fim:
             mode='lines+markers+text',  
             name="Almoço | Janta",
             fill='tozeroy',
-            marker_color=colors[0],
+            marker_color="#0e7089",
             #fillcolor="#b3112e"
         ))
 
@@ -417,8 +417,8 @@ if data_inicial or data_fim:
             mode='lines+markers+text',  # Corrigido
             name="Café | Lanche",
             fill='tozeroy',
-            marker_color=px.colors.sequential.PuBu_r[0],
-            fillcolor="#0e7089"
+            marker_color="#145073",
+            fillcolor="#7e96a8"
         ))
                
 
