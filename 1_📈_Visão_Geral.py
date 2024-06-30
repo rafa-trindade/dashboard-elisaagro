@@ -351,6 +351,7 @@ if data_inicial or data_fim:
                          y='Valor',
                         color='Refeição',
                         points="all",
+                        hover_data={'data': '|%d/%m/%y'},
                         color_discrete_sequence=  px.colors.sequential.Bluyl_r[0:1]  + px.colors.sequential.RdBu[1:2] + px.colors.sequential.RdBu_r[1:1],
                         )
 
