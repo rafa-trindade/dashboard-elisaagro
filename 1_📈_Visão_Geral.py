@@ -379,7 +379,9 @@ if data_inicial or data_fim:
         )
 
         fig_box.update_xaxes(showline=True, linecolor="Grey", linewidth=0.1, gridcolor='lightgrey', title_text='Refeições')
-        fig_box.update_traces(marker=dict(size=2.5))
+        fig_box.update_traces(marker=dict(size=2.5),
+                              boxmean='sd',  # Mostra a média e o desvio padrão
+        )
 
 
         col4.plotly_chart(fig_box, use_container_width=True)
