@@ -356,19 +356,29 @@ if data_inicial or data_fim:
 
         fig_box.update_layout(
             #title='Consumo Diário por Refeição',
-            height=359,
-            margin=dict(l=0, r=0, t=24, b=0),
+            height=400,
+            margin=dict(l=0, r=0, t=45, b=0),
             title_text=f'-BOX PLOT QUANTIDADE DE REFEIÇÕES EM {data_utils.mapa_meses[data_inicial.month].upper()}/{data_inicial.year}',
-            title_x=0.00,
-            title_y=0.964,
             title_font_color="rgb(98,83,119)",
             showlegend=False,
 
         )
 
-        fig_box.update_yaxes(showline=False, linecolor="Grey", linewidth=0.1, gridcolor='lightgrey', showticklabels=True, title_text='', range=[-10, df_agrupado['cafe'].max() + 30])
-        fig_box.update_xaxes(showline=True, linecolor="Grey", linewidth=0.1, gridcolor='lightgrey', title_text='REFEIÇÕES')
-        fig_box.update_traces(marker=dict(size=3))
+        fig_box.update_yaxes(
+            zerolinecolor='lightgrey',
+            autorange=True,
+            dtick=5, 
+            showline=False, 
+            linecolor="Grey", 
+            linewidth=0.1, 
+            gridcolor='lightgrey', 
+            showticklabels=True, 
+            title_text='Quantidade', 
+            #range=[-10, df_agrupado['cafe'].max() + 10]
+        )
+
+        fig_box.update_xaxes(showline=True, linecolor="Grey", linewidth=0.1, gridcolor='lightgrey', title_text='Refeições')
+        fig_box.update_traces(marker=dict(size=2.5))
 
 
         col4.plotly_chart(fig_box, use_container_width=True)
