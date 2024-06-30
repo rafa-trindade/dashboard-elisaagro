@@ -359,7 +359,7 @@ if data_inicial or data_fim:
             #title='Consumo Diário por Refeição',
             height=400,
             margin=dict(l=0, r=0, t=45, b=0),
-            title_text=f'-BOX PLOT QUANTIDADE DE REFEIÇÕES EM {data_utils.mapa_meses[data_inicial.month].upper()}/{data_inicial.year}',
+            title_text=f'-BOX PLOT QUANTIDADE DE REFEIÇÕES ({data_utils.mapa_meses[data_inicial.month].upper()}/{data_inicial.year})',
             title_font_color="rgb(98,83,119)",
             showlegend=False,
 
