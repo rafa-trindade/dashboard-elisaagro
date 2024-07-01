@@ -345,15 +345,21 @@ if data_inicial or data_fim:
         df_long = df_long.melt(id_vars=['data'], value_vars=['Café', 'Almoço', 'Lanche', 'Janta'], 
                                 var_name='Refeição', value_name='Valor')
 
-        # Criar o gráfico de box
-        fig_box = px.box(df_long,
-                         x='Refeição',
-                         y='Valor',
-                        color='Refeição',
-                        points="all",
-                        hover_data={'data': '|%d/%m/%y'},
-                        color_discrete_sequence=  px.colors.sequential.Bluyl_r[0:1]  + px.colors.sequential.RdBu[1:2] + px.colors.sequential.RdBu_r[1:1],
-                        )
+        # Criando a figura com go.Box
+        fig_box = go.Figure()
+
+        # Adicionando caixas para cada refeição
+        colors = ["#2c6281", "#2c6281", "#2c6281", "#2c6281"]
+
+        for i, refeicao in enumerate(df_long['Refeição'].unique()):
+            fig_box.add_trace(go.Box(
+                y=df_long[df_long['Refeição'] == refeicao]['Valor'],
+                name=refeicao,
+                marker=dict(color="#b3112e"),  # Cycle through colors
+                line=dict(color=colors[i % len(colors)]),  # Optional: set a constant line color
+                boxpoints="all",  # Show all points
+                hovertext=df_long[df_long['Refeição'] == refeicao]['data'].dt.strftime('%d/%m/%y'),
+            ))
 
         fig_box.update_layout(
             #title='Consumo Diário por Refeição',
@@ -375,13 +381,12 @@ if data_inicial or data_fim:
             gridcolor='lightgrey', 
             showticklabels=True, 
             title_text='Quantidade', 
-            #range=[-10, df_agrupado['cafe'].max() + 10]
+            range=[-20, df_long['Valor'].max() + 20]
         )
 
         fig_box.update_xaxes(showline=True, linecolor="Grey", linewidth=0.1, gridcolor='lightgrey', title_text='Refeições')
         fig_box.update_traces(marker=dict(size=2.5),
-                              boxmean='sd',  # Mostra a média e o desvio padrão
-        )
+                              boxmean='sd',)
 
 
         col4.plotly_chart(fig_box, use_container_width=True)
