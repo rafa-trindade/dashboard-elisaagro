@@ -15,10 +15,12 @@ hide_st_style = """
                 #MainMenu {visibility: hidden;}    
                 footer {visibility: hidden;}
                 header {visibility: hidden;} 
+
+                .st-emotion-cache-1jicfl2 {
+                    padding: 3.17rem 4rem 7rem;
                 </style>
                 """
 st.markdown(hide_st_style, unsafe_allow_html=True)
-
 
 sidebar_logo = "https://i.postimg.cc/j5mwCcfV/logo-elisa.png"
 main_body_logo = "https://i.postimg.cc/3xkGPmC6/streamlit02.png"

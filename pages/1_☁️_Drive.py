@@ -12,6 +12,9 @@ hide_st_style = """
                 #MainMenu {visibility: hidden;}    
                 footer {visibility: hidden;}
                 header {visibility: hidden;} 
+
+                .st-emotion-cache-1jicfl2 {
+                    padding: 4rem 4rem 7rem;
                 </style>
                 """
 st.markdown(hide_st_style, unsafe_allow_html=True)
