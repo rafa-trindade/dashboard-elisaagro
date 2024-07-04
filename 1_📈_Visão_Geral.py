@@ -3,6 +3,7 @@ import pandas as pd
 import plotly.express as px
 import plotly.graph_objects as go
 import datetime as dt
+import numpy as np
 
 import utils.data_utils as data_utils
 import utils.string_utils as string_utils
@@ -10,17 +11,7 @@ import utils.style_utils as style_utils
 
 st.set_page_config(layout="wide", page_title="B2B Refeições | Elisa Agro", initial_sidebar_state="expanded", page_icon="📊")
 
-hide_st_style = """
-                <style>
-                #MainMenu {visibility: hidden;}    
-                footer {visibility: hidden;}
-                header {visibility: hidden;} 
-
-                .st-emotion-cache-1jicfl2 {
-                    padding: 3.17rem 4rem 7rem;
-                </style>
-                """
-st.markdown(hide_st_style, unsafe_allow_html=True)
+style_utils.aplicar_estilo()
 
 sidebar_logo = "https://i.postimg.cc/j5mwCcfV/logo-elisa.png"
 main_body_logo = "https://i.postimg.cc/3xkGPmC6/streamlit02.png"
@@ -79,11 +70,19 @@ st.sidebar.write("____")
 tab1, tab2 = st.tabs(["📅 Fechamentos Diários", "\t"])
 
 with tab1:
+
     with st.container(border=True):
         col_data_ini, col_data_fim = st.columns(2)
-        col1, col2, col3 = st.columns([2,2,1])     
+        col1, col2, col3  = st.columns([2,2,1])     
     with st.container(border=True):
-        col4 ,  col5= st.columns([2,3])
+
+        colradios, col4, col5= st.columns([0.65,1.3,3])
+        with colradios:
+            colradio1 = st.container(border=True) 
+            colradio2 = st.container(border=True)
+
+
+
 ########################################################################################
 ####### ABA FECHAMENTOS DIÁRIOS ########################################################
 ########################################################################################
@@ -333,62 +332,92 @@ if data_inicial or data_fim:
 ####### GRAFICO BOX PLOT MENSAL ########################################################
 ########################################################################################
 
+
         # Filtrar os dados para incluir apenas o mês da data mais antiga
         df_filtrado = df[(pd.to_datetime(df['data']).dt.month == data_inicial.month) &
-                         (pd.to_datetime(df['data']).dt.year == data_inicial.year)]
-        
-        # Agrupar e somar os valores por data
-        df_agrupado = df_filtrado.groupby('data').sum().reset_index()
+                        (pd.to_datetime(df['data']).dt.year == data_inicial.year)]
 
-        df_long = df_agrupado.rename(columns={'cafe': 'Café', 'almoco': 'Almoço','lanche': 'Lanche', 'janta': 'Janta'})  
+        # Agrupar e somar os valores por data e fazenda
+        df_agrupado = df_filtrado.groupby(['data', 'fazenda']).sum().reset_index()
+
+        # Renomear as colunas
+        df_agrupado = df_agrupado.rename(columns={'cafe': 'Café', 'almoco': 'Almoço', 'lanche': 'Lanche', 'janta': 'Janta'})  
 
         # Transformar o DataFrame para o formato longo
-        df_long = df_long.melt(id_vars=['data'], value_vars=['Café', 'Almoço', 'Lanche', 'Janta'], 
+        df_long = df_agrupado.melt(id_vars=['data', 'fazenda'], value_vars=['Café', 'Almoço', 'Lanche', 'Janta'], 
                                 var_name='Refeição', value_name='Valor')
+        
+        # Filtrar as opções de fazendas com valor maior que 0
+        fazendas_com_valor = df_long[df_long['Valor'] > 0]['fazenda'].unique()
+        opcoes_fazenda = np.append(['Todas'], fazendas_com_valor)
+
+        with colradio1:
+            # Configurar o radio com as opções de fazendas únicas
+            fazenda_selecionada = st.radio("FAZENDA:", options=opcoes_fazenda, index=0, key="fazenda_selecionada")
+
+        # Filtrar o DataFrame para a fazenda selecionada (ou todas)
+        if fazenda_selecionada != 'Todas':
+            df_filtrado_fazenda = df_long[(df_long['fazenda'] == fazenda_selecionada) & (df_long['Valor'] > 0)]
+        else:
+            df_filtrado_fazenda = df_long[df_long['Valor'] > 0]
+
+        # Obter os valores únicos da coluna 'Refeição' com valor maior que 0 para a fazenda selecionada
+        tipos_com_valor = df_filtrado_fazenda['Refeição'].unique()
+
+        with colradio2:
+            # Configurar o radio com as opções de refeições únicas
+            tipo_refeicao = st.radio("TIPO REFEIÇÃO:", options=tipos_com_valor, index=list(tipos_com_valor).index("Almoço") if "Almoço" in tipos_com_valor else 0, key="tipo_selecionado")
+
+        # Filtrar pelo tipo de refeição selecionado
+        df_selecionado = df_filtrado_fazenda[df_filtrado_fazenda['Refeição'] == tipo_refeicao]
+        
+        # Filtrar pelo fazenda selecionada
+        if fazenda_selecionada == 'Todas':
+            # Agrupar por data para obter a soma de todas as fazendas
+            df_selecionado = df_selecionado.groupby('data').sum().reset_index()
 
         # Criando a figura com go.Box
         fig_box = go.Figure()
 
-        # Adicionando caixas para cada refeição
-        colors = ["#2d5480", "#176f87", "#2d5480", "#176f87"]
+        # Adicionando caixa para a refeição selecionada
+        colors = {"Café": "#2d5480", "Almoço": "#2d5480", "Lanche": "#2d5480", "Janta": "#2d5480"}
+        color = colors.get(tipo_refeicao, "#b3112e")  # Cor padrão
 
-        for i, refeicao in enumerate(df_long['Refeição'].unique()):
-            fig_box.add_trace(go.Box(
-                y=df_long[df_long['Refeição'] == refeicao]['Valor'],
-                name=refeicao,
-                marker=dict(color="#b3112e"),  # Cycle through colors
-                line=dict(color=colors[i % len(colors)]),  # Optional: set a constant line color
-                boxpoints="all",  # Show all points
-                hovertext=df_long[df_long['Refeição'] == refeicao]['data'].dt.strftime('%d/%m/%y'),
-            ))
+        fig_box.add_trace(go.Box(
+            y=df_selecionado['Valor'],
+            name=tipo_refeicao,
+            marker=dict(color="#b3112e"),  # Cor personalizada para cada refeição
+            line=dict(color=color),  # Cor da linha
+            boxpoints="all",  # Mostrar todos os pontos
+            hovertext=df_selecionado['data'].dt.strftime('%d/%m/%y'),
+
+            
+        ))
 
         fig_box.update_layout(
-            #title='Consumo Diário por Refeição',
-            height=400,
-            margin=dict(l=0, r=0, t=45, b=0),
-            title_text=f'-BOX PLOT QUANTIDADE DE REFEIÇÕES ({data_utils.mapa_meses[data_inicial.month].upper()}/{data_inicial.year})',
+            height=386,
+            margin=dict(l=0, r=0, t=40, b=0),
+            title_text=f'-BOX PLOT QTD. DE REFEIÇÕES ({data_utils.mapa_meses[data_inicial.month].upper()}/{data_inicial.year})',
             title_font_color="rgb(98,83,119)",
             showlegend=False,
-
         )
 
         fig_box.update_yaxes(
             zerolinecolor='lightgrey',
             autorange=True,
-            dtick=5, 
+            autorangeoptions=dict(maxallowed = df_selecionado['Valor'].max() + 1, minallowed = df_selecionado['Valor'].min() - 1 ),
+            dtick=5,
             showline=False, 
             linecolor="Grey", 
             linewidth=0.1, 
             gridcolor='lightgrey', 
             showticklabels=True, 
-            title_text='Quantidade', 
-            range=[-20, df_long['Valor'].max() + 20]
+            title_text='Quantidade',
         )
 
-        fig_box.update_xaxes(showline=True, linecolor="Grey", linewidth=0.1, gridcolor='lightgrey', title_text='Refeições')
-        fig_box.update_traces(marker=dict(size=2.5),
-                              boxmean='sd',)
-
+        fig_box.update_xaxes(showline=True, linecolor="Grey", linewidth=0.1, gridcolor='lightgrey', title_text=f'{fazenda_selecionada}')
+        fig_box.update_traces(marker=dict(size=4.5),
+                            boxmean='sd',)
 
         col4.plotly_chart(fig_box, use_container_width=True)
 
@@ -492,7 +521,9 @@ if data_inicial or data_fim:
         # Configuração do gráfico
         fig.update_yaxes(showline=True, linecolor="Grey", linewidth=0.1, gridcolor='lightgrey')
         fig.update_xaxes(showline=True, linecolor="Grey", linewidth=0.1, gridcolor='lightgrey')
-        fig.update_layout(margin=dict(t=50), height=400, title="-HISTÓRICO QUANTIDADE DE REFEIÇÕES AGRUPADAS", title_font_color="rgb(98,83,119)", yaxis_title="Quantidade")
+        fig.update_layout(margin=dict(t=40), height=400, title="-HISTÓRICO QUANTIDADE DE REFEIÇÕES AGRUPADAS", title_font_color="rgb(98,83,119)", yaxis_title="Quantidade",
+                                  legend=dict(x=0.722, y=1.09, orientation='h')
+)
 
         # Exibir o gráfico no Streamlit
         col5.plotly_chart(fig, use_container_width=True, automargin=True)

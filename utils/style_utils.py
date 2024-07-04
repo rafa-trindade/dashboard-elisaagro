@@ -1,5 +1,6 @@
 import numpy as np
 import plotly.express as px # type: ignore
+import streamlit as st
 
 barra_azul = "#2d5480" 
 barra_azul2 = "#42658d" 
@@ -56,3 +57,65 @@ def table_highlight_rows(data):
         styles.append(row_style)
 
     return np.array(styles)
+
+
+# Defina a função para aplicar estilo CSS
+def aplicar_estilo():
+    st.markdown(
+        """
+        <style> 
+
+            #MainMenu {visibility: hidden;}    
+            footer {visibility: hidden;}
+            header {visibility: hidden;} 
+
+            [data-testid="baseButton-headerNoPadding"] {
+                color: #2d4f72;
+            }
+            [data-testid="stSidebarCollapseButton"] {
+                display: unset;
+            }
+            
+            .st-emotion-cache-1jicfl2 {
+                padding: 3.6rem 5rem 7rem;        
+
+            /* Estilo para o container principal das notificações */
+            [data-testid="stNotification"][role="alert"] {
+                border-radius: 10px !important; /* Mantém a borda arredondada */
+            }
+
+            /* Estilo para o conteúdo específico das notificações */
+            [data-testid="stNotificationContentInfo"] {
+                background-color: #bac2d0 !important; /* Cor de fundo para st.info */
+                color: #34527e !important; /* Cor do texto para st.info */
+            }
+            [data-testid="stNotificationContentSuccess"] {
+                background-color: #b5cbd1 !important; /* Cor de fundo para st.success */
+                color: #1d6e85 !important; /* Cor do texto para st.success */
+            }
+            [data-testid="stNotificationContentError"] {
+                background-color: #dcb5bb !important; /* Cor de fundo para st.error */
+                color: #a32639 !important; /* Cor do texto para st.error */
+            }
+
+            /* Estilo para garantir que o container principal também tenha o mesmo fundo */
+            [data-testid="stNotification"][role="alert"]:has([data-testid="stNotificationContentInfo"]) {
+                background-color: #bac2d0 !important; /* Cor de fundo para o container principal de st.info */
+                color: #34527e !important; /* Cor do texto para o container principal de st.info */
+            }
+            [data-testid="stNotification"][role="alert"]:has([data-testid="stNotificationContentSuccess"]) {
+                background-color: #b5cbd1 !important; /* Cor de fundo para o container principal de st.success */
+                color: #1d6e85 !important; /* Cor do texto para o container principal de st.success */
+            }
+            [data-testid="stNotification"][role="alert"]:has([data-testid="stNotificationContentError"]) {
+                background-color: #dcb5bb !important; /* Cor de fundo para o container principal de st.error */
+                color: #a32639 !important; /* Cor do texto para o container principal de st.error */
+            }
+            
+            [data-testid="stWidgetLabel"] {
+                color: rgb(36, 67, 102);
+            }
+        </style>
+        """,
+        unsafe_allow_html=True
+    )
