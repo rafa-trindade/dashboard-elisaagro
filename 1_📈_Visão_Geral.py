@@ -82,7 +82,6 @@ with tab1:
             colradio2 = st.container(border=True)
 
 
-
 ########################################################################################
 ####### ABA FECHAMENTOS DIÁRIOS ########################################################
 ########################################################################################
@@ -189,9 +188,9 @@ if data_inicial or data_fim:
         fill_colors = [
             ['#176f87'] * len(data_frame), 
             ['white'] * len(data_frame), 
-            ['#e8ecec'] * len(data_frame), 
+            ['#e2e7ed'] * len(data_frame), 
             ['white'] * len(data_frame), 
-            ['#e8ecec'] * len(data_frame),
+            ['#e2e7ed'] * len(data_frame),
         ]
         font_colors = [
             ['white'] * len(data_frame),
@@ -215,16 +214,17 @@ if data_inicial or data_fim:
                 fill_color='#244366',
                 line_color="lightgrey",
                 font_color="white",
+                font=dict(size=14),
                 align='center',
-                height=32  # Ajusta a altura do cabeçalho
+                height=28  # Ajusta a altura do cabeçalho
             ),
             cells=dict(
                 values=[data_frame[col] for col in data_frame.columns],
                 fill=dict(color=fill_colors),
                 line_color="lightgrey",
-                font=dict(color=font_colors),
+                font=dict(color=font_colors, size=13),
                 align='center',
-                height=32  # Ajusta a altura das células
+                height=29  # Ajusta a altura das células
             ))
         ])
 
@@ -233,7 +233,7 @@ if data_inicial or data_fim:
                                         domain=[0.3, 1]  # Ajuste os valores conforme necessário
                                     ),
                                     #title={ 'text': "-FECHAMENTO DE " + periodo, 'y':0.92, 'x':0.0, 'xanchor': 'left', 'yanchor': 'top'},
-                                    height=310,
+                                    height=284,
                                     margin=dict(r=0, t=20,b=0)
         )
 
@@ -267,7 +267,7 @@ if data_inicial or data_fim:
 
         fig_barras.update_layout(
             #title='Consumo Diário por Refeição',
-            height=332,
+            height=301,
             margin=dict(l=0, r=0, t=40, b=0),
             yaxis=dict(showticklabels=False),
             title_text='-QUANTIDADE TOTAL DE REFEIÇÕES NO PERÍODO SELECIONADO',
@@ -276,7 +276,7 @@ if data_inicial or data_fim:
             title_font_color="rgb(98,83,119)"
 
         )
-        fig_barras.update_yaxes(showline=True, linecolor="Grey", linewidth=0.1, gridcolor='lightgrey')
+        fig_barras.update_yaxes(showline=True, linecolor="Grey", linewidth=0.1, gridcolor='lightgrey', dtick=5)
         fig_barras.update_xaxes(showline=True, linecolor="Grey", linewidth=0.1, gridcolor='lightgrey')
 
         # Mostrando a tabela ao lado do gráfico de barras
@@ -316,7 +316,7 @@ if data_inicial or data_fim:
         
         fig_venda_fazenda.update_layout(
             #width=200, 
-            height=310, 
+            height=265, 
             margin=dict(l=0, t=50, b=0, r=0), 
             showlegend=False,
             title_text='-DISTRIBUIÇÃO POR FAZENDA',
@@ -381,7 +381,7 @@ if data_inicial or data_fim:
 
         # Adicionando caixa para a refeição selecionada
         colors = {"Café": "#2d5480", "Almoço": "#2d5480", "Lanche": "#2d5480", "Janta": "#2d5480"}
-        color = colors.get(tipo_refeicao, "#2d5480")  # Cor padrão
+        color = colors.get(tipo_refeicao, "#b3112e")  # Cor padrão
 
         fig_box.add_trace(go.Box(
             y=df_selecionado['Valor'],
