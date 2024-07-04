@@ -381,12 +381,12 @@ if data_inicial or data_fim:
 
         # Adicionando caixa para a refeição selecionada
         colors = {"Café": "#2d5480", "Almoço": "#2d5480", "Lanche": "#2d5480", "Janta": "#2d5480"}
-        color = colors.get(tipo_refeicao, "#b3112e")  # Cor padrão
+        color = colors.get(tipo_refeicao, "#2d5480")  # Cor padrão
 
         fig_box.add_trace(go.Box(
             y=df_selecionado['Valor'],
             name=tipo_refeicao,
-            marker=dict(color="#b3112e"),  # Cor personalizada para cada refeição
+            marker=dict(color="#2d5480"),  # Cor personalizada para cada refeição
             line=dict(color=color),  # Cor da linha
             boxpoints="all",  # Mostrar todos os pontos
             hovertext=df_selecionado['data'].dt.strftime('%d/%m/%y'),

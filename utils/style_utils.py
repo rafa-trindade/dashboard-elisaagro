@@ -112,9 +112,6 @@ def aplicar_estilo():
                 color: #a32639 !important; /* Cor do texto para o container principal de st.error */
             }
             
-            [data-testid="stWidgetLabel"] {
-                color: rgb(36, 67, 102);
-            }
         </style>
         """,
         unsafe_allow_html=True
