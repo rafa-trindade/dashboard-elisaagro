@@ -82,7 +82,6 @@ with tab1:
         col1, col2, col3 = st.columns([2,2,1])     
     with st.container(border=True):
         col4 ,  col5= st.columns([2,3])
-
 ########################################################################################
 ####### ABA FECHAMENTOS DIÁRIOS ########################################################
 ########################################################################################
@@ -187,7 +186,7 @@ if data_inicial or data_fim:
         
         # Inicializar listas de cores para as células com as cores padrões
         fill_colors = [
-            ['#0e7089'] * len(data_frame), 
+            ['#176f87'] * len(data_frame), 
             ['white'] * len(data_frame), 
             ['#e8ecec'] * len(data_frame), 
             ['white'] * len(data_frame), 
@@ -205,14 +204,14 @@ if data_inicial or data_fim:
         for i, col in enumerate(data_frame.columns):
             for j, cell_value in enumerate(data_frame[col]):
                 if '<b>' in str(cell_value):  # Verificar se a string <b> está presente no valor da célula
-                    fill_colors[i][j] = '#006494'  # Cor de fundo
+                    fill_colors[i][j] = '#2d5480'  # Cor de fundo
                     font_colors[i][j] = 'white'  # Cor da fonte
 
         # Criar a tabela
         fig_tabela_dia = go.Figure(data=[go.Table(
             header=dict(
                 values=list(data_frame.columns),
-                fill_color='#124b70',
+                fill_color='#244366',
                 line_color="lightgrey",
                 font_color="white",
                 align='center',
@@ -260,7 +259,7 @@ if data_inicial or data_fim:
             text=valores,
             textposition='auto',
             texttemplate='%{y:.0f}',  # Formato do texto (inteiro sem casas decimais)
-            marker_color=px.colors.sequential.Bluyl_r[0:2] + px.colors.sequential.Bluyl_r[0:2],  # Cor das barras
+            marker_color=["#2d5480", "#176f87", "#2d5480", "#176f87"],  # Cor das barras
             textangle = 0
 
         ))
@@ -305,7 +304,7 @@ if data_inicial or data_fim:
         # Criando o gráfico de rosca
         fig_venda_fazenda = px.pie(fazenda_total, names='fazenda', values='porcentagem', 
                                 color='fazenda', 
-                                color_discrete_sequence=  px.colors.sequential.RdBu[1:2] + px.colors.sequential.Teal_r + px.colors.sequential.Teal_r[3:], 
+                                color_discrete_sequence= [style_utils.barra_vermelha, style_utils.barra_azul, style_utils.barra_verde_escuro],
                                 hover_data=['porcentagem_formatada'])
 
         # Configurações adicionais
@@ -349,7 +348,7 @@ if data_inicial or data_fim:
         fig_box = go.Figure()
 
         # Adicionando caixas para cada refeição
-        colors = ["#2c6281", "#2c6281", "#2c6281", "#2c6281"]
+        colors = ["#2d5480", "#176f87", "#2d5480", "#176f87"]
 
         for i, refeicao in enumerate(df_long['Refeição'].unique()):
             fig_box.add_trace(go.Box(
@@ -390,7 +389,6 @@ if data_inicial or data_fim:
 
 
         col4.plotly_chart(fig_box, use_container_width=True)
-
 
 ########################################################################################
 ####### GRAFICO AREA HISTORICO QUANTIDADES #############################################
@@ -473,7 +471,7 @@ if data_inicial or data_fim:
             mode='lines+markers+text',  
             name="Almoço | Janta",
             fill='tozeroy',
-            marker_color="#0e7089",
+            marker_color="#176f87",
             #fillcolor="#b3112e"
         ))
 
@@ -484,8 +482,8 @@ if data_inicial or data_fim:
             mode='lines+markers+text',  # Corrigido
             name="Café | Lanche",
             fill='tozeroy',
-            marker_color="#145073",
-            fillcolor="#7e96a8"
+            marker_color="#2d5480",
+            fillcolor="#6c87a6"
         ))
                
 

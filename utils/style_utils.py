@@ -1,16 +1,19 @@
 import numpy as np
 import plotly.express as px # type: ignore
 
-barra_azul = "#1b6292"
-barra_azul_escuro = "#145073"
+barra_azul = "#2d5480" 
+barra_azul2 = "#42658d" 
+barra_azul_escuro = "#2d5c80"
 barra_verde = "#176f87"
-barra_vermelha = px.colors.sequential.RdBu[1]
+barra_vermelha = "#a22938"
+
+
 
 barra_verde_claro = px.colors.sequential.Darkmint[3]
-barra_verde_escuro = px.colors.sequential.Darkmint[4]
+barra_verde_escuro = "#176f87"
 
-barra_cinza_claro = "#d9d9d9"
-barra_cinza_escuro = "#cccccc"
+barra_cinza_claro = "#c6d0d2"
+barra_cinza_escuro = "#c6d0d2"
 
 
 conjunto_cores = px.colors.diverging.RdBu
