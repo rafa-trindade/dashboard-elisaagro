@@ -325,7 +325,7 @@ fig_venda_fazenda.update_layout(
         y=0,
         xanchor="center",
         x=0.5,
-        font=dict(size=10),
+        font=dict(size=12),
         itemsizing='constant',
         itemwidth=30,
         entrywidthmode='pixels'
