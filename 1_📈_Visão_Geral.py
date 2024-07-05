@@ -49,7 +49,7 @@ col1_side.markdown('<h5 style="margin-bottom: 15px; color: #053061;">Última Atu
 col2_side.markdown('<h5 style="margin-bottom: 15px; text-align: end; color: #053061;">' + str(df['data'].max().strftime('%d/%m/%Y'))+ '</h5>', unsafe_allow_html=True)
 
 
-col1_side.markdown('<h5 style="margin-bottom: -25px;">Contrato Vigente:</h5>', unsafe_allow_html=True)
+col1_side.markdown('<h5 style="margin-bottom: -25px; color: #053061;">Contrato Vigente:</h5>', unsafe_allow_html=True)
 col2_side.markdown('<h5 style="text-align: end; margin-bottom: -25px;">02/2027</h5>', unsafe_allow_html=True)
 
 # Ordenar o DataFrame com base na coluna 'data' para obter a data mais recente e pegar a última linha
@@ -59,9 +59,9 @@ linha_mais_recente = df.sort_values(by='data', ascending=False).iloc[0]
 valor_refeicao = "R$ {:,.2f}".format(linha_mais_recente['vlrAlmoco']).replace(".", "@").replace(",", ".").replace("@", ",")
 valor_lanche = "R$ {:,.2f}".format(linha_mais_recente['vlrCafe']).replace(".", "@").replace(",", ".").replace("@", ",")
 
-col1_side.markdown('<h5 style="margin-bottom: -25px;">Refeição:</h5>', unsafe_allow_html=True)
+col1_side.markdown('<h5 style="margin-bottom: -25px; color: #053061;">Refeição:</h5>', unsafe_allow_html=True)
 col2_side.markdown(f'<h5 style="text-align: end; margin-bottom: -25px;">{valor_refeicao}</h5>', unsafe_allow_html=True)
-col1_side.markdown('<h5 style="margin-bottom: -25px;">Lanche:</h5>', unsafe_allow_html=True)
+col1_side.markdown('<h5 style="margin-bottom: -25px; color: #053061;">Lanche:</h5>', unsafe_allow_html=True)
 col2_side.markdown(f'<h5 style="text-align: end; margin-bottom: -25px;">{valor_lanche}</h5>', unsafe_allow_html=True)
 
 st.sidebar.write("____")
@@ -69,6 +69,9 @@ st.sidebar.write("____")
 
 tab1, tab2 = st.tabs(["📅 Fechamentos Diários", "\t"])
 
+########################################################################################
+####### ABA FECHAMENTOS DIÁRIOS ########################################################
+########################################################################################
 with tab1:
 
     with st.container(border=True):
@@ -80,11 +83,6 @@ with tab1:
         with colradios:
             colradio1 = st.container(border=True) 
             colradio2 = st.container(border=True)
-
-
-########################################################################################
-####### ABA FECHAMENTOS DIÁRIOS ########################################################
-########################################################################################
 
 ########################################################################################
 ####### TABELA FECHAMENTO DIÁRIO #######################################################
@@ -108,422 +106,416 @@ if data_fim:
 
 df['data'] = pd.to_datetime(df['data'])
 
-if data_inicial or data_fim:
-    if 'data' in df.columns:  
-        if data_inicial is not None:
-            dia_start = str(data_inicial.day).zfill(2)
-            mes_start = str(data_inicial.month).zfill(2)
-            ano_start = str(data_inicial.year)
-        if data_fim is not None:
-            dia_end = str(data_fim.day).zfill(2)
-            mes_end = str(data_fim.month).zfill(2)
-            ano_end = str(data_fim.year)
-        if data_inicial and data_fim:
-            if data_inicial > data_fim:
-                st.warning('Data de início é maior que data de término!')
-            else:
-                filtered_df = df[(df['data'] >= data_inicial) & (df['data'] <= data_fim)] 
+filtered_df = df[(df['data'] == data_inicial)]
 
-                if data_inicial == data_fim:
-                    periodo = dia_start + "/" + mes_start + "/" + ano_start                
-                else:
-                    periodo = dia_start + "/" + mes_start + "/" + ano_start + " A " + dia_end + "/" + mes_end + "/" + ano_end
-        elif data_inicial:
-            periodo = dia_start + "/" + mes_start + "/" + ano_start
-            filtered_df = df[(df['data'] == data_inicial)]
-        elif data_fim:
-            periodo = dia_end + "/" + mes_end + "/" + ano_end
-            filtered_df = df[(df['data'] == data_fim)]
+if data_inicial is not None:
+    dia_start = str(data_inicial.day).zfill(2)
+    mes_start = str(data_inicial.month).zfill(2)
+    ano_start = str(data_inicial.year)
+if data_fim is not None:
+    dia_end = str(data_fim.day).zfill(2)
+    mes_end = str(data_fim.month).zfill(2)
+    ano_end = str(data_fim.year)
 
-        lista_fazenda = df['fazenda'].unique().tolist()
+if data_inicial and data_fim:
+    if data_inicial > data_fim:
+        st.warning('Data de início é maior que data de término!')
+    else:
+        filtered_df = df[(df['data'] >= data_inicial) & (df['data'] <= data_fim)] 
 
-        qtd_almoco = filtered_df.groupby("fazenda")[["almoco"]].sum()
-        qtd_janta = filtered_df.groupby("fazenda")[["janta"]].sum()
-        qtd_cafe = filtered_df.groupby("fazenda")[["cafe"]].sum()
-        qtd_lanche = filtered_df.groupby("fazenda")[["lanche"]].sum()
+        if data_inicial == data_fim:
+            periodo = dia_start + "/" + mes_start + "/" + ano_start                
+        else:
+            periodo = dia_start + "/" + mes_start + "/" + ano_start + " A " + dia_end + "/" + mes_end + "/" + ano_end
+elif data_inicial:
+    periodo = dia_start + "/" + mes_start + "/" + ano_start
+    filtered_df = df[(df['data'] == data_inicial)]
+elif data_fim:
+    periodo = dia_end + "/" + mes_end + "/" + ano_end
+    filtered_df = df[(df['data'] == data_fim)]
 
-        qtd_almoco = qtd_almoco.reindex(lista_fazenda)
-        qtd_janta = qtd_janta.reindex(lista_fazenda)
-        qtd_cafe = qtd_cafe.reindex(lista_fazenda)
-        qtd_lanche = qtd_lanche.reindex(lista_fazenda)
+lista_fazenda = df['fazenda'].unique().tolist()
 
-        lista_almoco = qtd_almoco["almoco"].tolist()
-        lista_janta = qtd_janta["janta"].tolist()
-        lista_cafe = qtd_cafe["cafe"].tolist()
-        lista_lanche = qtd_lanche["lanche"].tolist()
+qtd_almoco = filtered_df.groupby("fazenda")[["almoco"]].sum()
+qtd_janta = filtered_df.groupby("fazenda")[["janta"]].sum()
+qtd_cafe = filtered_df.groupby("fazenda")[["cafe"]].sum()
+qtd_lanche = filtered_df.groupby("fazenda")[["lanche"]].sum()
 
-        # Cria cópias das listas para exibição com "-" no lugar de 0
-        lista_almoco_display = ['-' if v == 0 else v for v in lista_almoco]
-        lista_janta_display = ['-' if v == 0 else v for v in lista_janta]
-        lista_cafe_display = ['-' if v == 0 else v for v in lista_cafe]
-        lista_lanche_display = ['-' if v == 0 else v for v in lista_lanche]
+qtd_almoco = qtd_almoco.reindex(lista_fazenda)
+qtd_janta = qtd_janta.reindex(lista_fazenda)
+qtd_cafe = qtd_cafe.reindex(lista_fazenda)
+qtd_lanche = qtd_lanche.reindex(lista_fazenda)
 
-        data = {
-            "Fazenda": lista_fazenda,
-            "Café": lista_cafe_display,
-            "Almoço": lista_almoco_display,
-            "Lanche": lista_lanche_display,
-            "Janta": lista_janta_display
-        }
+lista_almoco = qtd_almoco["almoco"].tolist()
+lista_janta = qtd_janta["janta"].tolist()
+lista_cafe = qtd_cafe["cafe"].tolist()
+lista_lanche = qtd_lanche["lanche"].tolist()
 
-        data_frame = pd.DataFrame(data)
+# Cria cópias das listas para exibição com "-" no lugar de 0
+lista_almoco_display = ['-' if v == 0 else v for v in lista_almoco]
+lista_janta_display = ['-' if v == 0 else v for v in lista_janta]
+lista_cafe_display = ['-' if v == 0 else v for v in lista_cafe]
+lista_lanche_display = ['-' if v == 0 else v for v in lista_lanche]
 
-        # Filtrar o data_frame para incluir apenas linhas onde algum dos valores não é NaN
-        data_frame = data_frame.dropna(subset=["Café", "Almoço", "Lanche", "Janta"], how='all')
+data = {
+    "Fazenda": lista_fazenda,
+    "Café": lista_cafe_display,
+    "Almoço": lista_almoco_display,
+    "Lanche": lista_lanche_display,
+    "Janta": lista_janta_display
+}
 
-        soma_colunas = {
-            "Fazenda": "<b>TOTAL</b>",
-            "Café": f"<b>{int(qtd_cafe.sum(numeric_only=True).iloc[0]):,}".replace(',', '.') + "</b>",
-            "Almoço": f"<b>{int(qtd_almoco.sum(numeric_only=True).iloc[0]):,}".replace(',', '.') + "</b>",
-            "Lanche": f"<b>{int(qtd_lanche.sum(numeric_only=True).iloc[0]):,}".replace(',', '.') + "</b>",
-            "Janta": f"<b>{int(qtd_janta.sum(numeric_only=True).iloc[0]):,}".replace(',', '.') + "</b>"
-        }
+data_frame = pd.DataFrame(data)
 
-        # Convertendo o dicionário para um DataFrame
-        soma_colunas_df = pd.DataFrame([soma_colunas])
+# Filtrar o data_frame para incluir apenas linhas onde algum dos valores não é NaN
+data_frame = data_frame.dropna(subset=["Café", "Almoço", "Lanche", "Janta"], how='all')
 
-        data_frame = pd.concat([data_frame, soma_colunas_df], ignore_index=True)
-        
-        # Inicializar listas de cores para as células com as cores padrões
-        fill_colors = [
-            ['#176f87'] * len(data_frame), 
-            ['white'] * len(data_frame), 
-            ['#e2e7ed'] * len(data_frame), 
-            ['white'] * len(data_frame), 
-            ['#e2e7ed'] * len(data_frame),
-        ]
-        font_colors = [
-            ['white'] * len(data_frame),
-            ['black'] * len(data_frame),
-            ['black'] * len(data_frame),
-            ['black'] * len(data_frame),
-            ['black'] * len(data_frame)
-        ]
+soma_colunas = {
+    "Fazenda": "<b>TOTAL</b>",
+    "Café": f"<b>{int(qtd_cafe.sum(numeric_only=True).iloc[0]):,}".replace(',', '.') + "</b>",
+    "Almoço": f"<b>{int(qtd_almoco.sum(numeric_only=True).iloc[0]):,}".replace(',', '.') + "</b>",
+    "Lanche": f"<b>{int(qtd_lanche.sum(numeric_only=True).iloc[0]):,}".replace(',', '.') + "</b>",
+    "Janta": f"<b>{int(qtd_janta.sum(numeric_only=True).iloc[0]):,}".replace(',', '.') + "</b>"
+}
 
-        # Iterar sobre todas as células e aplicar estilo se contiver <b>
-        for i, col in enumerate(data_frame.columns):
-            for j, cell_value in enumerate(data_frame[col]):
-                if '<b>' in str(cell_value):  # Verificar se a string <b> está presente no valor da célula
-                    fill_colors[i][j] = '#2d5480'  # Cor de fundo
-                    font_colors[i][j] = 'white'  # Cor da fonte
+# Convertendo o dicionário para um DataFrame
+soma_colunas_df = pd.DataFrame([soma_colunas])
 
-        # Criar a tabela
-        fig_tabela_dia = go.Figure(data=[go.Table(
-            header=dict(
-                values=list(data_frame.columns),
-                fill_color='#244366',
-                line_color="lightgrey",
-                font_color="white",
-                font=dict(size=14),
-                align='center',
-                height=28  # Ajusta a altura do cabeçalho
-            ),
-            cells=dict(
-                values=[data_frame[col] for col in data_frame.columns],
-                fill=dict(color=fill_colors),
-                line_color="lightgrey",
-                font=dict(color=font_colors, size=13),
-                align='center',
-                height=29  # Ajusta a altura das células
-            ))
-        ])
+data_frame = pd.concat([data_frame, soma_colunas_df], ignore_index=True)
 
-        fig_tabela_dia.update_layout(
-                                    yaxis=dict(
-                                        domain=[0.3, 1]  # Ajuste os valores conforme necessário
-                                    ),
-                                    #title={ 'text': "-FECHAMENTO DE " + periodo, 'y':0.92, 'x':0.0, 'xanchor': 'left', 'yanchor': 'top'},
-                                    height=284,
-                                    margin=dict(r=0, t=20,b=0)
-        )
+# Inicializar listas de cores para as células com as cores padrões
+fill_colors = [
+    ['#176f87'] * len(data_frame), 
+    ['white'] * len(data_frame), 
+    ['#e2e7ed'] * len(data_frame), 
+    ['white'] * len(data_frame), 
+    ['#e2e7ed'] * len(data_frame),
+]
+font_colors = [
+    ['white'] * len(data_frame),
+    ['black'] * len(data_frame),
+    ['black'] * len(data_frame),
+    ['black'] * len(data_frame),
+    ['black'] * len(data_frame)
+]
 
+# Iterar sobre todas as células e aplicar estilo se contiver <b>
+for i, col in enumerate(data_frame.columns):
+    for j, cell_value in enumerate(data_frame[col]):
+        if '<b>' in str(cell_value):  # Verificar se a string <b> está presente no valor da célula
+            fill_colors[i][j] = '#2d5480'  # Cor de fundo
+            font_colors[i][j] = 'white'  # Cor da fonte
 
-        # Convertendo colunas relevantes para tipo numérico (se necessário)
-        data_frame['Café'] = pd.to_numeric(data_frame['Café'], errors='coerce')
-        data_frame['Almoço'] = pd.to_numeric(data_frame['Almoço'], errors='coerce')
-        data_frame['Lanche'] = pd.to_numeric(data_frame['Lanche'], errors='coerce')
-        data_frame['Janta'] = pd.to_numeric(data_frame['Janta'], errors='coerce')
+# Criar a tabela
+fig_tabela_dia = go.Figure(data=[go.Table(
+    header=dict(
+        values=list(data_frame.columns),
+        fill_color='#244366',
+        line_color="lightgrey",
+        font_color="white",
+        font=dict(size=14),
+        align='center',
+        height=28  # Ajusta a altura do cabeçalho
+    ),
+    cells=dict(
+        values=[data_frame[col] for col in data_frame.columns],
+        fill=dict(color=fill_colors),
+        line_color="lightgrey",
+        font=dict(color=font_colors, size=13),
+        align='center',
+        height=29  # Ajusta a altura das células
+    ))
+])
 
-        # Dados para o gráfico de barras
-        categorias = ['Café', 'Almoço', 'Lanche', 'Janta']
-        valores = [
-            data_frame['Café'].sum(),
-            data_frame['Almoço'].sum(),
-            data_frame['Lanche'].sum(),
-            data_frame['Janta'].sum()
-        ]
+fig_tabela_dia.update_layout(
+                            yaxis=dict(
+                                domain=[0.3, 1]  # Ajuste os valores conforme necessário
+                            ),
+                            #title={ 'text': "-FECHAMENTO DE " + periodo, 'y':0.92, 'x':0.0, 'xanchor': 'left', 'yanchor': 'top'},
+                            height=284,
+                            margin=dict(r=0, t=20,b=0)
+)
 
-        # Criando o gráfico de barras
-        fig_barras = go.Figure(data=go.Bar(
-            x=categorias,
-            y=valores,
-            text=valores,
-            textposition='auto',
-            texttemplate='%{y:.0f}',  # Formato do texto (inteiro sem casas decimais)
-            marker_color=["#2d5480", "#176f87", "#2d5480", "#176f87"],  # Cor das barras
-            textangle = 0
+# Convertendo colunas relevantes para tipo numérico (se necessário)
+data_frame['Café'] = pd.to_numeric(data_frame['Café'], errors='coerce')
+data_frame['Almoço'] = pd.to_numeric(data_frame['Almoço'], errors='coerce')
+data_frame['Lanche'] = pd.to_numeric(data_frame['Lanche'], errors='coerce')
+data_frame['Janta'] = pd.to_numeric(data_frame['Janta'], errors='coerce')
 
-        ))
+# Dados para o gráfico de barras
+categorias = ['Café', 'Almoço', 'Lanche', 'Janta']
+valores = [
+    data_frame['Café'].sum(),
+    data_frame['Almoço'].sum(),
+    data_frame['Lanche'].sum(),
+    data_frame['Janta'].sum()
+]
 
-        fig_barras.update_layout(
-            #title='Consumo Diário por Refeição',
-            height=301,
-            margin=dict(l=0, r=0, t=40, b=0),
-            yaxis=dict(showticklabels=False),
-            title_text='-QUANTIDADE TOTAL DE REFEIÇÕES NO PERÍODO SELECIONADO',
-            title_x=0.01,
-            title_y=0.94,
-            title_font_color="rgb(98,83,119)"
+# Criando o gráfico de barras
+fig_barras = go.Figure(data=go.Bar(
+    x=categorias,
+    y=valores,
+    text=valores,
+    textposition='auto',
+    texttemplate='%{y:.0f}',  # Formato do texto (inteiro sem casas decimais)
+    marker_color=["#2d5480", "#176f87", "#2d5480", "#176f87"],  # Cor das barras
+    textangle = 0
 
-        )
-        fig_barras.update_yaxes(showline=True, linecolor="Grey", linewidth=0.1, gridcolor='lightgrey', dtick=5)
-        fig_barras.update_xaxes(showline=True, linecolor="Grey", linewidth=0.1, gridcolor='lightgrey')
+))
 
-        # Mostrando a tabela ao lado do gráfico de barras
-        col1.plotly_chart(fig_tabela_dia, use_container_width=True, automargin=True)
-        col2.plotly_chart(fig_barras, use_container_width=True)
+fig_barras.update_layout(
+    #title='Consumo Diário por Refeição',
+    height=301,
+    margin=dict(l=0, r=0, t=40, b=0),
+    yaxis=dict(showticklabels=False),
+    title_text='-QUANTIDADE TOTAL DE REFEIÇÕES NO PERÍODO SELECIONADO',
+    title_x=0.01,
+    title_y=0.94,
+    title_font_color="rgb(98,83,119)"
 
-        
+)
+fig_barras.update_yaxes(showline=True, linecolor="Grey", linewidth=0.1, gridcolor='lightgrey')
+fig_barras.update_xaxes(showline=True, linecolor="Grey", linewidth=0.1, gridcolor='lightgrey')
+
+# Mostrando a tabela ao lado do gráfico de barras
+col1.plotly_chart(fig_tabela_dia, use_container_width=True, automargin=True)
+col2.plotly_chart(fig_barras, use_container_width=True)
 
 
 ########################################################################################
 ####### GRÁFICO PIZZA FECHAMENTO DIÁRIO ################################################
 ########################################################################################
-        # Cálculo dos totais
-        fazenda_total = filtered_df.groupby("fazenda")[["total"]].sum(numeric_only=True).reset_index()
+# Cálculo dos totais
+fazenda_total = filtered_df.groupby("fazenda")[["total"]].sum(numeric_only=True).reset_index()
 
-        # Filtrar as fazendas com valor maior que 0
-        fazenda_total = fazenda_total[fazenda_total['total'] > 0]
+# Filtrar as fazendas com valor maior que 0
+fazenda_total = fazenda_total[fazenda_total['total'] > 0]
 
-        # Calcular a porcentagem relativa ao total
-        total_geral = fazenda_total['total'].sum()
-        fazenda_total['porcentagem'] = fazenda_total['total'] / total_geral * 100
+# Calcular a porcentagem relativa ao total
+total_geral = fazenda_total['total'].sum()
+fazenda_total['porcentagem'] = fazenda_total['total'] / total_geral * 100
 
-        # Adicionando uma coluna com os valores formatados em porcentagem
-        fazenda_total['porcentagem_formatada'] = fazenda_total['porcentagem'].apply(lambda x: f"{x:.2f}%")
+# Adicionando uma coluna com os valores formatados em porcentagem
+fazenda_total['porcentagem_formatada'] = fazenda_total['porcentagem'].apply(lambda x: f"{x:.2f}%")
 
-        # Criando o gráfico de rosca
-        fig_venda_fazenda = px.pie(fazenda_total, names='fazenda', values='porcentagem', 
-                                color='fazenda', 
-                                color_discrete_sequence= [style_utils.barra_vermelha, style_utils.barra_azul, style_utils.barra_verde_escuro],
-                                hover_data=['porcentagem_formatada'])
+# Criando o gráfico de rosca
+fig_venda_fazenda = px.pie(fazenda_total, names='fazenda', values='porcentagem', 
+                        color='fazenda', 
+                        color_discrete_sequence= [style_utils.barra_vermelha, style_utils.barra_azul, style_utils.barra_verde_escuro],
+                        hover_data=['porcentagem_formatada'])
 
-        # Configurações adicionais
-        fig_venda_fazenda.update_traces(
-            texttemplate='%{label}<br>%{value:.2f}%', 
-            textposition='inside'
-        )
-        
-        fig_venda_fazenda.update_layout(
-            #width=200, 
-            height=265, 
-            margin=dict(l=0, t=50, b=0, r=0), 
-            showlegend=False,
-            title_text='-DISTRIBUIÇÃO POR FAZENDA',
-            title_x=0.1,
-            title_y=0.94,
-            title_font_color="rgb(98,83,119)"
-        )
+# Configurações adicionais
+fig_venda_fazenda.update_traces(
+    texttemplate='%{label}<br>%{value:.2f}%', 
+    textposition='inside'
+)
 
-        col3.plotly_chart(fig_venda_fazenda, use_container_width=True)
+fig_venda_fazenda.update_layout(
+    #width=200, 
+    height=265, 
+    margin=dict(l=0, t=50, b=0, r=0), 
+    showlegend=False,
+    title_text='-DISTRIBUIÇÃO POR FAZENDA',
+    title_x=0.1,
+    title_y=0.94,
+    title_font_color="rgb(98,83,119)"
+)
+
+col3.plotly_chart(fig_venda_fazenda, use_container_width=True)
 
 
 ########################################################################################
 ####### GRAFICO BOX PLOT MENSAL ########################################################
 ########################################################################################
+df_filtrado = df[(pd.to_datetime(df['data']).dt.month == data_inicial.month) &
+                (pd.to_datetime(df['data']).dt.year == data_inicial.year)]
 
+# Agrupar e somar os valores por data e fazenda
+df_agrupado = df_filtrado.groupby(['data', 'fazenda']).sum().reset_index()
 
-        # Filtrar os dados para incluir apenas o mês da data mais antiga
-        df_filtrado = df[(pd.to_datetime(df['data']).dt.month == data_inicial.month) &
-                        (pd.to_datetime(df['data']).dt.year == data_inicial.year)]
+# Renomear as colunas
+df_agrupado = df_agrupado.rename(columns={'cafe': 'Café', 'almoco': 'Almoço', 'lanche': 'Lanche', 'janta': 'Janta'})  
 
-        # Agrupar e somar os valores por data e fazenda
-        df_agrupado = df_filtrado.groupby(['data', 'fazenda']).sum().reset_index()
+# Transformar o DataFrame para o formato longo
+df_long = df_agrupado.melt(id_vars=['data', 'fazenda'], value_vars=['Café', 'Almoço', 'Lanche', 'Janta'], 
+                        var_name='Refeição', value_name='Valor')
 
-        # Renomear as colunas
-        df_agrupado = df_agrupado.rename(columns={'cafe': 'Café', 'almoco': 'Almoço', 'lanche': 'Lanche', 'janta': 'Janta'})  
+# Filtrar as opções de fazendas com valor maior que 0
+fazendas_com_valor = df_long[df_long['Valor'] > 0]['fazenda'].unique()
+opcoes_fazenda = np.append(['Todas'], fazendas_com_valor)
 
-        # Transformar o DataFrame para o formato longo
-        df_long = df_agrupado.melt(id_vars=['data', 'fazenda'], value_vars=['Café', 'Almoço', 'Lanche', 'Janta'], 
-                                var_name='Refeição', value_name='Valor')
-        
-        # Filtrar as opções de fazendas com valor maior que 0
-        fazendas_com_valor = df_long[df_long['Valor'] > 0]['fazenda'].unique()
-        opcoes_fazenda = np.append(['Todas'], fazendas_com_valor)
+with colradio1:
+    # Configurar o radio com as opções de fazendas únicas
+    fazenda_selecionada = st.radio("FAZENDA:", options=opcoes_fazenda, index=0, key="fazenda_selecionada")
 
-        with colradio1:
-            # Configurar o radio com as opções de fazendas únicas
-            fazenda_selecionada = st.radio("FAZENDA:", options=opcoes_fazenda, index=0, key="fazenda_selecionada")
+# Filtrar o DataFrame para a fazenda selecionada (ou todas)
+if fazenda_selecionada != 'Todas':
+    df_filtrado_fazenda = df_long[(df_long['fazenda'] == fazenda_selecionada) & (df_long['Valor'] > 0)]
+else:
+    df_filtrado_fazenda = df_long[df_long['Valor'] > 0]
 
-        # Filtrar o DataFrame para a fazenda selecionada (ou todas)
-        if fazenda_selecionada != 'Todas':
-            df_filtrado_fazenda = df_long[(df_long['fazenda'] == fazenda_selecionada) & (df_long['Valor'] > 0)]
-        else:
-            df_filtrado_fazenda = df_long[df_long['Valor'] > 0]
+# Obter os valores únicos da coluna 'Refeição' com valor maior que 0 para a fazenda selecionada
+tipos_com_valor = df_filtrado_fazenda['Refeição'].unique()
 
-        # Obter os valores únicos da coluna 'Refeição' com valor maior que 0 para a fazenda selecionada
-        tipos_com_valor = df_filtrado_fazenda['Refeição'].unique()
+with colradio2:
+    # Configurar o radio com as opções de refeições únicas
+    tipo_refeicao = st.radio("TIPO REFEIÇÃO:", options=tipos_com_valor, index=list(tipos_com_valor).index("Almoço") if "Almoço" in tipos_com_valor else 0, key="tipo_selecionado")
 
-        with colradio2:
-            # Configurar o radio com as opções de refeições únicas
-            tipo_refeicao = st.radio("TIPO REFEIÇÃO:", options=tipos_com_valor, index=list(tipos_com_valor).index("Almoço") if "Almoço" in tipos_com_valor else 0, key="tipo_selecionado")
+# Filtrar pelo tipo de refeição selecionado
+df_selecionado = df_filtrado_fazenda[df_filtrado_fazenda['Refeição'] == tipo_refeicao]
 
-        # Filtrar pelo tipo de refeição selecionado
-        df_selecionado = df_filtrado_fazenda[df_filtrado_fazenda['Refeição'] == tipo_refeicao]
-        
-        # Filtrar pelo fazenda selecionada
-        if fazenda_selecionada == 'Todas':
-            # Agrupar por data para obter a soma de todas as fazendas
-            df_selecionado = df_selecionado.groupby('data').sum().reset_index()
+# Filtrar pelo fazenda selecionada
+if fazenda_selecionada == 'Todas':
+    # Agrupar por data para obter a soma de todas as fazendas
+    df_selecionado = df_selecionado.groupby('data').sum().reset_index()
 
-        # Criando a figura com go.Box
-        fig_box = go.Figure()
+# Criando a figura com go.Box
+fig_box = go.Figure()
 
-        # Adicionando caixa para a refeição selecionada
-        colors = {"Café": "#2d5480", "Almoço": "#2d5480", "Lanche": "#2d5480", "Janta": "#2d5480"}
-        color = colors.get(tipo_refeicao, "#b3112e")  # Cor padrão
+# Adicionando caixa para a refeição selecionada
+colors = {"Café": "#2d5480", "Almoço": "#2d5480", "Lanche": "#2d5480", "Janta": "#2d5480"}
+color = colors.get(tipo_refeicao, "#b3112e")  # Cor padrão
 
-        fig_box.add_trace(go.Box(
-            y=df_selecionado['Valor'],
-            name=tipo_refeicao,
-            marker=dict(color="#2d5480"),  # Cor personalizada para cada refeição
-            line=dict(color=color),  # Cor da linha
-            boxpoints="all",  # Mostrar todos os pontos
-            hovertext=df_selecionado['data'].dt.strftime('%d/%m/%y'),
+fig_box.add_trace(go.Box(
+    y=df_selecionado['Valor'],
+    name=tipo_refeicao,
+    marker=dict(color="#2d5480"),  # Cor personalizada para cada refeição
+    line=dict(color=color),  # Cor da linha
+    boxpoints="all",  # Mostrar todos os pontos
+    hovertext=df_selecionado['data'].dt.strftime('%d/%m/%y')   
+))
 
-            
-        ))
+fig_box.update_layout(
+    height=386,
+    margin=dict(l=0, r=0, t=40, b=0),
+    title_text=f'-BOX PLOT QTD. DE REFEIÇÕES ({data_utils.mapa_meses[data_inicial.month].upper()}/{data_inicial.year})',
+    title_font_color="rgb(98,83,119)",
+    showlegend=False,
+)
 
-        fig_box.update_layout(
-            height=386,
-            margin=dict(l=0, r=0, t=40, b=0),
-            title_text=f'-BOX PLOT QTD. DE REFEIÇÕES ({data_utils.mapa_meses[data_inicial.month].upper()}/{data_inicial.year})',
-            title_font_color="rgb(98,83,119)",
-            showlegend=False,
-        )
+fig_box.update_yaxes(
+    zerolinecolor='lightgrey',
+    autorange=True,
+    autorangeoptions=dict(maxallowed = df_selecionado['Valor'].max() + 1, minallowed = df_selecionado['Valor'].min() - 1 ),
+    dtick=5,
+    showline=False, 
+    linecolor="Grey", 
+    linewidth=0.1, 
+    gridcolor='lightgrey', 
+    showticklabels=True, 
+    title_text='Quantidade',
+)
 
-        fig_box.update_yaxes(
-            zerolinecolor='lightgrey',
-            autorange=True,
-            autorangeoptions=dict(maxallowed = df_selecionado['Valor'].max() + 1, minallowed = df_selecionado['Valor'].min() - 1 ),
-            dtick=5,
-            showline=False, 
-            linecolor="Grey", 
-            linewidth=0.1, 
-            gridcolor='lightgrey', 
-            showticklabels=True, 
-            title_text='Quantidade',
-        )
+fig_box.update_xaxes(showline=True, linecolor="Grey", linewidth=0.1, gridcolor='lightgrey', title_text=f'{fazenda_selecionada}')
+fig_box.update_traces(marker=dict(size=4.5),
+                    boxmean='sd',)
 
-        fig_box.update_xaxes(showline=True, linecolor="Grey", linewidth=0.1, gridcolor='lightgrey', title_text=f'{fazenda_selecionada}')
-        fig_box.update_traces(marker=dict(size=4.5),
-                            boxmean='sd',)
+col4.plotly_chart(fig_box, use_container_width=True)
 
-        col4.plotly_chart(fig_box, use_container_width=True)
 
 ########################################################################################
 ####### GRAFICO AREA HISTORICO QUANTIDADES #############################################
 ########################################################################################
 
-        df["data"] = pd.to_datetime(df["data"], errors='coerce')
+df["data"] = pd.to_datetime(df["data"], errors='coerce')
 
-        df["Almoço | Janta"] = df["almoco"] + df["janta"]
-        df["Café | Lanche"] = df["cafe"] + df["lanche"]
+df["Almoço | Janta"] = df["almoco"] + df["janta"]
+df["Café | Lanche"] = df["cafe"] + df["lanche"]
 
-        df["ano"] = df["data"].dt.year
-        df["mes"] = df["data"].dt.month
+df["ano"] = df["data"].dt.year
+df["mes"] = df["data"].dt.month
 
-        # Agrupar os dados por ano e mês
-        df_grouped = df.groupby(["ano", "mes"]).sum(numeric_only=True).reset_index()
+# Agrupar os dados por ano e mês
+df_grouped = df.groupby(["ano", "mes"]).sum(numeric_only=True).reset_index()
 
-        # Criar uma nova coluna com o formato "Mês/Ano"
-        df_grouped["Mês/Ano"] = df_grouped.apply(lambda row: f"{data_utils.mapa_meses[row['mes']]}/{int(row['ano'])}", axis=1)
+# Criar uma nova coluna com o formato "Mês/Ano"
+df_grouped["Mês/Ano"] = df_grouped.apply(lambda row: f"{data_utils.mapa_meses[row['mes']]}/{int(row['ano'])}", axis=1)
 
-        # Criar o gráfico de área
-        fig = go.Figure()
-
-
-        # Identificar o mês e ano atual
-        current_month = pd.Timestamp.now().month
-        current_year = pd.Timestamp.now().year
-
-        # Calculando o mês anterior
-        previous_month = current_month - 1 if current_month != 1 else 12
-        previous_year = current_year if current_month != 1 else current_year - 1
-
-        # Identificar o valor de 'Almoço | Janta' para o mês anterior
-        previous_almoco_janta_value = df_grouped[(df_grouped["ano"] == previous_year) & (df_grouped["mes"] == previous_month)]["Almoço | Janta"].values[0]
-        previous_cafe_lanche_value = df_grouped[(df_grouped["ano"] == previous_year) & (df_grouped["mes"] == previous_month)]["Café | Lanche"].values[0]
+# Criar o gráfico de área
+fig = go.Figure()
 
 
-        # Adicionar a linha horizontal ao gráfico
-        fig.add_shape(
-            type="line",
-            x0=df_grouped["Mês/Ano"].iloc[0],  # Começa no primeiro ponto do eixo x
-            x1=df_grouped["Mês/Ano"].iloc[-1],  # Termina no último ponto do eixo x
-            y0=previous_almoco_janta_value,
-            y1=previous_almoco_janta_value,
-            line=dict(color="#0e7089", width=1.5, dash="dashdot")
-        )
+# Identificar o mês e ano atual
+current_month = pd.Timestamp.now().month
+current_year = pd.Timestamp.now().year
 
-        # Adicionar a linha horizontal ao gráfico
-        fig.add_shape(
-            type="line",
-            x0=df_grouped["Mês/Ano"].iloc[0],  # Começa no primeiro ponto do eixo x
-            x1=df_grouped["Mês/Ano"].iloc[-1],  # Termina no último ponto do eixo x
-            y0=previous_cafe_lanche_value,
-            y1=previous_cafe_lanche_value,
-            line=dict(color="#145073", width=1.5, dash="dashdot")
-        )
+# Calculando o mês anterior
+previous_month = current_month - 1 if current_month != 1 else 12
+previous_year = current_year if current_month != 1 else current_year - 1
 
-        # Identificar o mês anterior ao atual
-        current_month = pd.Timestamp.now().month
-        previous_month = current_month - 1 if current_month != 1 else 12
+# Identificar o valor de 'Almoço | Janta' para o mês anterior
+previous_almoco_janta_value = df_grouped[(df_grouped["ano"] == previous_year) & (df_grouped["mes"] == previous_month)]["Almoço | Janta"].values[0]
+previous_cafe_lanche_value = df_grouped[(df_grouped["ano"] == previous_year) & (df_grouped["mes"] == previous_month)]["Café | Lanche"].values[0]
 
-        # Buscar os anos para os quais temos dados do mês anterior
-        previous_month_years = df_grouped[df_grouped["mes"] == previous_month]["ano"].values
 
-        # Adicionar linhas verticais para cada "Mês/Ano" do mês anterior em todos os anos disponíveis
-        for year in previous_month_years:
-            month_year_label = f"{data_utils.mapa_meses[previous_month]}/{year}"
-            fig.add_shape(
-                type="line",
-                x0=month_year_label,
-                x1=month_year_label,
-                y0=0,
-                y1=df_grouped["Almoço | Janta"].max(),  # Assumindo que isso cobre o máximo valor do gráfico
-                line=dict(color="#b3112e", width=1, dash="dot")
-            )
-
-        # Adicionar a área para Almoço | Janta
-        fig.add_trace(go.Scatter(
-            x=df_grouped["Mês/Ano"],
-            y=df_grouped["Almoço | Janta"],
-            mode='lines+markers+text',  
-            name="Almoço | Janta",
-            fill='tozeroy',
-            marker_color="#176f87",
-            #fillcolor="#b3112e"
-        ))
-
-        # Adicionar a área para Café | Lanche
-        fig.add_trace(go.Scatter(
-            x=df_grouped["Mês/Ano"],
-            y=df_grouped["Café | Lanche"],
-            mode='lines+markers+text',  # Corrigido
-            name="Café | Lanche",
-            fill='tozeroy',
-            marker_color="#2d5480",
-            fillcolor="#6c87a6"
-        ))
-               
-
-        # Configuração do gráfico
-        fig.update_yaxes(showline=True, linecolor="Grey", linewidth=0.1, gridcolor='lightgrey')
-        fig.update_xaxes(showline=True, linecolor="Grey", linewidth=0.1, gridcolor='lightgrey')
-        fig.update_layout(margin=dict(t=40), height=400, title="-HISTÓRICO QUANTIDADE DE REFEIÇÕES AGRUPADAS", title_font_color="rgb(98,83,119)", yaxis_title="Quantidade",
-                                  legend=dict(x=0.722, y=1.09, orientation='h')
+# Adicionar a linha horizontal ao gráfico
+fig.add_shape(
+    type="line",
+    x0=df_grouped["Mês/Ano"].iloc[0],  # Começa no primeiro ponto do eixo x
+    x1=df_grouped["Mês/Ano"].iloc[-1],  # Termina no último ponto do eixo x
+    y0=previous_almoco_janta_value,
+    y1=previous_almoco_janta_value,
+    line=dict(color="#0e7089", width=1.5, dash="dashdot")
 )
 
-        # Exibir o gráfico no Streamlit
-        col5.plotly_chart(fig, use_container_width=True, automargin=True)
+# Adicionar a linha horizontal ao gráfico
+fig.add_shape(
+    type="line",
+    x0=df_grouped["Mês/Ano"].iloc[0],  # Começa no primeiro ponto do eixo x
+    x1=df_grouped["Mês/Ano"].iloc[-1],  # Termina no último ponto do eixo x
+    y0=previous_cafe_lanche_value,
+    y1=previous_cafe_lanche_value,
+    line=dict(color="#145073", width=1.5, dash="dashdot")
+)
+
+# Identificar o mês anterior ao atual
+current_month = pd.Timestamp.now().month
+previous_month = current_month - 1 if current_month != 1 else 12
+
+# Buscar os anos para os quais temos dados do mês anterior
+previous_month_years = df_grouped[df_grouped["mes"] == previous_month]["ano"].values
+
+# Adicionar linhas verticais para cada "Mês/Ano" do mês anterior em todos os anos disponíveis
+for year in previous_month_years:
+    month_year_label = f"{data_utils.mapa_meses[previous_month]}/{year}"
+    fig.add_shape(
+        type="line",
+        x0=month_year_label,
+        x1=month_year_label,
+        y0=0,
+        y1=df_grouped["Almoço | Janta"].max(),  # Assumindo que isso cobre o máximo valor do gráfico
+        line=dict(color="#b3112e", width=1, dash="dot")
+    )
+
+# Adicionar a área para Almoço | Janta
+fig.add_trace(go.Scatter(
+    x=df_grouped["Mês/Ano"],
+    y=df_grouped["Almoço | Janta"],
+    mode='lines+markers+text',  
+    name="Almoço | Janta",
+    fill='tozeroy',
+    marker_color="#176f87",
+    #fillcolor="#b3112e"
+))
+
+# Adicionar a área para Café | Lanche
+fig.add_trace(go.Scatter(
+    x=df_grouped["Mês/Ano"],
+    y=df_grouped["Café | Lanche"],
+    mode='lines+markers+text',  # Corrigido
+    name="Café | Lanche",
+    fill='tozeroy',
+    marker_color="#2d5480",
+    fillcolor="#6c87a6"
+))
+        
+
+# Configuração do gráfico
+fig.update_yaxes(showline=True, linecolor="Grey", linewidth=0.1, gridcolor='lightgrey')
+fig.update_xaxes(showline=True, linecolor="Grey", linewidth=0.1, gridcolor='lightgrey')
+fig.update_layout(margin=dict(t=40), height=400, title="-HISTÓRICO QUANTIDADE DE REFEIÇÕES AGRUPADAS", title_font_color="rgb(98,83,119)", yaxis_title="Quantidade",
+                            legend=dict(x=0.722, y=1.09, orientation='h')
+)
+
+# Exibir o gráfico no Streamlit
+col5.plotly_chart(fig, use_container_width=True, automargin=True)
