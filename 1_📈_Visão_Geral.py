@@ -521,10 +521,27 @@ fig.add_trace(go.Scatter(
 ))
         
 
+data_inicial_area = df['data'].min()
+data_fim_area = df['data'].max()
+
+data_inicial_area = pd.Timestamp(data_inicial_area)
+data_fim_area = pd.Timestamp(data_fim_area)
+
+dia_start_area = str(data_inicial_area.day).zfill(2)
+mes_start_area = str(data_inicial_area.month).zfill(2)
+ano_start_area = str(data_inicial_area.year)
+
+dia_end_area = str(data_fim_area.day).zfill(2)
+mes_end_area = str(data_fim_area.month).zfill(2)
+ano_end_area = str(data_fim_area.year)
+
+periodo_area = dia_start_area + "/" + mes_start_area + "/" + ano_start_area + " A " + dia_end_area + "/" + mes_end_area + "/" + ano_end_area
+
+
 # Configuração do gráfico
 fig.update_yaxes(showline=True, linecolor="Grey", linewidth=0.1, gridcolor='lightgrey')
 fig.update_xaxes(showline=True, linecolor="Grey", linewidth=0.1, gridcolor='lightgrey')
-fig.update_layout(margin=dict(t=40), height=400, title="-HISTÓRICO QUANTIDADE DE REFEIÇÕES AGRUPADAS", title_font_color="rgb(98,83,119)", yaxis_title="Quantidade",
+fig.update_layout(margin=dict(t=40), height=400, title=f"-HISTÓRICO QUANTIDADE DE REFEIÇÕES AGRUPADAS ({periodo_area})", title_font_color="rgb(98,83,119)", yaxis_title="Quantidade",
                             legend=dict(x=0.722, y=1.09, orientation='h')
 )
 
