@@ -268,7 +268,7 @@ fig_barras.update_layout(
     height=301,
     margin=dict(l=0, r=0, t=40, b=0),
     yaxis=dict(showticklabels=False),
-    title_text='-QUANTIDADE TOTAL DE REFEIÇÕES NO PERÍODO SELECIONADO',
+    title_text=f'-QUANTIDADE TOTAL DE REFEIÇÕES ({periodo})',
     title_x=0.01,
     title_y=0.94,
     title_font_color="rgb(98,83,119)"
@@ -312,13 +312,24 @@ fig_venda_fazenda.update_traces(
 
 fig_venda_fazenda.update_layout(
     #width=200, 
-    height=265, 
-    margin=dict(l=0, t=50, b=0, r=0), 
-    showlegend=False,
-    title_text='-DISTRIBUIÇÃO POR FAZENDA',
-    title_x=0.1,
-    title_y=0.94,
-    title_font_color="rgb(98,83,119)"
+    height=295, 
+    margin=dict(l=0, t=20, b=0, r=0), 
+    #showlegend=False,
+    title_text=' ',
+    #title_x=0.1,
+    #title_y=0.94,
+    #title_font_color="rgb(98,83,119)",
+    legend=dict(
+        orientation="h",
+        yanchor="top",
+        y=0,
+        xanchor="center",
+        x=0.5,
+        font=dict(size=10),
+        itemsizing='constant',
+        itemwidth=30,
+        entrywidthmode='pixels'
+    )
 )
 
 col3.plotly_chart(fig_venda_fazenda, use_container_width=True)
