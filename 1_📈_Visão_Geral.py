@@ -76,7 +76,7 @@ with tab1:
 
     with st.container(border=True):
         col_data_ini, col_data_fim = st.columns(2)
-        col1, col2, col3  = st.columns([2,2,1])     
+        col1, col2, col3  = st.columns([2.05,1.7,1])     
     with st.container(border=True):
 
         colradios, col4, col5= st.columns([0.65,1.3,3])
