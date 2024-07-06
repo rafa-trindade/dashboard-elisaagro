@@ -440,7 +440,7 @@ df["mes"] = df["data"].dt.month
 df_grouped = df.groupby(["ano", "mes"]).sum(numeric_only=True).reset_index()
 
 # Criar uma nova coluna com o formato "Mês/Ano"
-df_grouped["Mês/Ano"] = df_grouped.apply(lambda row: f"{data_utils.mapa_meses[row['mes']]}/{int(row['ano'])}", axis=1)
+df_grouped["Mês/Ano"] = df_grouped.apply(lambda row: f"{str(int(row['mes'])).zfill(2)}/{int(row['ano'])}", axis=1)
 
 # Criar o gráfico de área
 fig = go.Figure()
@@ -529,8 +529,9 @@ periodo_area = f"{data_utils.mapa_meses[data_inicial_area.month].upper()}/{data_
 # Configuração do gráfico
 fig.update_yaxes(showline=True, linecolor="Grey", linewidth=0.1, gridcolor='lightgrey')
 fig.update_xaxes(showline=True, linecolor="Grey", linewidth=0.1, gridcolor='lightgrey')
-fig.update_layout(margin=dict(t=40), height=400, title=f"-HISTÓRICO QUANTIDADE DE REFEIÇÕES AGRUPADAS ({periodo_area})", title_font_color="rgb(98,83,119)", yaxis_title="Quantidade",
+fig.update_layout(margin=dict(t=40), height=410, title=f"-HISTÓRICO QUANTIDADE DE REFEIÇÕES AGRUPADAS ({periodo_area})", title_font_color="rgb(98,83,119)", yaxis_title="Quantidade",
                             legend=dict(x=0.722, y=1.09, orientation='h')
 )
+
 # Exibir o gráfico no Streamlit
 col5.plotly_chart(fig, use_container_width=True, automargin=True)
