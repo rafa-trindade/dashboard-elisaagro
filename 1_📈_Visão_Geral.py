@@ -428,11 +428,10 @@ col4.plotly_chart(fig_box, use_container_width=True)
 ####### GRAFICO AREA HISTORICO QUANTIDADES #############################################
 ########################################################################################
 
+# Conversão de colunas e criação de novas
 df["data"] = pd.to_datetime(df["data"], errors='coerce')
-
 df["Almoço | Janta"] = df["almoco"] + df["janta"]
 df["Café | Lanche"] = df["cafe"] + df["lanche"]
-
 df["ano"] = df["data"].dt.year
 df["mes"] = df["data"].dt.month
 
@@ -442,10 +441,6 @@ df_grouped = df.groupby(["ano", "mes"]).sum(numeric_only=True).reset_index()
 # Criar uma nova coluna com o formato "Mês/Ano"
 df_grouped["Mês/Ano"] = df_grouped.apply(lambda row: f"{str(int(row['mes'])).zfill(2)}/{int(row['ano'])}", axis=1)
 
-# Criar o gráfico de área
-fig = go.Figure()
-
-
 # Identificar o mês e ano atual
 current_month = pd.Timestamp.now().month
 current_year = pd.Timestamp.now().year
@@ -454,83 +449,84 @@ current_year = pd.Timestamp.now().year
 previous_month = current_month - 1 if current_month != 1 else 12
 previous_year = current_year if current_month != 1 else current_year - 1
 
-# Identificar o valor de 'Almoço | Janta' para o mês anterior
+# Identificar o valor de 'Almoço | Janta' e 'Café | Lanche' para o mês anterior
 previous_almoco_janta_value = df_grouped[(df_grouped["ano"] == previous_year) & (df_grouped["mes"] == previous_month)]["Almoço | Janta"].values[0]
 previous_cafe_lanche_value = df_grouped[(df_grouped["ano"] == previous_year) & (df_grouped["mes"] == previous_month)]["Café | Lanche"].values[0]
 
-
-# Adicionar a linha horizontal ao gráfico
-fig.add_shape(
-    type="line",
-    x0=df_grouped["Mês/Ano"].iloc[0],  # Começa no primeiro ponto do eixo x
-    x1=df_grouped["Mês/Ano"].iloc[-1],  # Termina no último ponto do eixo x
-    y0=previous_almoco_janta_value,
-    y1=previous_almoco_janta_value,
-    line=dict(color="#0e7089", width=1.5, dash="dashdot")
-)
-
-# Adicionar a linha horizontal ao gráfico
-fig.add_shape(
-    type="line",
-    x0=df_grouped["Mês/Ano"].iloc[0],  # Começa no primeiro ponto do eixo x
-    x1=df_grouped["Mês/Ano"].iloc[-1],  # Termina no último ponto do eixo x
-    y0=previous_cafe_lanche_value,
-    y1=previous_cafe_lanche_value,
-    line=dict(color="#145073", width=1.5, dash="dashdot")
-)
-
-# Identificar o mês anterior ao atual
-current_month = pd.Timestamp.now().month
-previous_month = current_month - 1 if current_month != 1 else 12
-
-# Buscar os anos para os quais temos dados do mês anterior
-previous_month_years = df_grouped[df_grouped["mes"] == previous_month]["ano"].values
-
-# Adicionar linhas verticais para cada "Mês/Ano" do mês anterior em todos os anos disponíveis
-for year in previous_month_years:
-    month_year_label = f"{data_utils.mapa_meses[previous_month]}/{year}"
-    fig.add_shape(
-        type="line",
-        x0=month_year_label,
-        x1=month_year_label,
-        y0=0,
-        y1=df_grouped["Almoço | Janta"].max(),  # Assumindo que isso cobre o máximo valor do gráfico
-        line=dict(color="#b3112e", width=1, dash="dot")
-    )
+# Criar o gráfico de área
+fig = go.Figure()
 
 # Adicionar a área para Almoço | Janta
 fig.add_trace(go.Scatter(
     x=df_grouped["Mês/Ano"],
     y=df_grouped["Almoço | Janta"],
-    mode='lines+markers+text',  
+    mode='lines+markers+text',
     name="Almoço | Janta",
     fill='tozeroy',
     marker_color="#176f87",
-    #fillcolor="#b3112e"
 ))
 
 # Adicionar a área para Café | Lanche
 fig.add_trace(go.Scatter(
     x=df_grouped["Mês/Ano"],
     y=df_grouped["Café | Lanche"],
-    mode='lines+markers+text',  # Corrigido
+    mode='lines+markers+text',
     name="Café | Lanche",
     fill='tozeroy',
     marker_color="#2d5480",
     fillcolor="#6c87a6"
 ))
-        
 
+# Adicionar a linha horizontal para Almoço | Janta do mês anterior
+fig.add_shape(
+    type="line",
+    x0=df_grouped["Mês/Ano"].iloc[0],
+    x1=df_grouped["Mês/Ano"].iloc[-1],
+    y0=previous_almoco_janta_value,
+    y1=previous_almoco_janta_value,
+    line=dict(color="#0e7089", width=1.5, dash="dashdot")
+)
+
+# Adicionar a linha horizontal para Café | Lanche do mês anterior
+fig.add_shape(
+    type="line",
+    x0=df_grouped["Mês/Ano"].iloc[0],
+    x1=df_grouped["Mês/Ano"].iloc[-1],
+    y0=previous_cafe_lanche_value,
+    y1=previous_cafe_lanche_value,
+    line=dict(color="#145073", width=1.5, dash="dashdot")
+)
+
+# Buscar os anos para os quais temos dados do mês anterior
+previous_month_years = df_grouped[df_grouped["mes"] == previous_month]["ano"].values
+
+# Adicionar linhas verticais para cada "Mês/Ano" do mês anterior em todos os anos disponíveis
+for year in previous_month_years:
+    month_year_label = f"{str(previous_month).zfill(2)}/{year}"
+    fig.add_shape(
+        type="line",
+        x0=month_year_label,
+        x1=month_year_label,
+        y0=0,
+        y1=df_grouped["Almoço | Janta"].max(),
+        line=dict(color="#b3112e", width=1, dash="dot")
+    )
+
+# Período do gráfico
 data_inicial_area = pd.Timestamp(df['data'].min())
 data_fim_area = pd.Timestamp(df['data'].max())
-
 periodo_area = f"{data_utils.mapa_meses[data_inicial_area.month].upper()}/{data_inicial_area.year} A {data_utils.mapa_meses[data_fim_area.month].upper()}/{data_fim_area.year}"
 
 # Configuração do gráfico
-fig.update_yaxes(showline=True, linecolor="Grey", linewidth=0.1, gridcolor='lightgrey')
+fig.update_yaxes(showline=True, linecolor="Grey", linewidth=0.1, gridcolor='lightgrey', dtick=1000)
 fig.update_xaxes(showline=True, linecolor="Grey", linewidth=0.1, gridcolor='lightgrey')
-fig.update_layout(margin=dict(t=40), height=410, title=f"-HISTÓRICO QUANTIDADE DE REFEIÇÕES AGRUPADAS ({periodo_area})", title_font_color="rgb(98,83,119)", yaxis_title="Quantidade",
-                            legend=dict(x=0.722, y=1.09, orientation='h')
+fig.update_layout(
+    margin=dict(t=40),
+    height=410,
+    title=f"-HISTÓRICO QUANTIDADE DE REFEIÇÕES AGRUPADAS ({periodo_area})",
+    title_font_color="rgb(98,83,119)",
+    yaxis_title="Quantidade",
+    legend=dict(x=0.722, y=1.09, orientation='h')
 )
 
 # Exibir o gráfico no Streamlit
