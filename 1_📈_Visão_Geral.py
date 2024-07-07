@@ -345,9 +345,9 @@ with colradio1:
 
 # Filtrar o DataFrame para a fazenda selecionada (ou todas)
 if fazenda_selecionada != 'Todas':
-    df_filtrado_fazenda = df_long[(df_long['fazenda'] == fazenda_selecionada) & (df_long['Valor'] > 0)]
+    df_filtrado_fazenda = df_long[(df_long['fazenda'] == fazenda_selecionada) & (df_long['Valor'] >= 0)]
 else:
-    df_filtrado_fazenda = df_long[df_long['Valor'] > 0]
+    df_filtrado_fazenda = df_long[df_long['Valor'] >= 0]
 
 # Obter os valores únicos da coluna 'Refeição' com valor maior que 0 para a fazenda selecionada
 tipos_com_valor = df_filtrado_fazenda['Refeição'].unique()
