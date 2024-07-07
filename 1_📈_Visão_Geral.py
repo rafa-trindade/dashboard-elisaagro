@@ -30,7 +30,7 @@ df_elisa['data'] = pd.to_datetime(df_elisa['data'], format='%d/%m/%Y', errors='c
 # Opção de seleção no Streamlit
 opcao = st.sidebar.selectbox(
     "Selecione:",
-    ("Todas as datas", "Início Contrato Vigente")
+    ("Todas as datas", "Contrato Vigente")
 )
 # Filtrar o DataFrame conforme a opção selecionada
 if opcao == "Todas as datas":
