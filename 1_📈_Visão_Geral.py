@@ -349,8 +349,11 @@ if fazenda_selecionada != 'Todas':
 else:
     df_filtrado_fazenda = df_long[df_long['Valor'] >= 0]
 
-# Obter os valores únicos da coluna 'Refeição' com valor maior que 0 para a fazenda selecionada
-tipos_com_valor = df_filtrado_fazenda['Refeição'].unique()
+# Filtrar os valores onde a coluna 'valor' é maior que 0
+df_filtrado_valor_radio = df_filtrado_fazenda[df_filtrado_fazenda['Valor'] > 0]
+
+# Obter os valores únicos da coluna 'Refeição'
+tipos_com_valor = df_filtrado_valor_radio['Refeição'].unique()
 
 with colradio2:
     # Configurar o radio com as opções de refeições únicas
