@@ -197,7 +197,7 @@ fig_tabela_dia = go.Figure(data=[go.Table(
         fill_color='#244366',
         line_color="lightgrey",
         font_color="white",
-        font=dict(size=14),
+        font=dict(size=14.5),
         align='center',
         height=28  # Ajusta a altura do cabeçalho
     ),
