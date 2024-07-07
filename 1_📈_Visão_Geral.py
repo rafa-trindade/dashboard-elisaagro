@@ -255,8 +255,8 @@ fig_barras.update_layout(
     title_text=f'-QUANTIDADE TOTAL DE REFEIÇÕES ({periodo})',
     title_x=0.01,
     title_y=0.94,
-    title_font_color="rgb(98,83,119)"
-
+    title_font_color="rgb(98,83,119)",
+    title_font_size=15
 )
 fig_barras.update_yaxes(showline=True, linecolor="Grey", linewidth=0.1, gridcolor='lightgrey')
 fig_barras.update_xaxes(showline=True, linecolor="Grey", linewidth=0.1, gridcolor='lightgrey')
@@ -297,7 +297,8 @@ fig_venda_fazenda.update_traces(
 fig_venda_fazenda.update_layout(
     #width=200, 
     height=295, 
-    margin=dict(l=0, t=20, b=0, r=0), 
+    margin=dict(l=0, t=20, b=0, r=0),
+    title_font_size=15,    
     #showlegend=False,
     title_text=' ',
     #title_x=0.1,
@@ -388,6 +389,7 @@ fig_box.update_layout(
     margin=dict(l=0, r=0, t=40, b=0),
     title_text=f'-BOX PLOT QTD. DE REFEIÇÕES ({data_utils.mapa_meses[data_inicial.month].upper()}/{data_inicial.year})',
     title_font_color="rgb(98,83,119)",
+    title_font_size=15,
     showlegend=False,
 )
 
@@ -512,6 +514,7 @@ fig.update_layout(
     height=410,
     title=f"-HISTÓRICO QUANTIDADE DE REFEIÇÕES AGRUPADAS ({periodo_area})",
     title_font_color="rgb(98,83,119)",
+    title_font_size=15,    
     yaxis_title="Quantidade",
     legend=dict(x=0.722, y=1.09, orientation='h')
 )
