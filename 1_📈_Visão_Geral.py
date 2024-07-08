@@ -4,6 +4,7 @@ import plotly.express as px
 import plotly.graph_objects as go
 import datetime as dt
 import numpy as np
+from datetime import datetime
 
 import utils.data_utils as data_utils
 import utils.string_utils as string_utils
@@ -85,7 +86,7 @@ tab1, tab2 = st.tabs(["📅 Fechamentos Diários", "\t"])
 with tab1:
 
     with st.container(border=True):
-        col_data_ini, col_data_fim = st.columns(2)
+        col_ano,col_mes, col_data_ini, col_data_fim = st.columns([1.95,1.95,3,3])
         col1, col2, col3  = st.columns([1.775,1.7,1])   
         with col1:
             ct1 = st.container()
@@ -117,8 +118,58 @@ if df['data'].max().day < 20:
 else:
     mes_inicial_padrão = dt.date(ano_atual, mes_atual, 20)
 
-data_inicial = col_data_ini.date_input('DATA INÍCIO:', df['data'].max(), None, format="DD/MM/YYYY",  key="data_inicio_key")
-data_fim = col_data_fim.date_input('DATA FIM:', None, format="DD/MM/YYYY", key="data_fim_key")
+# Obter a data máxima do DataFrame
+data_maxima = df['data'].max()
+
+# Inicialização da data
+if 'data_inicio_key' not in st.session_state:
+    st.session_state.data_inicio_key = data_maxima
+    st.session_state.mes_selectbox = data_utils.mapa_meses[data_maxima.month]
+    st.session_state.ano_selectbox = data_maxima.year
+
+# Atualizar os valores dos selectbox com base na data selecionada
+data_inicial = st.session_state.data_inicio_key
+mes_inicial = data_inicial.month
+ano_inicial = data_inicial.year
+
+# Obter anos únicos disponíveis no DataFrame
+anos_disponiveis = sorted(df['data'].dt.year.unique())
+
+# Seleção de ano
+ano_selecionado = col_ano.selectbox('ANO:', anos_disponiveis, index=anos_disponiveis.index(ano_inicial), key="ano_selectbox")
+
+# Filtrar os meses disponíveis com base no ano selecionado
+meses_disponiveis = sorted(df[df['data'].dt.year == ano_selecionado]['data'].dt.month.unique())
+
+# Mapear meses para nomes em português
+meses_disponiveis_por_extenso = [data_utils.mapa_meses[mes] for mes in meses_disponiveis]
+
+# Determinar o índice do mês inicial por nome
+mes_nome_inicial = data_utils.mapa_meses[mes_inicial]
+if mes_nome_inicial in meses_disponiveis_por_extenso:
+    index_mes = meses_disponiveis_por_extenso.index(mes_nome_inicial)
+else:
+    index_mes = 0
+
+# Seleção de mês
+mes_nome_selecionado = col_mes.selectbox('MÊS:', meses_disponiveis_por_extenso, index=index_mes, key="mes_selectbox")
+mes_selecionado = [mes for mes, nome in data_utils.mapa_meses.items() if nome == mes_nome_selecionado][0]
+
+# Atualizar session state para date_input quando mês ou ano são alterados
+nova_data = datetime(ano_selecionado, mes_selecionado, 1)
+if nova_data != st.session_state.data_inicio_key:
+    st.session_state.data_inicio_key = nova_data
+
+# Atualizar date_input
+data_inicial = col_data_ini.date_input('DATA INÍCIO:', st.session_state.data_inicio_key, format="DD/MM/YYYY", key="data_inicio_key")
+
+# Atualizar session state para mês e ano quando date_input é alterado
+mes_nome_atual = data_utils.mapa_meses[data_inicial.month]
+if mes_nome_atual != st.session_state.mes_selectbox or data_inicial.year != st.session_state.ano_selectbox:
+    st.session_state.mes_selectbox = mes_nome_atual
+    st.session_state.ano_selectbox = data_inicial.year
+
+data_fim = col_data_fim.date_input('Data Fim:', None, format="DD/MM/YYYY", key="data_fim_key")
 
 if data_inicial:
     data_inicial = pd.Timestamp(data_inicial)
