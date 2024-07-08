@@ -136,7 +136,7 @@ ano_inicial = data_inicial.year
 anos_disponiveis = sorted(df['data'].dt.year.unique())
 
 # Seleção de ano
-ano_selecionado = col_ano.selectbox('ANO:', anos_disponiveis, index=anos_disponiveis.index(ano_inicial), key="ano_selectbox")
+ano_selecionado = col_ano.selectbox('Selecione o Ano:', anos_disponiveis, index=anos_disponiveis.index(ano_inicial), key="ano_selectbox")
 
 # Filtrar os meses disponíveis com base no ano selecionado
 meses_disponiveis = sorted(df[df['data'].dt.year == ano_selecionado]['data'].dt.month.unique())
@@ -152,7 +152,7 @@ else:
     index_mes = 0
 
 # Seleção de mês
-mes_nome_selecionado = col_mes.selectbox('MÊS:', meses_disponiveis_por_extenso, index=index_mes, key="mes_selectbox")
+mes_nome_selecionado = col_mes.selectbox('Selecione o Mês:', meses_disponiveis_por_extenso, index=index_mes, key="mes_selectbox")
 mes_selecionado = [mes for mes, nome in data_utils.mapa_meses.items() if nome == mes_nome_selecionado][0]
 
 # Atualizar session state para date_input quando mês ou ano são alterados
@@ -161,7 +161,7 @@ if nova_data != st.session_state.data_inicio_key:
     st.session_state.data_inicio_key = nova_data
 
 # Atualizar date_input
-data_inicial = col_data_ini.date_input('DATA INÍCIO:', st.session_state.data_inicio_key, format="DD/MM/YYYY", key="data_inicio_key")
+data_inicial = col_data_ini.date_input('Data Início:', st.session_state.data_inicio_key, format="DD/MM/YYYY", key="data_inicio_key")
 
 # Atualizar session state para mês e ano quando date_input é alterado
 mes_nome_atual = data_utils.mapa_meses[data_inicial.month]
