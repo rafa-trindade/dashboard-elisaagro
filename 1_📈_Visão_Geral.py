@@ -118,8 +118,8 @@ if df['data'].max().day < 20:
 else:
     mes_inicial_padrão = dt.date(ano_atual, mes_atual, 20)
 
-data_inicial = col_data_ini.date_input('DATA INÍCIO:', df['data'].max(), None, format="DD/MM/YYYY",  key="data_inicio_key")
-data_fim = col_data_fim.date_input('DATA FIM:', None, format="DD/MM/YYYY", key="data_fim_key")
+data_inicial = col_data_ini.date_input('Data Início:', df['data'].max(), None, format="DD/MM/YYYY",  key="data_inicio_key")
+data_fim = col_data_fim.date_input('Data Fim:', None, format="DD/MM/YYYY", key="data_fim_key")
 
 
 if data_inicial:
