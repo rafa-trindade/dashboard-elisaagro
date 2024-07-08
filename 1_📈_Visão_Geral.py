@@ -335,7 +335,7 @@ fig.add_trace(go.Bar(
     x=df_grouped["Dia/Mês"],
     y=df_grouped["Almoço | Janta"],
     name="Almoço | Janta",
-    marker_color="#176f87",
+    marker_color="#81a8b4",
     showlegend=False  # Remover legenda das cores
 ))
 
@@ -344,7 +344,7 @@ fig.add_trace(go.Bar(
     x=df_grouped["Dia/Mês"],
     y=df_grouped["Café | Lanche"],
     name="Café | Lanche",
-    marker_color="#2d5480",
+    marker_color="#6882a0",
     showlegend=False  # Remover legenda das cores
 ))
 
