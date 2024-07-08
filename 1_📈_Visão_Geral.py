@@ -86,17 +86,25 @@ with tab1:
 
     with st.container(border=True):
         col_data_ini, col_data_fim = st.columns(2)
-        col1, col2, col3  = st.columns([2.05,1.7,1])   
+        col1, col2, col3  = st.columns([1.775,1.7,1])   
         with col1:
             ct1 = st.container()
-            ct2 = st.container()
+            ct2 = st.container(border=True )
+
+        with col2:
+            ct3 = st.container(border=True )
+        with col3:
+            ct4 = st.container(border=True )
     with st.container(border=True):
 
         colradios, col4, col5= st.columns([0.65,1.3,3])
         with colradios:
             colradio1 = st.container(border=True) 
             colradio2 = st.container(border=True)
-
+        with col4:
+            ct5 = st.container(border=True )
+        with col5:
+            ct6 = st.container(border=True )
 ########################################################################################
 ####### TABELA FECHAMENTO DIÁRIO #######################################################
 ########################################################################################
@@ -279,11 +287,11 @@ fig_barras = go.Figure(data=go.Bar(
 fig_barras.update_layout(
     #title='Consumo Diário por Refeição',
     height=301,
-    margin=dict(l=0, r=0, t=40, b=0),
+    margin=dict(l=0, r=0, t=23, b=0),
     yaxis=dict(showticklabels=False),
     title_text=f'-QUANTIDADE TOTAL DE REFEIÇÕES ({periodo})',
-    title_x=0.01,
-    title_y=0.94,
+    title_x=0,
+    title_y=0.98,
     title_font_color="rgb(98,83,119)",
     title_font_size=15,
 )
@@ -292,10 +300,10 @@ fig_barras.update_xaxes(showline=True, linecolor="Grey", linewidth=0.1, gridcolo
 
 # Mostrando a tabela ao lado do gráfico de barras
 ct1.plotly_chart(fig_tabela_dia, use_container_width=True, automargin=True)
-col2.plotly_chart(fig_barras, use_container_width=True)
+ct3.plotly_chart(fig_barras, use_container_width=True)
 
 ########################################################################################
-####### GRAFICO MES AREA HISTORICO QUANTIDADES #############################################
+####### HISTOGRAMA MES HISTORICO QUANTIDADES #############################################
 ########################################################################################
 
 # Conversão de colunas e criação de novas
@@ -319,30 +327,25 @@ df_grouped = df_filtrado.groupby(["ano", "mes", "dia"]).sum(numeric_only=True).r
 # Criar uma nova coluna com o formato "Dia/Mês"
 df_grouped["Dia/Mês"] = df_grouped.apply(lambda row: f"{str(int(row['dia'])).zfill(2)}/{str(int(row['mes'])).zfill(2)}", axis=1)
 
-# Criar o gráfico de área
+# Criar o histograma
 fig = go.Figure()
 
-# Adicionar a área para Almoço | Janta
-fig.add_trace(go.Scatter(
+# Adicionar barras para Almoço | Janta
+fig.add_trace(go.Bar(
     x=df_grouped["Dia/Mês"],
     y=df_grouped["Almoço | Janta"],
-    mode='lines+markers+text',
     name="Almoço | Janta",
-    fill='tozeroy',
     marker_color="#176f87",
-    showlegend=False
+    showlegend=False  # Remover legenda das cores
 ))
 
-# Adicionar a área para Café | Lanche
-fig.add_trace(go.Scatter(
+# Adicionar barras para Café | Lanche
+fig.add_trace(go.Bar(
     x=df_grouped["Dia/Mês"],
     y=df_grouped["Café | Lanche"],
-    mode='lines+markers+text',
     name="Café | Lanche",
-    fill='tozeroy',
     marker_color="#2d5480",
-    fillcolor="#6c87a6",
-    showlegend=False
+    showlegend=False  # Remover legenda das cores
 ))
 
 # Identificar o último dia registrado no mês
@@ -359,7 +362,7 @@ for day in range(ultimo_dia, df_grouped['dia'].min() - 1, -7):
             x0=day_label,
             x1=day_label,
             y0=0,
-            y1=df_grouped["Almoço | Janta"].max(),
+            y1=df_grouped[["Almoço | Janta", "Café | Lanche"]].max().max(),
             line=dict(color="#b3112e", width=1, dash="dot")
         )
 
@@ -374,7 +377,7 @@ fig.add_shape(
     x1=df_grouped["Dia/Mês"].iloc[-1],
     y0=ultimo_dia_almoco_janta,
     y1=ultimo_dia_almoco_janta,
-    line=dict(color="#0e7089", width=1.5, dash="dashdot")
+    line=dict(color="#b3112e", width=1, dash="dashdot")
 )
 
 # Adicionar a linha horizontal para Café | Lanche do último dia
@@ -384,7 +387,7 @@ fig.add_shape(
     x1=df_grouped["Dia/Mês"].iloc[-1],
     y0=ultimo_dia_cafe_lanche,
     y1=ultimo_dia_cafe_lanche,
-    line=dict(color="#145073", width=1.5, dash="dashdot")
+    line=dict(color="#b3112e", width=1, dash="dashdot")
 )
 
 # Configurar as datas do eixo x
@@ -394,7 +397,7 @@ else:
     tickvals = linhas_verticais
 
 # Configuração do gráfico
-fig.update_yaxes(showline=True, linecolor="Grey", linewidth=0.1, gridcolor='lightgrey', dtick=10, showticklabels=False)
+fig.update_yaxes(showline=True, linecolor="Grey", linewidth=0.1, gridcolor='lightgrey', dtick=10)
 fig.update_xaxes(
     showline=True, 
     linecolor="Grey", 
@@ -405,17 +408,22 @@ fig.update_xaxes(
     tickformat="%d/%m"
 )
 fig.update_layout(
-    margin=dict(t=0,l=0,r=0,b=0),
-    height=147,
+    margin=dict(l=5, r=0, t=28, b=0),
+    height=147.5,
     title=" ",
+    title_text=f'-HISTOGRAMA QUANTIDADE REFEIÇÕES AGRUPADAS ({data_utils.mapa_meses[data_inicial.month].upper()}/{data_inicial.year})',
+    title_x=0.00,
+    title_y=0.98,
     title_font_color="rgb(98,83,119)",
     title_font_size=15,
-    yaxis_title="Quantidade",
-    legend=dict(x=0.722, y=1.09, orientation='h')
+    barmode='group',  # Configurar as barras para serem agrupadas lado a lado
+    yaxis=dict(showticklabels=False),
+
 )
 
 # Exibir o gráfico no Streamlit
 ct2.plotly_chart(fig, use_container_width=True, automargin=True)
+
 
 ########################################################################################
 ####### GRÁFICO PIZZA FECHAMENTO DIÁRIO ################################################
@@ -447,13 +455,8 @@ fig_venda_fazenda.update_traces(
 
 fig_venda_fazenda.update_layout(
     #width=200, 
-    height=293, 
-    margin=dict(l=0, t=20, b=0, r=0), 
-    #showlegend=False,
-    title_text=' ',
-    #title_x=0.1,
-    #title_y=0.94,
-    #title_font_color="rgb(98,83,119)",
+    height=301, 
+    margin=dict(l=0, t=35, b=0, r=0), 
     legend=dict(
         orientation="h",
         yanchor="top",
@@ -464,10 +467,22 @@ fig_venda_fazenda.update_layout(
         itemsizing='constant',
         itemwidth=30,
         entrywidthmode='pixels'
-    )
+    ),
+    title={
+        'text': f"-DISTRIBUIÇÃO ({periodo})",
+        'y': 0.965,
+        'x': 0.5,
+        'xanchor': 'center',
+        'yanchor': 'top',
+        'font': {
+            'color': "rgb(98,83,119)",
+            'size': 15
+        }
+    },
+    #showlegend = False
 )
 
-col3.plotly_chart(fig_venda_fazenda, use_container_width=True)
+ct4.plotly_chart(fig_venda_fazenda, use_container_width=True)
 
 
 ########################################################################################
@@ -536,12 +551,14 @@ fig_box.add_trace(go.Box(
 ))
 
 fig_box.update_layout(
-    height=386,
-    margin=dict(l=0, r=0, t=40, b=0),
+    height=284,
+    margin=dict(l=0, r=0, t=30, b=0),
     title_text=f'-BOX PLOT QTD. DE REFEIÇÕES ({data_utils.mapa_meses[data_inicial.month].upper()}/{data_inicial.year})',
     title_font_color="rgb(98,83,119)",
     title_font_size=15,
     showlegend=False,
+    title_x=0,
+    title_y=1,
 )
 
 fig_box.update_yaxes(
@@ -561,7 +578,7 @@ fig_box.update_xaxes(showline=True, linecolor="Grey", linewidth=0.1, gridcolor='
 fig_box.update_traces(marker=dict(size=4.5),
                     boxmean='sd',)
 
-col4.plotly_chart(fig_box, use_container_width=True)
+ct5.plotly_chart(fig_box, use_container_width=True)
 
 
 ########################################################################################
@@ -578,8 +595,8 @@ df["mes"] = df["data"].dt.month
 # Agrupar os dados por ano e mês
 df_grouped = df.groupby(["ano", "mes"]).sum(numeric_only=True).reset_index()
 
-# Criar uma nova coluna com o formato "Mês/Ano"
-df_grouped["Mês/Ano"] = df_grouped.apply(lambda row: f"{str(int(row['mes'])).zfill(2)}/{int(row['ano'])}", axis=1)
+# Criar uma nova coluna com o formato "Mês/Ano" utilizando o mapa de meses
+df_grouped["Mês/Ano"] = df_grouped.apply(lambda row: f"{data_utils.mapa_meses[int(row['mes'])].upper()}/{int(row['ano'])}", axis=1)
 
 # Identificar o mês e ano atual
 current_month = pd.Timestamp.now().month
@@ -641,8 +658,10 @@ fig.add_shape(
 previous_month_years = df_grouped[df_grouped["mes"] == previous_month]["ano"].values
 
 # Adicionar linhas verticais para cada "Mês/Ano" do mês anterior em todos os anos disponíveis
+linhas_verticais = []
 for year in previous_month_years:
-    month_year_label = f"{str(previous_month).zfill(2)}/{year}"
+    month_year_label = f"{data_utils.mapa_meses[previous_month].upper()}/{year}"
+    linhas_verticais.append(month_year_label)
     fig.add_shape(
         type="line",
         x0=month_year_label,
@@ -652,24 +671,36 @@ for year in previous_month_years:
         line=dict(color="#b3112e", width=1, dash="dot")
     )
 
+# Configurar as datas do eixo x para mostrar somente as datas com linhas verticais
+tickvals = linhas_verticais
+
 # Período do gráfico
 data_inicial_area = pd.Timestamp(df['data'].min())
 data_fim_area = pd.Timestamp(df['data'].max())
 periodo_area = f"{data_utils.mapa_meses[data_inicial_area.month].upper()}/{data_inicial_area.year} A {data_utils.mapa_meses[data_fim_area.month].upper()}/{data_fim_area.year}"
 
 # Configuração do gráfico
-fig.update_yaxes(showline=True, linecolor="Grey", linewidth=0.1, gridcolor='lightgrey', dtick=1000)
-fig.update_xaxes(showline=True, linecolor="Grey", linewidth=0.1, gridcolor='lightgrey')
+fig.update_yaxes(showline=True, linecolor="Grey", linewidth=0.1, gridcolor='lightgrey', dtick=5000)
+fig.update_xaxes(
+    showline=True, 
+    linecolor="Grey", 
+    linewidth=0.1, 
+    gridcolor='lightgrey',
+    tickmode='array',
+    tickvals=tickvals,
+)
 fig.update_layout(
-    margin=dict(t=40),
-    height=410,
+    margin=dict(l=0, r=0, t=30, b=0),
+    height=284,
     title=f"-HISTÓRICO QUANTIDADE DE REFEIÇÕES AGRUPADAS ({periodo_area})",
     title_font_color="rgb(98,83,119)",
     title_font_size=15,
     yaxis_title="Quantidade",
-    legend=dict(x=0.722, y=1.09, orientation='h')
+    xaxis_title="Período",
+    legend=dict(x=0.722, y=1.09, orientation='h'),
+    title_x=0,
+    title_y=1,
 )
 
 # Exibir o gráfico no Streamlit
-col5.plotly_chart(fig, use_container_width=True, automargin=True)
-
+ct6.plotly_chart(fig, use_container_width=True, automargin=True)
