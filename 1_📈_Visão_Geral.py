@@ -406,7 +406,7 @@ fig.update_xaxes(
 )
 fig.update_layout(
     margin=dict(t=0,l=0,r=0,b=0),
-    height=167,
+    height=147,
     title=" ",
     title_font_color="rgb(98,83,119)",
     title_font_size=15,
