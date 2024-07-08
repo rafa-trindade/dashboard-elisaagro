@@ -598,7 +598,7 @@ df["mes"] = df["data"].dt.month
 df_grouped = df.groupby(["ano", "mes"]).sum(numeric_only=True).reset_index()
 
 # Criar uma nova coluna com o formato "Mês/Ano" utilizando o mapa de meses
-df_grouped["Mês/Ano"] = df_grouped.apply(lambda row: f"{data_utils.mapa_meses[int(row['mes'])].upper()}/{int(row['ano'])}", axis=1)
+df_grouped["Mês/Ano"] = df_grouped.apply(lambda row: f"{data_utils.mapa_meses[int(row['mes'])]}/{int(row['ano'])}", axis=1)
 
 # Identificar o mês e ano atual
 current_month = pd.Timestamp.now().month
@@ -662,7 +662,7 @@ previous_month_years = df_grouped[df_grouped["mes"] == previous_month]["ano"].va
 # Adicionar linhas verticais para cada "Mês/Ano" do mês anterior em todos os anos disponíveis
 linhas_verticais = []
 for year in previous_month_years:
-    month_year_label = f"{data_utils.mapa_meses[previous_month].upper()}/{year}"
+    month_year_label = f"{data_utils.mapa_meses[previous_month]}/{year}"
     linhas_verticais.append(month_year_label)
     fig.add_shape(
         type="line",
