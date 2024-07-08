@@ -27,6 +27,32 @@ df_elisa = pd.read_csv(csv_url, sep=";", decimal=",", thousands=".", usecols=['d
 # Convertendo a coluna 'data' para o tipo datetime após carregar o dataframe
 df_elisa['data'] = pd.to_datetime(df_elisa['data'], format='%d/%m/%Y', errors='coerce')
 
+# Fazendas a serem agrupadas
+fazendas_santa_elisa = ['São Francisco', 'Canaã', 'Augusta', 'Santa Joana', 'Aparecida', 'Taquari']
+fazendas_silo = ['Cidade', 'Água Limpa', 'El Dorado']
+
+# Função para agrupar valores
+def agrupar_fazendas(df, nova_fazenda, fazendas_agrupadas):
+    df_agrupado = df[df['fazenda'].isin(fazendas_agrupadas)].groupby('data').sum().reset_index()
+    df_agrupado['fazenda'] = nova_fazenda
+    return df_agrupado
+
+# Agrupar valores para Santa Elisa
+df_santa_elisa_agrupado = agrupar_fazendas(df_elisa, 'Santa Elisa', fazendas_santa_elisa)
+
+# Agrupar valores para Silo
+df_silo_agrupado = agrupar_fazendas(df_elisa, 'Silo', fazendas_silo)
+
+# Filtrar o DataFrame original removendo as fazendas agrupadas
+df_filtrado = df_elisa[~df_elisa['fazenda'].isin(fazendas_santa_elisa + fazendas_silo)]
+
+# Mesclar os DataFrames agrupados com o DataFrame filtrado
+df_resultado = pd.concat([df_filtrado, df_santa_elisa_agrupado, df_silo_agrupado])
+
+# Agrupar os resultados finais para somar os valores das fazendas remanescentes
+df_elisa = df_resultado.groupby(['data', 'fazenda']).sum().reset_index()
+
+
 # Opção de seleção no Streamlit
 opcao = st.sidebar.selectbox(
     "Selecione:",
@@ -60,7 +86,10 @@ with tab1:
 
     with st.container(border=True):
         col_data_ini, col_data_fim = st.columns(2)
-        col1, col2, col3  = st.columns([2.05,1.7,1])     
+        col1, col2, col3  = st.columns([2.05,1.7,1])   
+        with col1:
+            ct1 = st.container()
+            ct2 = st.container()
     with st.container(border=True):
 
         colradios, col4, col5= st.columns([0.65,1.3,3])
@@ -216,7 +245,7 @@ fig_tabela_dia.update_layout(
                                 domain=[0.3, 1]  # Ajuste os valores conforme necessário
                             ),
                             #title={ 'text': "-FECHAMENTO DE " + periodo, 'y':0.92, 'x':0.0, 'xanchor': 'left', 'yanchor': 'top'},
-                            height=284,
+                            height=138,
                             margin=dict(r=0, t=20,b=0)
 )
 
@@ -256,15 +285,137 @@ fig_barras.update_layout(
     title_x=0.01,
     title_y=0.94,
     title_font_color="rgb(98,83,119)",
-    title_font_size=15
+    title_font_size=15,
 )
 fig_barras.update_yaxes(showline=True, linecolor="Grey", linewidth=0.1, gridcolor='lightgrey')
 fig_barras.update_xaxes(showline=True, linecolor="Grey", linewidth=0.1, gridcolor='lightgrey')
 
 # Mostrando a tabela ao lado do gráfico de barras
-col1.plotly_chart(fig_tabela_dia, use_container_width=True, automargin=True)
+ct1.plotly_chart(fig_tabela_dia, use_container_width=True, automargin=True)
 col2.plotly_chart(fig_barras, use_container_width=True)
 
+########################################################################################
+####### GRAFICO MES AREA HISTORICO QUANTIDADES #############################################
+########################################################################################
+
+# Conversão de colunas e criação de novas
+df["data"] = pd.to_datetime(df["data"], errors='coerce')
+df["Almoço | Janta"] = df["almoco"] + df["janta"]
+df["Café | Lanche"] = df["cafe"] + df["lanche"]
+df["ano"] = df["data"].dt.year
+df["mes"] = df["data"].dt.month
+df["dia"] = df["data"].dt.day
+
+# Identificar o mês selecionado em data_inicial
+data_inicial = pd.Timestamp(data_inicial)  # Supondo que esta é a data selecionada
+data_selecionada = data_inicial
+
+# Filtrar os dados para o mês selecionado
+df_filtrado = df[(df["ano"] == data_selecionada.year) & (df["mes"] == data_selecionada.month)]
+
+# Agrupar os dados por dia
+df_grouped = df_filtrado.groupby(["ano", "mes", "dia"]).sum(numeric_only=True).reset_index()
+
+# Criar uma nova coluna com o formato "Dia/Mês"
+df_grouped["Dia/Mês"] = df_grouped.apply(lambda row: f"{str(int(row['dia'])).zfill(2)}/{str(int(row['mes'])).zfill(2)}", axis=1)
+
+# Criar o gráfico de área
+fig = go.Figure()
+
+# Adicionar a área para Almoço | Janta
+fig.add_trace(go.Scatter(
+    x=df_grouped["Dia/Mês"],
+    y=df_grouped["Almoço | Janta"],
+    mode='lines+markers+text',
+    name="Almoço | Janta",
+    fill='tozeroy',
+    marker_color="#176f87",
+    showlegend=False
+))
+
+# Adicionar a área para Café | Lanche
+fig.add_trace(go.Scatter(
+    x=df_grouped["Dia/Mês"],
+    y=df_grouped["Café | Lanche"],
+    mode='lines+markers+text',
+    name="Café | Lanche",
+    fill='tozeroy',
+    marker_color="#2d5480",
+    fillcolor="#6c87a6",
+    showlegend=False
+))
+
+# Identificar o último dia registrado no mês
+ultimo_dia = df_grouped['dia'].max()
+
+# Adicionar linhas verticais a cada 7 dias a partir do último dia registrado
+linhas_verticais = []
+for day in range(ultimo_dia, df_grouped['dia'].min() - 1, -7):
+    if day in df_grouped['dia'].values:
+        day_label = df_grouped[df_grouped['dia'] == day]["Dia/Mês"].values[0]
+        linhas_verticais.append(day_label)
+        fig.add_shape(
+            type="line",
+            x0=day_label,
+            x1=day_label,
+            y0=0,
+            y1=df_grouped["Almoço | Janta"].max(),
+            line=dict(color="#b3112e", width=1, dash="dot")
+        )
+
+# Pegar os valores de Almoço | Janta e Café | Lanche do último dia do mês selecionado
+ultimo_dia_almoco_janta = df_grouped["Almoço | Janta"].iloc[-1]
+ultimo_dia_cafe_lanche = df_grouped["Café | Lanche"].iloc[-1]
+
+# Adicionar a linha horizontal para Almoço | Janta do último dia
+fig.add_shape(
+    type="line",
+    x0=df_grouped["Dia/Mês"].iloc[0],
+    x1=df_grouped["Dia/Mês"].iloc[-1],
+    y0=ultimo_dia_almoco_janta,
+    y1=ultimo_dia_almoco_janta,
+    line=dict(color="#0e7089", width=1.5, dash="dashdot")
+)
+
+# Adicionar a linha horizontal para Café | Lanche do último dia
+fig.add_shape(
+    type="line",
+    x0=df_grouped["Dia/Mês"].iloc[0],
+    x1=df_grouped["Dia/Mês"].iloc[-1],
+    y0=ultimo_dia_cafe_lanche,
+    y1=ultimo_dia_cafe_lanche,
+    line=dict(color="#145073", width=1.5, dash="dashdot")
+)
+
+# Configurar as datas do eixo x
+if len(df_grouped) < 22:
+    tickvals = df_grouped["Dia/Mês"].tolist()
+else:
+    tickvals = linhas_verticais
+
+# Configuração do gráfico
+fig.update_yaxes(showline=True, linecolor="Grey", linewidth=0.1, gridcolor='lightgrey', dtick=10, showticklabels=False)
+fig.update_xaxes(
+    showline=True, 
+    linecolor="Grey", 
+    linewidth=0.1, 
+    gridcolor='lightgrey',
+    tickmode='array',
+    tickvals=tickvals,
+    tickformat="%d/%m"
+)
+fig.update_layout(
+    margin=dict(t=0,l=0,r=0,b=0),
+    height=167,
+    title=" ",
+    title_font_color="rgb(98,83,119)",
+    title_font_size=15,
+    yaxis_title="Quantidade",
+    legend=dict(x=0.722, y=1.09, orientation='h')
+)
+
+# Exibir o gráfico no Streamlit
+ct2.plotly_chart(fig, use_container_width=True, automargin=True)
 
 ########################################################################################
 ####### GRÁFICO PIZZA FECHAMENTO DIÁRIO ################################################
@@ -296,9 +447,8 @@ fig_venda_fazenda.update_traces(
 
 fig_venda_fazenda.update_layout(
     #width=200, 
-    height=295, 
-    margin=dict(l=0, t=20, b=0, r=0),
-    title_font_size=15,    
+    height=293, 
+    margin=dict(l=0, t=20, b=0, r=0), 
     #showlegend=False,
     title_text=' ',
     #title_x=0.1,
@@ -349,6 +499,7 @@ if fazenda_selecionada != 'Todas':
     df_filtrado_fazenda = df_long[(df_long['fazenda'] == fazenda_selecionada) & (df_long['Valor'] >= 0)]
 else:
     df_filtrado_fazenda = df_long[df_long['Valor'] >= 0]
+
 
 # Filtrar os valores onde a coluna 'valor' é maior que 0
 df_filtrado_valor_radio = df_filtrado_fazenda[df_filtrado_fazenda['Valor'] > 0]
@@ -514,10 +665,11 @@ fig.update_layout(
     height=410,
     title=f"-HISTÓRICO QUANTIDADE DE REFEIÇÕES AGRUPADAS ({periodo_area})",
     title_font_color="rgb(98,83,119)",
-    title_font_size=15,    
+    title_font_size=15,
     yaxis_title="Quantidade",
     legend=dict(x=0.722, y=1.09, orientation='h')
 )
 
 # Exibir o gráfico no Streamlit
 col5.plotly_chart(fig, use_container_width=True, automargin=True)
+
