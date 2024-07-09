@@ -642,6 +642,10 @@ fig.add_trace(go.Scatter(
     mode='lines+markers+text',
     name="Almoço | Janta",
     fill='tozeroy',
+    marker=dict(
+        color=style_utils.barra_verde,
+        size=5  
+    ),    
     marker_color=style_utils.barra_verde,
 ))
 
@@ -652,6 +656,10 @@ fig.add_trace(go.Scatter(
     mode='lines+markers+text',
     name="Café | Lanche",
     fill='tozeroy',
+    marker=dict(
+        color=style_utils.barra_azul,
+        size=5  
+    ),    
     marker_color=style_utils.barra_azul,
     fillcolor="#6c87a6"
 ))
