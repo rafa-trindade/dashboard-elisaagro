@@ -478,7 +478,6 @@ data_selecionada = data_inicial
 # Filtrar os dados para o mês selecionado
 df_filtrado = df[(df["ano"] == data_selecionada.year) & (df["mes"] == data_selecionada.month)]
 
-
 # Filtrar o DataFrame para a fazenda selecionada (ou todas)
 if fazenda_selecionada != 'Todas':
     df_filtrado = df_filtrado[df_filtrado['fazenda'] == fazenda_selecionada]
@@ -489,27 +488,6 @@ df_grouped = df_filtrado.groupby(["ano", "mes", "dia"]).sum(numeric_only=True).r
 # Criar uma nova coluna com o formato "Dia/Mês"
 df_grouped["Dia/Mês"] = df_grouped.apply(lambda row: f"{str(int(row['dia'])).zfill(2)}/{str(int(row['mes'])).zfill(2)}", axis=1)
 
-# Criar o histograma
-fig = go.Figure()
-
-# Adicionar barras para Almoço | Janta
-fig.add_trace(go.Bar(
-    x=df_grouped["Dia/Mês"],
-    y=df_grouped["Almoço | Janta"],
-    name="Almoço | Janta",
-    marker_color="#81a8b4",
-    showlegend=True  # Remover legenda das cores
-))
-
-# Adicionar barras para Café | Lanche
-fig.add_trace(go.Bar(
-    x=df_grouped["Dia/Mês"],
-    y=df_grouped["Café | Lanche"],
-    name="Café | Lanche",
-    marker_color="#6882a0",
-    showlegend=True  # Remover legenda das cores
-))
-
 # Identificar o último dia registrado no mês
 ultimo_dia = df_grouped['dia'].max()
 
@@ -519,14 +497,52 @@ for day in range(ultimo_dia, df_grouped['dia'].min() - 1, -7):
     if day in df_grouped['dia'].values:
         day_label = df_grouped[df_grouped['dia'] == day]["Dia/Mês"].values[0]
         linhas_verticais.append(day_label)
-        fig.add_shape(
-            type="line",
-            x0=day_label,
-            x1=day_label,
-            y0=0,
-            y1=df_grouped[["Almoço | Janta", "Café | Lanche"]].max().max(),
-            line=dict(color="#b3112e", width=1, dash="dot")
-        )
+
+# Criar o histograma
+fig = go.Figure()
+
+# Função para determinar se o valor deve ser exibido
+def should_show_text(x_value):
+    return x_value in linhas_verticais
+
+# Adicionar barras para Almoço | Janta
+fig.add_trace(go.Bar(
+    x=df_grouped["Dia/Mês"],
+    y=df_grouped["Almoço | Janta"],
+    name="Almoço | Janta",
+    marker_color="#81a8b4",
+    showlegend=True,  # Remover legenda das cores
+    text=df_grouped.apply(lambda row: f"{int(row['Almoço | Janta'])}" if row["Dia/Mês"] in linhas_verticais else "", axis=1)
+))
+
+# Adicionar barras para Café | Lanche
+fig.add_trace(go.Bar(
+    x=df_grouped["Dia/Mês"],
+    y=df_grouped["Café | Lanche"],
+    name="Café | Lanche",
+    marker_color="#6882a0",
+    showlegend=True,  # Remover legenda das cores
+    text=df_grouped.apply(lambda row: f"{int(row['Café | Lanche'])}" if row["Dia/Mês"] in linhas_verticais else "", axis=1)
+))
+
+fig.update_traces(
+    textposition='outside',
+    textangle=0,
+    textfont=dict(
+        color=style_utils.barra_azul_escuro,
+    )    
+)
+
+# Adicionar linhas verticais ao gráfico
+for day_label in linhas_verticais:
+    fig.add_shape(
+        type="line",
+        x0=day_label,
+        x1=day_label,
+        y0=0,
+        y1=df_grouped[["Almoço | Janta", "Café | Lanche"]].max().max(),
+        line=dict(color="#b3112e", width=1, dash="dot")
+    )
 
 # Pegar os valores de Almoço | Janta e Café | Lanche do último dia do mês selecionado
 ultimo_dia_almoco_janta = df_grouped["Almoço | Janta"].iloc[-1]
@@ -539,7 +555,7 @@ fig.add_shape(
     x1=df_grouped["Dia/Mês"].iloc[-1],
     y0=ultimo_dia_almoco_janta,
     y1=ultimo_dia_almoco_janta,
-    line=dict(color="#1d6e85", width=1.5, dash="dashdot")
+    line=dict(color="#176f87", width=1.5, dash="dashdot") 
 )
 
 # Adicionar a linha horizontal para Café | Lanche do último dia
@@ -549,7 +565,7 @@ fig.add_shape(
     x1=df_grouped["Dia/Mês"].iloc[-1],
     y0=ultimo_dia_cafe_lanche,
     y1=ultimo_dia_cafe_lanche,
-    line=dict(color="#34527e", width=1.5, dash="dashdot")
+    line=dict(color="#2d5480", width=1.5, dash="dashdot")
 )
 
 # Configurar as datas do eixo x
@@ -559,7 +575,7 @@ else:
     tickvals = linhas_verticais
 
 # Configuração do gráfico
-fig.update_yaxes(showline=True, linecolor="Grey", linewidth=0.1, gridcolor='lightgrey', dtick=10, range=[0, df_grouped["Almoço | Janta"].max() + 10])
+fig.update_yaxes(showline=True, linecolor="Grey", linewidth=0.1, gridcolor='lightgrey', dtick=10, range=[0, df_grouped["Almoço | Janta"].max() + 20])
 fig.update_xaxes(
     showline=True, 
     linecolor="Grey", 
