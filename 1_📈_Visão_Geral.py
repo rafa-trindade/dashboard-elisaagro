@@ -379,7 +379,7 @@ fig.add_shape(
     x1=df_grouped["Dia/Mês"].iloc[-1],
     y0=ultimo_dia_almoco_janta,
     y1=ultimo_dia_almoco_janta,
-    line=dict(color="#b3112e", width=1, dash="dashdot")
+    line=dict(color="#1d6e85", width=1.5, dash="dashdot")
 )
 
 # Adicionar a linha horizontal para Café | Lanche do último dia
@@ -389,8 +389,9 @@ fig.add_shape(
     x1=df_grouped["Dia/Mês"].iloc[-1],
     y0=ultimo_dia_cafe_lanche,
     y1=ultimo_dia_cafe_lanche,
-    line=dict(color="#b3112e", width=1, dash="dashdot")
+    line=dict(color="#34527e", width=1.5, dash="dashdot")
 )
+
 
 # Configurar as datas do eixo x
 if len(df_grouped) < 14:
