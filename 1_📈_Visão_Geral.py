@@ -305,130 +305,6 @@ ct1.plotly_chart(fig_tabela_dia, use_container_width=True, automargin=True)
 ct3.plotly_chart(fig_barras, use_container_width=True)
 
 ########################################################################################
-####### HISTOGRAMA MES HISTORICO QUANTIDADES #############################################
-########################################################################################
-
-# Conversão de colunas e criação de novas
-df["data"] = pd.to_datetime(df["data"], errors='coerce')
-df["Almoço | Janta"] = df["almoco"] + df["janta"]
-df["Café | Lanche"] = df["cafe"] + df["lanche"]
-df["ano"] = df["data"].dt.year
-df["mes"] = df["data"].dt.month
-df["dia"] = df["data"].dt.day
-
-# Identificar o mês selecionado em data_inicial
-data_inicial = pd.Timestamp(data_inicial)  # Supondo que esta é a data selecionada
-data_selecionada = data_inicial
-
-# Filtrar os dados para o mês selecionado
-df_filtrado = df[(df["ano"] == data_selecionada.year) & (df["mes"] == data_selecionada.month)]
-
-# Agrupar os dados por dia
-df_grouped = df_filtrado.groupby(["ano", "mes", "dia"]).sum(numeric_only=True).reset_index()
-
-# Criar uma nova coluna com o formato "Dia/Mês"
-df_grouped["Dia/Mês"] = df_grouped.apply(lambda row: f"{str(int(row['dia'])).zfill(2)}/{str(int(row['mes'])).zfill(2)}", axis=1)
-
-# Criar o histograma
-fig = go.Figure()
-
-# Adicionar barras para Almoço | Janta
-fig.add_trace(go.Bar(
-    x=df_grouped["Dia/Mês"],
-    y=df_grouped["Almoço | Janta"],
-    name="Almoço | Janta",
-    marker_color="#81a8b4",
-    showlegend=False  # Remover legenda das cores
-))
-
-# Adicionar barras para Café | Lanche
-fig.add_trace(go.Bar(
-    x=df_grouped["Dia/Mês"],
-    y=df_grouped["Café | Lanche"],
-    name="Café | Lanche",
-    marker_color="#6882a0",
-    showlegend=False  # Remover legenda das cores
-))
-
-# Identificar o último dia registrado no mês
-ultimo_dia = df_grouped['dia'].max()
-
-# Adicionar linhas verticais a cada 7 dias a partir do último dia registrado
-linhas_verticais = []
-for day in range(ultimo_dia, df_grouped['dia'].min() - 1, -7):
-    if day in df_grouped['dia'].values:
-        day_label = df_grouped[df_grouped['dia'] == day]["Dia/Mês"].values[0]
-        linhas_verticais.append(day_label)
-        fig.add_shape(
-            type="line",
-            x0=day_label,
-            x1=day_label,
-            y0=0,
-            y1=df_grouped[["Almoço | Janta", "Café | Lanche"]].max().max(),
-            line=dict(color="#b3112e", width=1, dash="dot")
-        )
-
-# Pegar os valores de Almoço | Janta e Café | Lanche do último dia do mês selecionado
-ultimo_dia_almoco_janta = df_grouped["Almoço | Janta"].iloc[-1]
-ultimo_dia_cafe_lanche = df_grouped["Café | Lanche"].iloc[-1]
-
-# Adicionar a linha horizontal para Almoço | Janta do último dia
-fig.add_shape(
-    type="line",
-    x0=df_grouped["Dia/Mês"].iloc[0],
-    x1=df_grouped["Dia/Mês"].iloc[-1],
-    y0=ultimo_dia_almoco_janta,
-    y1=ultimo_dia_almoco_janta,
-    line=dict(color="#1d6e85", width=1.5, dash="dashdot")
-)
-
-# Adicionar a linha horizontal para Café | Lanche do último dia
-fig.add_shape(
-    type="line",
-    x0=df_grouped["Dia/Mês"].iloc[0],
-    x1=df_grouped["Dia/Mês"].iloc[-1],
-    y0=ultimo_dia_cafe_lanche,
-    y1=ultimo_dia_cafe_lanche,
-    line=dict(color="#34527e", width=1.5, dash="dashdot")
-)
-
-
-# Configurar as datas do eixo x
-if len(df_grouped) < 14:
-    tickvals = df_grouped["Dia/Mês"].tolist()
-else:
-    tickvals = linhas_verticais
-
-# Configuração do gráfico
-fig.update_yaxes(showline=True, linecolor="Grey", linewidth=0.1, gridcolor='lightgrey', dtick=10)
-fig.update_xaxes(
-    showline=True, 
-    linecolor="Grey", 
-    linewidth=0.1, 
-    gridcolor='lightgrey',
-    tickmode='array',
-    tickvals=tickvals,
-    tickformat="%d/%m"
-)
-fig.update_layout(
-    margin=dict(l=5, r=0, t=28, b=0),
-    height=147.5,
-    title=" ",
-    title_text=f'-HISTOGRAMA QUANTIDADE REFEIÇÕES AGRUPADAS ({data_utils.mapa_meses[data_inicial.month].upper()}/{data_inicial.year})',
-    title_x=0.00,
-    title_y=0.98,
-    title_font_color="rgb(98,83,119)",
-    title_font_size=15,
-    barmode='group',  # Configurar as barras para serem agrupadas lado a lado
-    yaxis=dict(showticklabels=False),
-
-)
-
-# Exibir o gráfico no Streamlit
-ct2.plotly_chart(fig, use_container_width=True, automargin=True)
-
-
-########################################################################################
 ####### GRÁFICO PIZZA FECHAMENTO DIÁRIO ################################################
 ########################################################################################
 # Cálculo dos totais
@@ -583,6 +459,133 @@ fig_box.update_traces(marker=dict(size=4.5),
 
 ct5.plotly_chart(fig_box, use_container_width=True)
 
+########################################################################################
+####### HISTOGRAMA MES HISTORICO QUANTIDADES ###########################################
+########################################################################################
+
+# Conversão de colunas e criação de novas
+df["data"] = pd.to_datetime(df["data"], errors='coerce')
+df["Almoço | Janta"] = df["almoco"] + df["janta"]
+df["Café | Lanche"] = df["cafe"] + df["lanche"]
+df["ano"] = df["data"].dt.year
+df["mes"] = df["data"].dt.month
+df["dia"] = df["data"].dt.day
+
+# Identificar o mês selecionado em data_inicial
+data_inicial = pd.Timestamp(data_inicial)  # Supondo que esta é a data selecionada
+data_selecionada = data_inicial
+
+# Filtrar os dados para o mês selecionado
+df_filtrado = df[(df["ano"] == data_selecionada.year) & (df["mes"] == data_selecionada.month)]
+
+
+# Filtrar o DataFrame para a fazenda selecionada (ou todas)
+if fazenda_selecionada != 'Todas':
+    df_filtrado = df_filtrado[df_filtrado['fazenda'] == fazenda_selecionada]
+
+# Agrupar os dados por dia
+df_grouped = df_filtrado.groupby(["ano", "mes", "dia"]).sum(numeric_only=True).reset_index()
+
+# Criar uma nova coluna com o formato "Dia/Mês"
+df_grouped["Dia/Mês"] = df_grouped.apply(lambda row: f"{str(int(row['dia'])).zfill(2)}/{str(int(row['mes'])).zfill(2)}", axis=1)
+
+# Criar o histograma
+fig = go.Figure()
+
+# Adicionar barras para Almoço | Janta
+fig.add_trace(go.Bar(
+    x=df_grouped["Dia/Mês"],
+    y=df_grouped["Almoço | Janta"],
+    name="Almoço | Janta",
+    marker_color="#81a8b4",
+    showlegend=True  # Remover legenda das cores
+))
+
+# Adicionar barras para Café | Lanche
+fig.add_trace(go.Bar(
+    x=df_grouped["Dia/Mês"],
+    y=df_grouped["Café | Lanche"],
+    name="Café | Lanche",
+    marker_color="#6882a0",
+    showlegend=True  # Remover legenda das cores
+))
+
+# Identificar o último dia registrado no mês
+ultimo_dia = df_grouped['dia'].max()
+
+# Adicionar linhas verticais a cada 7 dias a partir do último dia registrado
+linhas_verticais = []
+for day in range(ultimo_dia, df_grouped['dia'].min() - 1, -7):
+    if day in df_grouped['dia'].values:
+        day_label = df_grouped[df_grouped['dia'] == day]["Dia/Mês"].values[0]
+        linhas_verticais.append(day_label)
+        fig.add_shape(
+            type="line",
+            x0=day_label,
+            x1=day_label,
+            y0=0,
+            y1=df_grouped[["Almoço | Janta", "Café | Lanche"]].max().max(),
+            line=dict(color="#b3112e", width=1, dash="dot")
+        )
+
+# Pegar os valores de Almoço | Janta e Café | Lanche do último dia do mês selecionado
+ultimo_dia_almoco_janta = df_grouped["Almoço | Janta"].iloc[-1]
+ultimo_dia_cafe_lanche = df_grouped["Café | Lanche"].iloc[-1]
+
+# Adicionar a linha horizontal para Almoço | Janta do último dia
+fig.add_shape(
+    type="line",
+    x0=df_grouped["Dia/Mês"].iloc[0],
+    x1=df_grouped["Dia/Mês"].iloc[-1],
+    y0=ultimo_dia_almoco_janta,
+    y1=ultimo_dia_almoco_janta,
+    line=dict(color="#1d6e85", width=1.5, dash="dashdot")
+)
+
+# Adicionar a linha horizontal para Café | Lanche do último dia
+fig.add_shape(
+    type="line",
+    x0=df_grouped["Dia/Mês"].iloc[0],
+    x1=df_grouped["Dia/Mês"].iloc[-1],
+    y0=ultimo_dia_cafe_lanche,
+    y1=ultimo_dia_cafe_lanche,
+    line=dict(color="#34527e", width=1.5, dash="dashdot")
+)
+
+# Configurar as datas do eixo x
+if len(df_grouped) < 14:
+    tickvals = df_grouped["Dia/Mês"].tolist()
+else:
+    tickvals = linhas_verticais
+
+# Configuração do gráfico
+fig.update_yaxes(showline=True, linecolor="Grey", linewidth=0.1, gridcolor='lightgrey', dtick=10, range=[0, df_grouped["Almoço | Janta"].max() + 10])
+fig.update_xaxes(
+    showline=True, 
+    linecolor="Grey", 
+    linewidth=0.1, 
+    gridcolor='lightgrey',
+    tickmode='array',
+    tickvals=tickvals,
+    tickformat="%d/%m"
+)
+fig.update_layout(
+    margin=dict(l=0, r=0, t=30, b=0),
+    height=284,
+    title=" ",
+    title_text=f'-HISTOGRAMA QUANTIDADE REFEIÇÕES AGRUPADAS ({data_utils.mapa_meses[data_inicial.month].upper()}/{data_inicial.year})',
+    title_x=0,
+    title_y=1,
+    title_font_color="rgb(98,83,119)",
+    title_font_size=15,
+    barmode='group',  # Configurar as barras para serem agrupadas lado a lado
+    yaxis=dict(showticklabels=False),
+    xaxis_title="Período",
+    legend=dict(x=0.7315, y=1.115, orientation='h')  # Configurar a posição da legenda
+)
+
+# Exibir o gráfico no Streamlit
+ct6.plotly_chart(fig, use_container_width=True, automargin=True)
 
 ########################################################################################
 ####### GRAFICO AREA HISTORICO QUANTIDADES #############################################
@@ -683,7 +686,7 @@ data_fim_area = pd.Timestamp(df['data'].max())
 periodo_area = f"{data_utils.mapa_meses[data_inicial_area.month].upper()}/{data_inicial_area.year} A {data_utils.mapa_meses[data_fim_area.month].upper()}/{data_fim_area.year}"
 
 # Configuração do gráfico
-fig.update_yaxes(showline=True, linecolor="Grey", linewidth=0.1, gridcolor='lightgrey', dtick=5000)
+fig.update_yaxes(showline=True, linecolor="Grey", linewidth=0.1, gridcolor='lightgrey', dtick=2000)
 fig.update_xaxes(
     showline=True, 
     linecolor="Grey", 
@@ -693,17 +696,17 @@ fig.update_xaxes(
     tickvals=tickvals,
 )
 fig.update_layout(
-    margin=dict(l=0, r=0, t=30, b=0),
-    height=284,
-    title=f"-HISTÓRICO QUANTIDADE DE REFEIÇÕES AGRUPADAS ({periodo_area})",
+    margin=dict(l=5, r=0, t=28, b=0),
+    height=147.5,
+    title=f"-HISTÓRICO REFEIÇÕES AGRUPADAS ({periodo_area})",
     title_font_color="rgb(98,83,119)",
     title_font_size=15,
-    yaxis_title="Quantidade",
-    xaxis_title="Período",
     legend=dict(x=0.722, y=1.09, orientation='h'),
     title_x=0,
     title_y=1,
+    yaxis=dict(showticklabels=False),
+    showlegend=False
 )
 
 # Exibir o gráfico no Streamlit
-ct6.plotly_chart(fig, use_container_width=True, automargin=True)
+ct2.plotly_chart(fig, use_container_width=True, automargin=True)
