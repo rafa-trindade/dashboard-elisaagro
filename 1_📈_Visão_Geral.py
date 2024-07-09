@@ -626,7 +626,7 @@ fig.add_trace(go.Scatter(
     mode='lines+markers+text',
     name="Almoço | Janta",
     fill='tozeroy',
-    marker_color="#176f87",
+    marker_color=style_utils.barra_verde,
 ))
 
 # Adicionar a área para Café | Lanche
@@ -636,7 +636,7 @@ fig.add_trace(go.Scatter(
     mode='lines+markers+text',
     name="Café | Lanche",
     fill='tozeroy',
-    marker_color="#2d5480",
+    marker_color=style_utils.barra_azul,
     fillcolor="#6c87a6"
 ))
 
