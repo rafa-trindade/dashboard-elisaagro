@@ -121,7 +121,6 @@ data_inicial = col_data_ini.date_input(
     key="data_inicio_key"
 )
 
-
 if validate_date(data_inicial, available_dates):
     # Atualize o min_value de data_fim com base na seleção de data_inicial
     data_fim = col_data_fim.date_input(
@@ -130,7 +129,8 @@ if validate_date(data_inicial, available_dates):
         min_value=data_inicial, 
         max_value=max_date, 
         format="DD/MM/YYYY", 
-        key="data_fim_key"
+        key="data_fim_key",
+        help="Para visualizar um dia em específico selecione o mesmo dia em Data Início e Data Fim"
     )
     
 if data_inicial:
