@@ -93,10 +93,46 @@ if df['data'].max().day < 20:
 else:
     mes_inicial_padrão = dt.date(ano_atual, mes_atual, 20)
 
-data_inicial = col_data_ini.date_input('Data Início:', df['data'].max(), None, format="DD/MM/YYYY",  key="data_inicio_key")
-data_fim = col_data_fim.date_input('Data Fim:', None, format="DD/MM/YYYY", key="data_fim_key")
+# Suponha que seu dataframe `df` tenha uma coluna de data chamada 'data'
+df['data'] = pd.to_datetime(df['data'])  # Certifique-se de que a coluna 'data' esteja no formato datetime
+
+# Crie um conjunto de todas as datas disponíveis no dataframe
+available_dates = set(df['data'].dt.date)
+
+# Defina a data mínima e máxima disponíveis no dataframe
+min_date = df['data'].min().date()
+max_date = df['data'].max().date()
+
+# Função para validar a data selecionada
+def validate_date(selected_date, available_dates):
+    if selected_date in available_dates:
+        return True
+    else:
+        st.error(f"A data {selected_date.strftime('%d/%m/%Y')} não está disponível. Por favor, selecione uma data válida.")
+        return False
+
+# Usando os componentes date_input
+data_inicial = col_data_ini.date_input(
+    'Data Início:', 
+    max_date, 
+    min_value=min_date, 
+    max_value=max_date, 
+    format="DD/MM/YYYY",  
+    key="data_inicio_key"
+)
 
 
+if validate_date(data_inicial, available_dates):
+    # Atualize o min_value de data_fim com base na seleção de data_inicial
+    data_fim = col_data_fim.date_input(
+        'Data Fim:', 
+        max_date,
+        min_value=data_inicial, 
+        max_value=max_date, 
+        format="DD/MM/YYYY", 
+        key="data_fim_key"
+    )
+    
 if data_inicial:
     data_inicial = pd.Timestamp(data_inicial)
 if data_fim:
