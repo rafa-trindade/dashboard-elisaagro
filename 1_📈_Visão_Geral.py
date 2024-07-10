@@ -28,31 +28,6 @@ df_elisa = pd.read_csv(csv_url, sep=";", decimal=",", thousands=".", usecols=['d
 # Convertendo a coluna 'data' para o tipo datetime após carregar o dataframe
 df_elisa['data'] = pd.to_datetime(df_elisa['data'], format='%d/%m/%Y', errors='coerce')
 
-# Fazendas a serem agrupadas
-fazendas_santa_elisa = ['São Francisco', 'Canaã', 'Augusta', 'Santa Joana', 'Aparecida', 'Taquari']
-fazendas_silo = ['Cidade', 'Água Limpa', 'El Dorado']
-
-# Função para agrupar valores
-def agrupar_fazendas(df, nova_fazenda, fazendas_agrupadas):
-    df_agrupado = df[df['fazenda'].isin(fazendas_agrupadas)].groupby('data').sum().reset_index()
-    df_agrupado['fazenda'] = nova_fazenda
-    return df_agrupado
-
-# Agrupar valores para Santa Elisa
-df_santa_elisa_agrupado = agrupar_fazendas(df_elisa, 'Santa Elisa', fazendas_santa_elisa)
-
-# Agrupar valores para Silo
-df_silo_agrupado = agrupar_fazendas(df_elisa, 'Silo', fazendas_silo)
-
-# Filtrar o DataFrame original removendo as fazendas agrupadas
-df_filtrado = df_elisa[~df_elisa['fazenda'].isin(fazendas_santa_elisa + fazendas_silo)]
-
-# Mesclar os DataFrames agrupados com o DataFrame filtrado
-df_resultado = pd.concat([df_filtrado, df_santa_elisa_agrupado, df_silo_agrupado])
-
-# Agrupar os resultados finais para somar os valores das fazendas remanescentes
-df_elisa = df_resultado.groupby(['data', 'fazenda']).sum().reset_index()
-
 
 # Opção de seleção no Streamlit
 opcao = st.sidebar.selectbox(
