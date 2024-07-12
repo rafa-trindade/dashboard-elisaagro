@@ -530,7 +530,7 @@ fig.add_trace(go.Bar(
     name="Almoço | Janta",
     marker_color="#81a8b4",
     showlegend=True,  # Remover legenda das cores
-    text=df_grouped.apply(lambda row: f"{int(row['Almoço | Janta'])}" if row["Dia/Mês"] in linhas_verticais else "", axis=1)
+    text=df_grouped.apply(lambda row: f"<b>{int(row['Almoço | Janta'])}</b>" if row["Dia/Mês"] in linhas_verticais else "", axis=1)
 ))
 
 # Adicionar barras para Café | Lanche
@@ -540,16 +540,17 @@ fig.add_trace(go.Bar(
     name="Café | Lanche",
     marker_color="#6882a0",
     showlegend=True,  # Remover legenda das cores
-    text=df_grouped.apply(lambda row: f"{int(row['Café | Lanche'])}" if row["Dia/Mês"] in linhas_verticais else "", axis=1)
+    text=df_grouped.apply(lambda row: f"<b>{int(row['Café | Lanche'])}</b>" if row["Dia/Mês"] in linhas_verticais else "", axis=1)
 ))
 
 fig.update_traces(
     textposition='outside',
-    textangle=0,
+    textangle=-45,
     textfont=dict(
-        color=style_utils.barra_azul_escuro,
+        color="black",
     )    
 )
+
 
 # Adicionar linhas verticais ao gráfico
 for day_label in linhas_verticais:
