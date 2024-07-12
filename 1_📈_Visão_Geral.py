@@ -499,12 +499,19 @@ df_grouped = df_filtrado.groupby(["ano", "mes", "dia"]).sum(numeric_only=True).r
 # Criar uma nova coluna com o formato "Dia/Mês"
 df_grouped["Dia/Mês"] = df_grouped.apply(lambda row: f"{str(int(row['dia'])).zfill(2)}/{str(int(row['mes'])).zfill(2)}", axis=1)
 
-# Identificar o último dia registrado no mês
-ultimo_dia = df_grouped['dia'].max()
+# Identificar o dia selecionado no mês
+dia_selecionado = data_selecionada.day
 
-# Adicionar linhas verticais a cada 7 dias a partir do último dia registrado
+# Adicionar linhas verticais a cada 7 dias para trás e para frente a partir do dia selecionado
 linhas_verticais = []
-for day in range(ultimo_dia, df_grouped['dia'].min() - 1, -7):
+# Para trás
+for day in range(dia_selecionado, df_grouped['dia'].min() - 1, -7):
+    if day in df_grouped['dia'].values:
+        day_label = df_grouped[df_grouped['dia'] == day]["Dia/Mês"].values[0]
+        linhas_verticais.append(day_label)
+        
+# Para frente
+for day in range(dia_selecionado + 7, df_grouped['dia'].max() + 1, 7):
     if day in df_grouped['dia'].values:
         day_label = df_grouped[df_grouped['dia'] == day]["Dia/Mês"].values[0]
         linhas_verticais.append(day_label)
