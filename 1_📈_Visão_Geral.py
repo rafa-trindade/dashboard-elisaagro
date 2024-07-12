@@ -266,7 +266,7 @@ fig_tabela_dia.update_layout(
                                 domain=[0.3, 1]  # Ajuste os valores conforme necessário
                             ),
                             #title={ 'text': "-FECHAMENTO DE " + periodo, 'y':0.92, 'x':0.0, 'xanchor': 'left', 'yanchor': 'top'},
-                            height=138,
+                            height=139,
                             margin=dict(r=0, t=20,b=0)
 )
 
@@ -732,7 +732,7 @@ fig.update_xaxes(
 )
 fig.update_layout(
     margin=dict(l=5, r=0, t=28, b=0),
-    height=147.5,
+    height=145.5,
     title=f"-HISTÓRICO REFEIÇÕES AGRUPADAS ({periodo_area})",
     title_font_color="rgb(98,83,119)",
     title_font_size=15,
