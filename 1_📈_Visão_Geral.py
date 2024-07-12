@@ -547,7 +547,7 @@ fig.update_traces(
     textposition='outside',
     textangle=-45,
     textfont=dict(
-        color="black",
+        color=style_utils.barra_azul_escuro,
     )    
 )
 
