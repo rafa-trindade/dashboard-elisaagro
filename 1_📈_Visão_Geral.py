@@ -27,6 +27,7 @@ df_elisa = pd.read_csv(csv_url, sep=";", decimal=",", thousands=".", usecols=['d
 
 # Convertendo a coluna 'data' para o tipo datetime após carregar o dataframe
 df_elisa['data'] = pd.to_datetime(df_elisa['data'], format='%d/%m/%Y', errors='coerce')
+df_elisa['fazenda'] = df_elisa['fazenda'].astype('category')
 
 
 # Opção de seleção no Streamlit
@@ -170,10 +171,10 @@ elif data_fim:
 
 lista_fazenda = df['fazenda'].unique().tolist()
 
-qtd_almoco = filtered_df.groupby("fazenda")[["almoco"]].sum()
-qtd_janta = filtered_df.groupby("fazenda")[["janta"]].sum()
-qtd_cafe = filtered_df.groupby("fazenda")[["cafe"]].sum()
-qtd_lanche = filtered_df.groupby("fazenda")[["lanche"]].sum()
+qtd_almoco = filtered_df.groupby("fazenda")[["almoco"]].sum(numeric_only=True)
+qtd_janta = filtered_df.groupby("fazenda")[["janta"]].sum(numeric_only=True)
+qtd_cafe = filtered_df.groupby("fazenda")[["cafe"]].sum(numeric_only=True)
+qtd_lanche = filtered_df.groupby("fazenda")[["lanche"]].sum(numeric_only=True)
 
 qtd_almoco = qtd_almoco.reindex(lista_fazenda)
 qtd_janta = qtd_janta.reindex(lista_fazenda)
@@ -279,10 +280,10 @@ data_frame['Janta'] = pd.to_numeric(data_frame['Janta'], errors='coerce')
 # Dados para o gráfico de barras
 categorias = ['Café', 'Almoço', 'Lanche', 'Janta']
 valores = [
-    data_frame['Café'].sum(),
-    data_frame['Almoço'].sum(),
-    data_frame['Lanche'].sum(),
-    data_frame['Janta'].sum()
+    data_frame['Café'].sum(numeric_only=True),
+    data_frame['Almoço'].sum(numeric_only=True),
+    data_frame['Lanche'].sum(numeric_only=True),
+    data_frame['Janta'].sum(numeric_only=True)
 ]
 
 # Criando o gráfico de barras
@@ -325,7 +326,7 @@ fazenda_total = filtered_df.groupby("fazenda")[["total"]].sum(numeric_only=True)
 fazenda_total = fazenda_total[fazenda_total['total'] > 0]
 
 # Calcular a porcentagem relativa ao total
-total_geral = fazenda_total['total'].sum()
+total_geral = fazenda_total['total'].sum(numeric_only=True)
 fazenda_total['porcentagem'] = fazenda_total['total'] / total_geral * 100
 
 # Adicionando uma coluna com os valores formatados em porcentagem
@@ -382,7 +383,7 @@ df_filtrado = df[(pd.to_datetime(df['data']).dt.month == data_inicial.month) &
                 (pd.to_datetime(df['data']).dt.year == data_inicial.year)]
 
 # Agrupar e somar os valores por data e fazenda
-df_agrupado = df_filtrado.groupby(['data', 'fazenda']).sum().reset_index()
+df_agrupado = df_filtrado.groupby(['data', 'fazenda']).sum(numeric_only=True).reset_index()
 
 # Renomear as colunas
 df_agrupado = df_agrupado.rename(columns={'cafe': 'Café', 'almoco': 'Almoço', 'lanche': 'Lanche', 'janta': 'Janta'})  
@@ -422,7 +423,7 @@ df_selecionado = df_filtrado_fazenda[df_filtrado_fazenda['Refeição'] == tipo_r
 # Filtrar pelo fazenda selecionada
 if fazenda_selecionada == 'Todas':
     # Agrupar por data para obter a soma de todas as fazendas
-    df_selecionado = df_selecionado.groupby('data').sum().reset_index()
+    df_selecionado = df_selecionado.groupby('data').sum(numeric_only=True).reset_index()
 
 # Criando a figura com go.Box
 fig_box = go.Figure()
