@@ -591,7 +591,7 @@ fig.add_shape(
 )
 
 # Configurar as datas do eixo x
-if len(df_grouped) < 14:
+if len(df_grouped) < 21:
     tickvals = df_grouped["Dia/Mês"].tolist()
 else:
     tickvals = linhas_verticais
