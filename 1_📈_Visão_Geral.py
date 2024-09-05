@@ -455,7 +455,7 @@ fig_box.update_layout(
 fig_box.update_yaxes(
     zerolinecolor='lightgrey',
     autorange=True,
-    autorangeoptions=dict(maxallowed = df_selecionado['Valor'].max() + 1, minallowed = df_selecionado['Valor'].min() - 1 ),
+    autorangeoptions=dict(maxallowed = df_selecionado['Valor'].max() + 10, minallowed = df_selecionado['Valor'].min() - 10 ),
     dtick=5,
     showline=False, 
     linecolor="Grey", 
@@ -597,7 +597,7 @@ else:
     tickvals = linhas_verticais
 
 # Configuração do gráfico
-fig.update_yaxes(showline=True, linecolor="Grey", linewidth=0.1, gridcolor='lightgrey', dtick=10, range=[0, df_grouped["Almoço | Janta"].max() + 20])
+fig.update_yaxes(showline=True, linecolor="Grey", linewidth=0.1, gridcolor='lightgrey', dtick=10, range=[0, df_grouped["Almoço | Janta"].max() + 40])
 fig.update_xaxes(
     showline=True, 
     linecolor="Grey", 
