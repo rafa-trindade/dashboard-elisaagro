@@ -598,8 +598,16 @@ with tab1:
     previous_month = current_month - 1 if current_month != 1 else 12
     previous_year = current_year if current_month != 1 else current_year - 1
 
-    previous_almoco_janta_value = df_grouped_area[(df_grouped_area["ano"] == previous_year) & (df_grouped_area["mes"] == previous_month)]["Almoço | Janta"].values[0]
-    previous_cafe_lanche_value = df_grouped_area[(df_grouped_area["ano"] == previous_year) & (df_grouped_area["mes"] == previous_month)]["Café | Lanche"].values[0]
+    # Filtrando o DataFrame
+    filtered_df = df_grouped_area[(df_grouped_area["ano"] == previous_year) & (df_grouped_area["mes"] == previous_month)]
+
+    # Verificando se há dados antes de acessar os valores
+    if not filtered_df.empty:
+        previous_almoco_janta_value = filtered_df["Almoço | Janta"].values[0]
+        previous_cafe_lanche_value = filtered_df["Café | Lanche"].values[0]
+    else:
+        previous_almoco_janta_value = 0  # Defina um valor padrão adequado
+        previous_cafe_lanche_value = 0   # Defina um valor padrão adequado
 
     fig_area = go.Figure()
 
