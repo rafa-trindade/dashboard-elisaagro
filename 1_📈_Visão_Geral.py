@@ -27,7 +27,7 @@ main_body_logo = "https://i.postimg.cc/3xkGPmC6/streamlit02.png"
 st.logo(sidebar_logo, icon_image=main_body_logo)
 
 # Define a data de início do contrato
-data_inicio = pd.Timestamp('2024-03-01')
+data_inicio = pd.Timestamp('2025-02-01')
 
 # ---------------------------------------------------------------------
 # CARREGAMENTO DOS DADOS
