@@ -45,7 +45,7 @@ df_elisa['fazenda'] = df_elisa['fazenda'].astype('category')
 # Opção de seleção no Streamlit (Todas as datas ou Contrato Vigente)
 opcao = st.sidebar.selectbox(
     "Selecione:",
-    ("Todas as datas", "Contrato Vigente")
+    ("Todas as datas", "MH Refeições")
 )
 
 # Filtrar o DataFrame conforme a opção selecionada
