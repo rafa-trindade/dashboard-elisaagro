@@ -39,26 +39,12 @@ col1_side.markdown('<h5 style="margin-bottom: 15px; color: #053061;">Última Atu
 col2_side.markdown('<h5 style="margin-bottom: 15px; text-align: end; color: #053061;">' + str(df['data'].max().strftime('%d/%m/%Y'))+ '</h5>', unsafe_allow_html=True)
 
 
-col1_side.markdown('<h5 style="margin-bottom: -25px;">Contrato Vigente:</h5>', unsafe_allow_html=True)
-col2_side.markdown('<h5 style="text-align: end; margin-bottom: -25px;">02/2027</h5>', unsafe_allow_html=True)
-
 # Ordenar o DataFrame com base na coluna 'data' para obter a data mais recente e pegar a última linha
 linha_mais_recente = df.sort_values(by='data', ascending=False).iloc[0]
 
 # Atribuir os valores às variáveis
 valor_refeicao = "R$ {:,.2f}".format(linha_mais_recente['vlrAlmoco']).replace(".", "@").replace(",", ".").replace("@", ",")
 valor_lanche = "R$ {:,.2f}".format(linha_mais_recente['vlrCafe']).replace(".", "@").replace(",", ".").replace("@", ",")
-
-col1_side.markdown('<h5 style="margin-bottom: -25px;">Refeição:</h5>', unsafe_allow_html=True)
-col2_side.markdown(f'<h5 style="text-align: end; margin-bottom: -25px;">{valor_refeicao}</h5>', unsafe_allow_html=True)
-col1_side.markdown('<h5 style="margin-bottom: -25px;">Lanche:</h5>', unsafe_allow_html=True)
-col2_side.markdown(f'<h5 style="text-align: end; margin-bottom: -25px;">{valor_lanche}</h5>', unsafe_allow_html=True)
-
-
-
-st.sidebar.write("____")
-
-
 
 link_url = "https://drive.google.com/drive/folders/1LQS1tEYiy3xGVXaUMb_77jQcngjZOgXA?usp=drive_link"
 
