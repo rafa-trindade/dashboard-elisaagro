@@ -1,5 +1,5 @@
 import numpy as np
-import plotly.express as px # type: ignore
+import plotly.express as px 
 import streamlit as st
 
 barra_azul = "#2d5480" 
@@ -8,33 +8,25 @@ barra_azul_escuro = "#2d5c80"
 barra_verde = "#176f87"
 barra_vermelha = "#a22938"
 
-
-
 barra_verde_claro = px.colors.sequential.Darkmint[3]
 barra_verde_escuro = "#176f87"
 
 barra_cinza_claro = "#c6d0d2"
 barra_cinza_escuro = "#c6d0d2"
 
-
 conjunto_cores = px.colors.diverging.RdBu
 
 
-
-
 def table_highlight_rows(data):
-    # Cores de fundo
     header_bg_color = '#2166ac'
-    total_row_bg_color = '#053061'  # Cor para a linha inteira com "TOTAL" na coluna Data
-    total_column_bg_color = '#4393c3'  # Cor para a coluna TOTAL
+    total_row_bg_color = '#053061'  
+    total_column_bg_color = '#4393c3'  
     column_colors = ['#eeeeee', '#dddddd']
 
-    # Cores de fonte
     header_font_color = 'white'
     total_font_color = 'white'
     default_font_color = 'black'
 
-    # Lista de estilos
     styles = []
     for idx, row in data.iterrows():
         row_style = []
@@ -59,7 +51,6 @@ def table_highlight_rows(data):
     return np.array(styles)
 
 
-# Defina a função para aplicar estilo CSS
 def aplicar_estilo():
     st.markdown(
         """
