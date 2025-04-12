@@ -49,10 +49,10 @@ opcao = st.sidebar.selectbox(
 
 # Filtrar o DataFrame conforme a opção selecionada
 if opcao == "Todas as datas":
-    df = df_elisa
+    df = df_elisa.copy()
     data_menu = df['data'].min()
 else:
-    df = df_elisa[df_elisa['data'] >= data_inicio]
+    df = df_elisa[df_elisa['data'] >= data_inicio].copy()
     data_menu = df['data'].min()
 
 col1_side, col2_side = st.sidebar.columns([2,1])
@@ -176,10 +176,10 @@ with tab1:
     ########################################################################################
     ####### TABELA FECHAMENTO DIÁRIO #######################################################
     ########################################################################################
-    qtd_almoco = filtered_df.groupby("fazenda")[["almoco"]].sum(numeric_only=True).reindex(lista_fazenda)
-    qtd_janta = filtered_df.groupby("fazenda")[["janta"]].sum(numeric_only=True).reindex(lista_fazenda)
-    qtd_cafe = filtered_df.groupby("fazenda")[["cafe"]].sum(numeric_only=True).reindex(lista_fazenda)
-    qtd_lanche = filtered_df.groupby("fazenda")[["lanche"]].sum(numeric_only=True).reindex(lista_fazenda)
+    qtd_almoco = filtered_df.groupby("fazenda", observed=False)[["almoco"]].sum(numeric_only=True).reindex(lista_fazenda)
+    qtd_janta = filtered_df.groupby("fazenda", observed=False)[["janta"]].sum(numeric_only=True).reindex(lista_fazenda)
+    qtd_cafe = filtered_df.groupby("fazenda", observed=False)[["cafe"]].sum(numeric_only=True).reindex(lista_fazenda)
+    qtd_lanche = filtered_df.groupby("fazenda", observed=False)[["lanche"]].sum(numeric_only=True).reindex(lista_fazenda)
 
     lista_almoco = qtd_almoco["almoco"].tolist()
     lista_janta = qtd_janta["janta"].tolist()
@@ -306,7 +306,7 @@ with tab1:
     ########################################################################################
     ####### GRÁFICO PIZZA (DISTRIBUIÇÃO POR FAZENDA) ######################################
     ########################################################################################
-    fazenda_total = filtered_df.groupby("fazenda")[["total"]].sum(numeric_only=True).reset_index()
+    fazenda_total = filtered_df.groupby("fazenda", observed=False)[["total"]].sum(numeric_only=True).reset_index()
     fazenda_total = fazenda_total[fazenda_total['total'] > 0]
     total_geral = fazenda_total['total'].sum(numeric_only=True)
     fazenda_total['porcentagem'] = fazenda_total['total'] / total_geral * 100
@@ -357,7 +357,7 @@ with tab1:
     df_filtrado_mes = df[(pd.to_datetime(df['data']).dt.month == data_inicial.month) &
                          (pd.to_datetime(df['data']).dt.year == data_inicial.year)]
 
-    df_agrupado = df_filtrado_mes.groupby(['data', 'fazenda']).sum(numeric_only=True).reset_index()
+    df_agrupado = df_filtrado_mes.groupby(['data', 'fazenda'], observed=False).sum(numeric_only=True).reset_index()
     df_agrupado = df_agrupado.rename(columns={'cafe': 'Café', 'almoco': 'Almoço', 'lanche': 'Lanche', 'janta': 'Janta'})  
 
     df_long = df_agrupado.melt(id_vars=['data', 'fazenda'], value_vars=['Café', 'Almoço', 'Lanche', 'Janta'], 
@@ -385,7 +385,7 @@ with tab1:
     df_selecionado = df_filtrado_fazenda[df_filtrado_fazenda['Refeição'] == tipo_refeicao]
 
     if fazenda_selecionada == 'Todas':
-        df_selecionado = df_selecionado.groupby('data').sum(numeric_only=True).reset_index()
+        df_selecionado = df_selecionado.groupby('data', observed=False).sum(numeric_only=True).reset_index()
 
     fig_box = go.Figure()
     colors = {"Café": "#2d5480", "Almoço": "#2d5480", "Lanche": "#2d5480", "Janta": "#2d5480"}
@@ -431,11 +431,13 @@ with tab1:
     ########################################################################################
     ####### HISTOGRAMA MENSAL QUANTIDADES POR DIA ##########################################
     ########################################################################################
-    df["Almoço | Janta"] = df["almoco"] + df["janta"]
-    df["Café | Lanche"] = df["cafe"] + df["lanche"]
-    df["ano"] = df["data"].dt.year
-    df["mes"] = df["data"].dt.month
-    df["dia"] = df["data"].dt.day
+    # Create a copy to avoid SettingWithCopyWarning
+    df = df.copy()
+    df.loc[:, "Almoço | Janta"] = df["almoco"] + df["janta"]
+    df.loc[:, "Café | Lanche"] = df["cafe"] + df["lanche"]
+    df.loc[:, "ano"] = df["data"].dt.year
+    df.loc[:, "mes"] = df["data"].dt.month
+    df.loc[:, "dia"] = df["data"].dt.day
 
     data_selecionada = data_inicial
     df_filtrado_hist = df[(df["ano"] == data_selecionada.year) & (df["mes"] == data_selecionada.month)]
@@ -539,12 +541,14 @@ with tab1:
     ########################################################################################
     ####### GRÁFICO ÁREA HISTÓRICO QUANTIDADES (LONGO PRAZO) ###############################
     ########################################################################################
-    df["Almoço | Janta"] = df["almoco"] + df["janta"]
-    df["Café | Lanche"] = df["cafe"] + df["lanche"]
-    df["ano"] = df["data"].dt.year
-    df["mes"] = df["data"].dt.month
+    # Create a copy to avoid SettingWithCopyWarning
+    df = df.copy()
+    df.loc[:, "Almoço | Janta"] = df["almoco"] + df["janta"]
+    df.loc[:, "Café | Lanche"] = df["cafe"] + df["lanche"]
+    df.loc[:, "ano"] = df["data"].dt.year
+    df.loc[:, "mes"] = df["data"].dt.month
 
-    df_grouped_area = df.groupby(["ano", "mes"]).sum(numeric_only=True).reset_index()
+    df_grouped_area = df.groupby(["ano", "mes"], observed=False).sum(numeric_only=True).reset_index()
     df_grouped_area["Mês/Ano"] = df_grouped_area.apply(lambda row: f"{data_utils.mapa_meses[int(row['mes'])]}/{int(row['ano'])}", axis=1)
 
     data_inicial_area = pd.Timestamp(df['data'].min())
