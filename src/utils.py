@@ -12,7 +12,7 @@ barra_vermelha = "#a22938"
 barra_cinza_claro = "#c6d0d2"
 barra_cinza_escuro = "#c6d0d2"
 
-#Cria um dicionário de meses por extenso
+# Dicionário de meses por extenso
 mapa_meses = {
     1: 'Janeiro', 2: 'Fevereiro', 3: 'Março', 4: 'Abril',
     5: 'Maio', 6: 'Junho', 7: 'Julho', 8: 'Agosto',
@@ -23,6 +23,17 @@ mapa_meses = {
 meses_mapa = {
     "Janeiro": 1, "Fevereiro": 2, "Março": 3, "Abril": 4, "Maio": 5, "Junho": 6,
     "Julho": 7, "Agosto": 8, "Setembro": 9, "Outubro": 10, "Novembro": 11, "Dezembro": 12
+}
+
+# Dicionário para traduzir os dias da semana
+traducao_dias = {
+    'Monday': 'Segunda-feira',
+    'Tuesday': 'Terça-feira',
+    'Wednesday': 'Quarta-feira',
+    'Thursday': 'Quinta-feira',
+    'Friday': 'Sexta-feira',
+    'Saturday': 'Sábado',
+    'Sunday': 'Domingo'
 }
 
 lista_meses = ["Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"]
