@@ -1,6 +1,7 @@
 import numpy as np
-import plotly.express as px # type: ignore
+import plotly.express as px 
 import streamlit as st
+import pandas as pd 
 
 barra_azul = "#2d5480" 
 barra_azul_escuro = "#2d5c80"
@@ -146,3 +147,53 @@ def aplicar_estilo():
         """,
         unsafe_allow_html=True
     )
+
+
+def generate_metadata(dataframe):
+    """
+    Gera um dataframe contendo metadados das colunas do dataframe fornecido.
+
+    :param dataframe: DataFrame para o qual os metadados serão gerados.
+    :return: DataFrame contendo metadados.
+    """
+
+    # Coleta de metadados básicos
+    metadata = pd.DataFrame({
+        'nome_variavel': dataframe.columns,
+        'tipo': dataframe.dtypes,
+        'qt_nulos': dataframe.isnull().sum(),
+        'percent_nulos': round((dataframe.isnull().sum() / len(dataframe))* 100,2),
+        'cardinalidade': dataframe.nunique(),
+    })
+    metadata=metadata.sort_values(by='tipo')
+    metadata = metadata.reset_index(drop=True)
+
+    return metadata
+
+
+def lista_valores_unicos(dataframe, coluna_categorica):
+
+    # Criação da lista de dicionários para consolidar os dados
+    linhas = []
+
+    for col in [coluna_categorica]:
+        total = dataframe[col].value_counts().sum()  # total apenas das top 5 (ou use df[col].count() para o total geral)
+        #top_valores = df[col].value_counts().head(5)
+        top_valores = dataframe[col].value_counts()
+
+
+        for categoria, qtd in top_valores.items():
+            porcentagem = (qtd / dataframe[col].count()) * 100  # percentual sobre o total da coluna
+            linhas.append({
+                'Coluna': col,
+                'Categoria': categoria,
+                'Cardinalidade': qtd,
+                'Porcentagem': f"{porcentagem:.2f}%"
+            })
+
+    # Criando o DataFrame consolidado
+    df_valores_unicos = pd.DataFrame(linhas)
+
+    # Exibindo a tabela
+    return df_valores_unicos
+

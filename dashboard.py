@@ -430,7 +430,6 @@ with tab1:
     ########################################################################################
     ####### HISTOGRAMA MENSAL QUANTIDADES POR DIA ##########################################
     ########################################################################################
-    # Create a copy to avoid SettingWithCopyWarning
     df = df.copy()
     df.loc[:, "Almoço | Janta"] = df["almoco"] + df["janta"]
     df.loc[:, "Café | Lanche"] = df["cafe"] + df["lanche"]
@@ -540,7 +539,6 @@ with tab1:
     ########################################################################################
     ####### GRÁFICO ÁREA HISTÓRICO QUANTIDADES (LONGO PRAZO) ###############################
     ########################################################################################
-    # Create a copy to avoid SettingWithCopyWarning
     df = df.copy()
     df.loc[:, "Almoço | Janta"] = df["almoco"] + df["janta"]
     df.loc[:, "Café | Lanche"] = df["cafe"] + df["lanche"]
