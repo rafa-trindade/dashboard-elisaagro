@@ -1,5 +1,5 @@
 import numpy as np
-import plotly.express as px # type: ignore
+import plotly.express as px
 import streamlit as st
 
 barra_azul = "#2d5480" 
