@@ -6,9 +6,8 @@ import numpy as np
 from datetime import datetime
 import datetime as dt
 
-import utils.data_utils as data_utils
-import utils.string_utils as string_utils
-import utils.style_utils as style_utils
+import src.utils as util
+
 
 # ---------------------------------------------------------------------
 # Configurações iniciais da página e estilo
@@ -20,7 +19,7 @@ st.set_page_config(
     page_icon="📊")
 
 # Chamar a função para aplicar o estilo no início do script
-style_utils.aplicar_estilo()
+util.aplicar_estilo()
 
 sidebar_logo = "https://i.postimg.cc/j5mwCcfV/logo-elisa.png"
 main_body_logo = "https://i.postimg.cc/3xkGPmC6/streamlit02.png"
@@ -314,7 +313,7 @@ with tab1:
 
     fig_venda_fazenda = px.pie(fazenda_total, names='fazenda', values='porcentagem', 
                                color='fazenda', 
-                               color_discrete_sequence=[style_utils.barra_vermelha, style_utils.barra_azul, style_utils.barra_verde_escuro],
+                               color_discrete_sequence=[util.barra_vermelha, util.barra_azul, util.barra_verde_escuro],
                                hover_data=['porcentagem_formatada'])
 
     fig_venda_fazenda.update_traces(
@@ -403,7 +402,7 @@ with tab1:
     fig_box.update_layout(
         height=284,
         margin=dict(l=0, r=0, t=30, b=0),
-        title_text=f'-BOX PLOT QTD. DE REFEIÇÕES ({data_utils.mapa_meses[data_inicial.month].upper()}/{data_inicial.year})',
+        title_text=f'-BOX PLOT QTD. DE REFEIÇÕES ({util.mapa_meses[data_inicial.month].upper()}/{data_inicial.year})',
         title_font_color="rgb(98,83,119)",
         title_font_size=15,
         showlegend=False,
@@ -468,7 +467,7 @@ with tab1:
         text=df_grouped.apply(lambda row: f"<b>{int(row['Almoço | Janta'])}</b>" if row["Dia/Mês"] in linhas_verticais else "", axis=1),
         textposition='outside',
         textangle=-45,
-        textfont=dict(color=style_utils.barra_verde_escuro,)
+        textfont=dict(color=util.barra_verde_escuro,)
     ))
 
     fig_hist.add_trace(go.Bar(
@@ -479,7 +478,7 @@ with tab1:
         text=df_grouped.apply(lambda row: f"<b>{int(row['Café | Lanche'])}</b>" if row["Dia/Mês"] in linhas_verticais else "", axis=1),
         textposition='outside',
         textangle=-45,
-        textfont=dict(color=style_utils.barra_azul_escuro,)
+        textfont=dict(color=util.barra_azul_escuro,)
     ))
 
     for day_label in linhas_verticais:
@@ -524,7 +523,7 @@ with tab1:
     fig_hist.update_layout(
         margin=dict(l=0, r=0, t=30, b=0),
         height=284,
-        title_text=f'-HISTOGRAMA QUANTIDADE REFEIÇÕES AGRUPADAS ({data_utils.mapa_meses[data_inicial.month].upper()}/{data_inicial.year})',
+        title_text=f'-HISTOGRAMA QUANTIDADE REFEIÇÕES AGRUPADAS ({util.mapa_meses[data_inicial.month].upper()}/{data_inicial.year})',
         title_x=0,
         title_y=1,
         title_font_color="rgb(98,83,119)",
@@ -549,11 +548,11 @@ with tab1:
     df.loc[:, "mes"] = df["data"].dt.month
 
     df_grouped_area = df.groupby(["ano", "mes"], observed=False).sum(numeric_only=True).reset_index()
-    df_grouped_area["Mês/Ano"] = df_grouped_area.apply(lambda row: f"{data_utils.mapa_meses[int(row['mes'])]}/{int(row['ano'])}", axis=1)
+    df_grouped_area["Mês/Ano"] = df_grouped_area.apply(lambda row: f"{util.mapa_meses[int(row['mes'])]}/{int(row['ano'])}", axis=1)
 
     data_inicial_area = pd.Timestamp(df['data'].min())
     data_fim_area = pd.Timestamp(df['data'].max())
-    periodo_area = f"{data_utils.mapa_meses[data_inicial_area.month].upper()}/{data_inicial_area.year} A {data_utils.mapa_meses[data_fim_area.month].upper()}/{data_fim_area.year}"
+    periodo_area = f"{util.mapa_meses[data_inicial_area.month].upper()}/{data_inicial_area.year} A {util.mapa_meses[data_fim_area.month].upper()}/{data_fim_area.year}"
 
     current_month = pd.Timestamp.now().month
     current_year = pd.Timestamp.now().year
@@ -577,7 +576,7 @@ with tab1:
         mode='lines+markers+text',
         name="Almoço | Janta",
         fill='tozeroy',
-        marker_color=style_utils.barra_verde,
+        marker_color=util.barra_verde,
     ))
 
     fig_area.add_trace(go.Scatter(
@@ -586,7 +585,7 @@ with tab1:
         mode='lines+markers+text',
         name="Café | Lanche",
         fill='tozeroy',
-        marker_color=style_utils.barra_azul,
+        marker_color=util.barra_azul,
         fillcolor="#6c87a6"
     ))
 
@@ -611,7 +610,7 @@ with tab1:
     previous_month_years = df_grouped_area[df_grouped_area["mes"] == previous_month]["ano"].values
     linhas_verticais = []
     for year in previous_month_years:
-        month_year_label = f"{data_utils.mapa_meses[previous_month]}/{year}"
+        month_year_label = f"{util.mapa_meses[previous_month]}/{year}"
         linhas_verticais.append(month_year_label)
         fig_area.add_shape(
             type="line",
