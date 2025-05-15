@@ -171,6 +171,7 @@ def generate_metadata(dataframe):
     return metadata
 
 
+
 def lista_valores_unicos(dataframe, coluna_categorica):
 
     # Criação da lista de dicionários para consolidar os dados

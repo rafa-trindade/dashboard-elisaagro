@@ -8,7 +8,6 @@ import datetime as dt
 
 import src.utils as util
 
-
 # ---------------------------------------------------------------------
 # Configurações iniciais da página e estilo
 # ---------------------------------------------------------------------
