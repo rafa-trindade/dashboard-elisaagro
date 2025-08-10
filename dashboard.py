@@ -80,7 +80,7 @@ def validate_date(selected_date, available_dates):
 ########################################################################################
 ####### ABA FECHAMENTOS DIÁRIOS #########################################################
 ########################################################################################
-with tab1:
+with tab1[0]:
     with st.container(border=True):
         col_data_ini, col_data_fim = st.columns(2)
         col1, col2, col3  = st.columns([1.775,1.7,1])   

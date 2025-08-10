@@ -2,8 +2,6 @@ import numpy as np
 import plotly.express as px 
 import streamlit as st
 import pandas as pd 
-import matplotlib.pyplot as plt
-from prophet import Prophet
 
 
 barra_azul = "#2d5480" 
@@ -199,131 +197,8 @@ def prever_e_plotar(df_filtrado, coluna, titulo, cor):
     )
 
 
-def generate_metadata(dataframe):
-    """
-    Gera um dataframe contendo metadados das colunas do dataframe fornecido.
-
-    :param dataframe: DataFrame para o qual os metadados serão gerados.
-    :return: DataFrame contendo metadados.
-    """
-
-    # Coleta de metadados básicos
-    metadata = pd.DataFrame({
-        'nome_variavel': dataframe.columns,
-        'tipo': dataframe.dtypes,
-        'qt_nulos': dataframe.isnull().sum(),
-        'percent_nulos': round((dataframe.isnull().sum() / len(dataframe))* 100,2),
-        'cardinalidade': dataframe.nunique(),
-    })
-    metadata=metadata.sort_values(by='tipo')
-    metadata = metadata.reset_index(drop=True)
-
-    return metadata
 
 
 
-def lista_valores_unicos(dataframe, coluna_categorica):
-
-    # Criação da lista de dicionários para consolidar os dados
-    linhas = []
-
-    for col in [coluna_categorica]:
-        total = dataframe[col].value_counts().sum()  # total apenas das top 5 (ou use df[col].count() para o total geral)
-        #top_valores = df[col].value_counts().head(5)
-        top_valores = dataframe[col].value_counts()
 
 
-        for categoria, qtd in top_valores.items():
-            porcentagem = (qtd / dataframe[col].count()) * 100  # percentual sobre o total da coluna
-            linhas.append({
-                'Coluna': col,
-                'Categoria': categoria,
-                'Cardinalidade': qtd,
-                'Porcentagem': f"{porcentagem:.2f}%"
-            })
-
-    # Criando o DataFrame consolidado
-    df_valores_unicos = pd.DataFrame(linhas)
-
-    # Exibindo a tabela
-    return df_valores_unicos
-
-
-def prophet_tipo(df_filtrado, coluna, titulo, cor):
-    # Agrupa por data somando a coluna desejada
-    df_serie = df_filtrado.groupby('data')[coluna].sum().reset_index()
-    df_serie.columns = ['ds', 'y']
-    
-    # Cria e treina o modelo Prophet
-    modelo = Prophet()
-    modelo.fit(df_serie)
-    
-    # Gera datas futuras (30 dias)
-    futuro = modelo.make_future_dataframe(periods=30)
-    previsao = modelo.predict(futuro)
-    
-    # Plotagem do gráfico com intervalo de confiança
-    plt.figure(figsize=(12, 6))
-    plt.plot(previsao['ds'], previsao['yhat'], color=cor, label='Previsão')
-    plt.fill_between(previsao['ds'], previsao['yhat_lower'], previsao['yhat_upper'],
-                     color=cor, alpha=0.2, label='Intervalo de confiança')
-    plt.title(titulo)
-    plt.xlabel('Data')
-    plt.ylabel('Quantidade Prevista')
-    plt.legend()
-    
-    # Tabela com os últimos 7 dias previstos
-    tabela_prev = previsao[['ds', 'yhat']].tail(5).copy()
-    tabela_prev['ds'] = tabela_prev['ds'].dt.strftime('%Y-%m-%d')
-    tabela_prev['yhat'] = tabela_prev['yhat'].round(2)
-
-    plt.table(cellText=tabela_prev.values,
-              colLabels=['Data', f'Previsão {titulo}'],
-              cellLoc='center',
-              loc='bottom',
-              bbox=[0.0, -0.45, 1.0, 0.3])  
-    plt.subplots_adjust(bottom=0.3)
-    plt.show()
-
-
-def prophet_fazenda(df_filtrado, fazenda, coluna, titulo, cor):
-
-
-    # Filtra só os dados da fazenda desejada
-    df_fazenda = df_filtrado[df_filtrado['fazenda'] == fazenda]
-    
-    # Agrupa por data e soma a coluna desejada
-    df_serie = df_fazenda.groupby('data')[coluna].sum().reset_index()
-    df_serie.columns = ['ds', 'y']
-    
-    if df_serie['y'].sum() == 0:
-        print(f"Sem dados para {titulo} na fazenda {fazenda}. Pulando...")
-        return
-    
-    modelo = Prophet()
-    modelo.fit(df_serie)
-    
-    futuro = modelo.make_future_dataframe(periods=30)
-    previsao = modelo.predict(futuro)
-    
-    plt.figure(figsize=(12, 6))
-    plt.plot(previsao['ds'], previsao['yhat'], color=cor, label='Previsão')
-    plt.fill_between(previsao['ds'], previsao['yhat_lower'], previsao['yhat_upper'],
-                     color=cor, alpha=0.2, label='Intervalo de confiança')
-    plt.title(f'{titulo} - Fazenda: {fazenda}')
-    plt.xlabel('Data')
-    plt.ylabel('Quantidade Prevista')
-    plt.legend()
-    
-    tabela_prev = previsao[['ds', 'yhat']].tail(7).copy()
-    tabela_prev['ds'] = tabela_prev['ds'].dt.strftime('%Y-%m-%d')
-    tabela_prev['yhat'] = tabela_prev['yhat'].round(2)
-    
-    plt.table(cellText=tabela_prev.values,
-              colLabels=['Data', f'Previsão {titulo}'],
-              cellLoc='center',
-              loc='bottom',
-              bbox=[0, -0.5, 1, 0.3])
-    
-    plt.subplots_adjust(bottom=0.3)
-    plt.show()
