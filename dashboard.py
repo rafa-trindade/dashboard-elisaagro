@@ -63,7 +63,7 @@ col1_side.markdown('<h5 style="margin-bottom: 15px; color: #053061;">Última Atu
 col2_side.markdown('<h5 style="margin-bottom: 15px; text-align: end; color: #053061;">' + str(df['data'].max().strftime('%d/%m/%Y'))+ '</h5>', unsafe_allow_html=True)
 
 # Criação das abas
-tab1, tab2 = st.tabs(["📅 Fechamentos Diários", "📕 Notebook"])
+tab1 = st.tabs(["📅 Fechamentos Diários"])
 
 # Função auxiliar para validar se a data selecionada está disponível no DataFrame
 def validate_date(selected_date, available_dates):
@@ -639,9 +639,4 @@ with tab1:
 
 
 
-with tab2:
 
-    with st.container(border=True):
-        nbviewer_url = "https://nbviewer.org/github/rafa-trindade/dashboard_elisaagro/blob/main/notebooks/eda.ipynb"
-
-        st.components.v1.iframe(nbviewer_url, height=750, scrolling=True)
