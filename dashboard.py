@@ -17,7 +17,7 @@ st.set_page_config(
     initial_sidebar_state="expanded", 
     page_icon="📊")
 
-# Chamar a função para aplicar o estilo no início do script
+# Chamar a função para aplicar o estilo
 util.aplicar_estilo()
 
 sidebar_logo = "https://i.postimg.cc/j5mwCcfV/logo-elisa.png"
@@ -427,7 +427,7 @@ with tab1[0]:
 
 
     ########################################################################################
-    ####### HISTOGRAMA MENSAL QUANTIDADES POR DIA ##########################################
+    ####### GRÁFICO MENSAL QUANTIDADES POR DIA ##########################################
     ########################################################################################
     df = df.copy()
     df.loc[:, "Almoço | Janta"] = df["almoco"] + df["janta"]
@@ -521,7 +521,7 @@ with tab1[0]:
     fig_hist.update_layout(
         margin=dict(l=0, r=0, t=30, b=0),
         height=284,
-        title_text=f'-HISTOGRAMA QUANTIDADE REFEIÇÕES AGRUPADAS ({util.mapa_meses[data_inicial.month].upper()}/{data_inicial.year})',
+        title_text=f'-QUANTIDADE DE REFEIÇÕES AGRUPADAS ({util.mapa_meses[data_inicial.month].upper()}/{data_inicial.year})',
         title_x=0,
         title_y=1,
         title_font_color="rgb(98,83,119)",
