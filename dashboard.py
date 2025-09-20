@@ -30,8 +30,10 @@ data_inicio = pd.Timestamp('2025-02-01')
 # ---------------------------------------------------------------------
 # CARREGAMENTO DOS DADOS
 # ---------------------------------------------------------------------
-csv_url = "data/databaseElisa.csv"
-df_elisa = pd.read_csv(csv_url, sep=";", decimal=",", thousands=".", 
+file_id = "1JHpQjQnVjVHYOBBYoQ8-KVVB0QLt_nONA7nfVURhI3Y"
+csv_url = f"https://docs.google.com/spreadsheets/d/{file_id}/export?format=csv"
+
+df_elisa = pd.read_csv(csv_url, sep=",", decimal=",", thousands=".", 
                        usecols=['data', 'fazenda', 'almoco', 'janta', 'cafe', 'lanche', 'vlrCafe', 'vlrAlmoco', 'total'], 
                        index_col=None)
 
