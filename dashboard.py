@@ -20,7 +20,7 @@ st.set_page_config(
 # Chamar a função para aplicar o estilo
 util.aplicar_estilo()
 
-sidebar_logo = "https://i.postimg.cc/j5mwCcfV/logo-elisa.png"
+sidebar_logo = "https://i.postimg.cc/XY1vRpXd/elisa.png"
 main_body_logo = "https://i.postimg.cc/3xkGPmC6/streamlit02.png"
 st.logo(sidebar_logo, icon_image=main_body_logo)
 
