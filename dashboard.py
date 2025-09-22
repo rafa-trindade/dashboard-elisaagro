@@ -13,7 +13,7 @@ import src.utils as util
 # ---------------------------------------------------------------------
 st.set_page_config(
     layout="wide",
-    page_title="B2B Refeições | Elisa Agro", 
+    page_title="MH Refeições | Elisa Agro", 
     initial_sidebar_state="expanded", 
     page_icon="📊")
 
