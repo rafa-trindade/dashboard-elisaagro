@@ -17,15 +17,15 @@ Este dashboard foi desenvolvido para permitir que o cliente acompanhem a quantid
 
 ## 📸 Capturas de Tela
 
-#### Painel Principal (Cliente)
+#### - Painel Principal (Cliente)
 ![Dashboard Cliente](docs/elisa-agro-03.png)
 
-#### Painel Principal (Interno)
+#### - Painel Principal (Interno)
 ![Painel Principal](docs/elisa-agro-01.png)
 
-#### Histórico Faturamento (Interno)
+#### - Histórico Faturamento (Interno)
 ![Histórico Faturamento](docs/elisa-agro-04.png)
 
-#### Relatórios (Fechamentos) (Cliente e Interno)
+#### - Relatórios (Fechamentos) (Cliente e Interno)
 ![Relatórios (Fechamentos)](docs/elisa-agro-02.png)
 
