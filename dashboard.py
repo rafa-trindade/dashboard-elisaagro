@@ -5,7 +5,7 @@ import plotly.graph_objects as go
 import numpy as np
 from datetime import datetime
 import datetime as dt
-
+from src.pdf import listar_arquivos_docs, exportar_pdf
 import src.utils as util
 
 # ---------------------------------------------------------------------
@@ -64,8 +64,99 @@ col2_side.markdown(f'<h5 style="text-align: end; margin-bottom: -25px;">{data_me
 col1_side.markdown('<h5 style="margin-bottom: 15px; color: #053061;">Última Atualização:</h5>', unsafe_allow_html=True)
 col2_side.markdown('<h5 style="margin-bottom: 15px; text-align: end; color: #053061;">' + str(df['data'].max().strftime('%d/%m/%Y'))+ '</h5>', unsafe_allow_html=True)
 
-# Criação das abas
-tab1 = st.tabs(["📅 Fechamentos Diários"])
+tab1, tab2 = st.tabs(["📅 Fechamentos Diários", "📂 Relatório (Fechamentos)"])
+
+with tab2:
+    arquivos = listar_arquivos_docs()
+
+    if not arquivos:
+        st.warning("Nenhum arquivo DOC encontrado na pasta.")
+    else:
+        # Lista apenas nomes
+        nomes = [f["name"] for f in arquivos]
+
+        # Extrair ano e mês do padrão AAAAMM-SEQ
+        anos_meses = sorted(
+            {(n[:4], n[4:6]) for n in nomes if len(n) >= 6},
+            key=lambda x: (x[0], x[1])
+        )
+
+        # Pegar último ano/mês disponível
+        ultimo_ano, ultimo_mes = anos_meses[-1]
+
+
+        with st.container(border=True):
+           col_ano, col_mes, col_drop, col_convert, col_download = st.columns([2, 2, 3, 2, 2])
+        
+
+        with col_ano:
+            anos_disp = sorted({a for a, m in anos_meses})
+            ano_sel = st.selectbox(
+                "Selecione o Ano:",
+                anos_disp,
+                index=anos_disp.index(ultimo_ano),
+                key="ano_docs"
+            )
+
+        with col_mes:
+            meses_disp = sorted({m for a, m in anos_meses if a == ano_sel})
+            # Converter meses para extenso
+            meses_labels = [util.mapa_meses[int(m)] for m in meses_disp]
+            mes_idx_default = meses_disp.index(ultimo_mes) if ano_sel == ultimo_ano else 0
+
+            mes_sel_label = st.selectbox(
+                "Selecione o Mês:",
+                meses_labels,
+                index=mes_idx_default,
+                key="mes_docs"
+            )
+
+            # Converter de volta para número (com zero à esquerda)
+            mes_sel = f"{list(util.mapa_meses.keys())[list(util.mapa_meses.values()).index(mes_sel_label)]:02d}"
+
+        # Filtrar documentos pelo ano/mês selecionado
+        nomes_filtrados = [
+            n for n in nomes if n.startswith(f"{ano_sel}{mes_sel}")
+        ]
+
+        with col_drop:
+            escolha = st.selectbox(
+                "Selecione um Fechamento: (aaaamm-seq)",
+                nomes_filtrados,
+                key="drop_docs"
+            )
+
+        # Botão de exportar PDF
+        with col_convert:
+            st.markdown("<div style='margin-top: 27.8px;'>", unsafe_allow_html=True)
+            if st.button("⬇️ Exportar como PDF", key="export_pdf_tab3", use_container_width=True):
+                idx = nomes.index(escolha)
+                file_id = arquivos[idx]["id"]
+                nome_arquivo = arquivos[idx]["name"]
+                fh, nome_pdf = exportar_pdf(file_id, nome_arquivo)
+                download_data = fh.getvalue()
+            st.markdown("</div>", unsafe_allow_html=True)
+
+        # Botão de download PDF
+        with col_download:
+            st.markdown("<div style='margin-top: 27.8px;'>", unsafe_allow_html=True)
+            if "download_data" in locals() and download_data and nome_pdf:
+                st.download_button(
+                    label="📥 Download PDF",
+                    data=download_data,
+                    file_name=nome_pdf,
+                    mime="application/pdf",
+                    key="download_pdf_tab3",
+                    use_container_width=True
+                )
+            st.markdown("</div>", unsafe_allow_html=True)
+
+        # Exibir Google Doc original
+        idx = nomes.index(escolha)
+        file_id = arquivos[idx]["id"]
+        doc_url = f"https://docs.google.com/document/d/{file_id}/preview"
+        with st.container(border=True):
+            st.components.v1.iframe(src=doc_url, height=450, scrolling=True)
 
 # Função auxiliar para validar se a data selecionada está disponível no DataFrame
 def validate_date(selected_date, available_dates):
@@ -82,7 +173,7 @@ def validate_date(selected_date, available_dates):
 ########################################################################################
 ####### ABA FECHAMENTOS DIÁRIOS #########################################################
 ########################################################################################
-with tab1[0]:
+with tab1:
     with st.container(border=True):
         col_data_ini, col_data_fim = st.columns(2)
         col1, col2, col3  = st.columns([1.775,1.7,1])   
